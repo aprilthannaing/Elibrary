@@ -1,9 +1,25 @@
-CREATE TABLE `category` (
+CREATE TABLE `user` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,
  `name` varchar(100) DEFAULT NULL,
+ `hluttawboId` varchar(255) NOT NULL,
+ `departmentboId` varchar(255) NOT NULL,
+ `positionboId` varchar(255) NOT NULL,
+ `email`  varchar(100) DEFAULT NULL,
+ `phoneNo`  varchar(100) DEFAULT NULL,
+ `password`  varchar(255) DEFAULT NULL,
+ `role`  varchar(100) DEFAULT NULL,
+ `type` varchar(255) DEFAULT NULL,
+ `createdDate` varchar(255) DEFAULT NULL,
+ `modifiedDate` varchar(255) DEFAULT NULL,
  `entityStatus` varchar(100) DEFAULT NULL,
-PRIMARY KEY (`boId`)
+ PRIMARY KEY (`boId`),
+ KEY `FK_s9ffjsajfkhsj89797` (`hluttawboId`),
+ CONSTRAINT `FK_s9ffjsajfkhsj89797` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`boId`),
+ KEY `FK_s9fffjwbesflkjso987` (`departmentboId`),
+ CONSTRAINT `FK_s9fffjwbesflkjso987` FOREIGN KEY (`departmentboId`) REFERENCES `department` (`boId`),
+ KEY `FK_sfjfhwfwshiowse8975430` (`positionboId`),
+ CONSTRAINT `FK_sfjfhwfwshiowse8975430` FOREIGN KEY (`positionboId`) REFERENCES `position` (`boId`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `book` (
@@ -63,28 +79,6 @@ CREATE TABLE `journal` (
   PRIMARY KEY (`boId`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `author` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `engName` varchar(50) DEFAULT NULL,
- `myanmarName` varchar(50) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-PRIMARY KEY (`boId`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-CREATE TABLE `bookauthor` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `authorboId` varchar(255) DEFAULT NULL,
- `bookboId` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
- PRIMARY KEY (`boId`),
- KEY `efsjkdflsfsdljfsdu9w384234jb3km` (`authorboId`),
- KEY `70mi0ken87492384792873djfkjs8d` (`bookboId`),
- CONSTRAINT `efsjkdflsfsdljfsdu9w384234jb3km` FOREIGN KEY (`authorboId`) REFERENCES `author` (`boId`),
- CONSTRAINT `70mi0ken87492384792873djfkjs8d` FOREIGN KEY (`bookboId`) REFERENCES `book` (`boId`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-
 CREATE TABLE `history` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,
@@ -99,7 +93,6 @@ CREATE TABLE `history` (
  CONSTRAINT `70mi0kenmvfnjsldfksokjs8d` FOREIGN KEY (`userboId`) REFERENCES `user` (`boId`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE `session` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,
@@ -113,59 +106,68 @@ CREATE TABLE `session` (
  CONSTRAINT `70mfjwlofilskmofjfksokjs8d` FOREIGN KEY (`userboId`) REFERENCES `user` (`boId`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `author` (
+  `id` bigint NOT NULL,
+  `boId` varchar(255) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `engName` varchar(50) DEFAULT NULL,
+  `myanmarName` varchar(50) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`boId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `bookauthor` (
+  `id` bigint NOT NULL,
+  `boId` varchar(255) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `authorboId` varchar(255) DEFAULT NULL,
+  `bookboId` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`boId`),
+  KEY `efsjkdflsfsdljfsdu9w384234jb3km` (`authorboId`),
+  KEY `70mi0ken87492384792873djfkjs8d` (`bookboId`),
+  CONSTRAINT `70mi0ken87492384792873djfkjs8d` FOREIGN KEY (`bookboId`) REFERENCES `book` (`boId`),
+  CONSTRAINT `efsjkdflsfsdljfsdu9w384234jb3km` FOREIGN KEY (`authorboId`) REFERENCES `author` (`boId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `category` (
+  `id` bigint NOT NULL,
+  `boId` varchar(255) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `type` varchar(100) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`boId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `hluttaw` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `name` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`boId`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
+  `id` bigint NOT NULL,
+  `boId` varchar(255) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`boId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `department` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `hluttawboId` varchar(255) NOT NULL,
- `name` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `boId` varchar(255) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `hluttawboId` varchar(255) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`boId`),
- KEY `FK_s9y70mfjwiqoafj94228` (`hluttawboId`),
-CONSTRAINT `FK_s9y70mfjwiqoafj94228` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`boId`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
+  KEY `FK_s9y70mfjwiqoafj94228` (`hluttawboId`),
+  CONSTRAINT `FK_s9y70mfjwiqoafj94228` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`boId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `position` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `departmentboId` varchar(255) NOT NULL,
- `name` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `boId` varchar(255) NOT NULL,
+  `departmentboId` varchar(255) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`boId`),
- KEY `FK_s9fhuowafoeiihfi34820` (`departmentboId`),
-CONSTRAINT `FK_s9fhuowafoeiihfi34820` FOREIGN KEY (`departmentboId`) REFERENCES `department` (`boId`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-
-CREATE TABLE `user` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `hluttawboId` varchar(255) NOT NULL,
- `departmentboId` varchar(255) NOT NULL,
- `positionboId` varchar(255) NOT NULL,
- `name` varchar(100) DEFAULT NULL,
- `email`  varchar(100) DEFAULT NULL,
- `phoneNo`  varchar(100) DEFAULT NULL,
- `password`  varchar(255) DEFAULT NULL,
- `role`  varchar(100) DEFAULT NULL,
- `type` varchar(255) DEFAULT NULL,
- `createdDate` varchar(255) DEFAULT NULL,
- `modifiedDate` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
- PRIMARY KEY (`boId`),
- KEY `FK_s9ffjsajfkhsj89797` (`hluttawboId`),
- CONSTRAINT `FK_s9ffjsajfkhsj89797` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`boId`),
- KEY `FK_s9fffjwbesflkjso987` (`departmentboId`),
- CONSTRAINT `FK_s9fffjwbesflkjso987` FOREIGN KEY (`departmentboId`) REFERENCES `department` (`boId`),
- KEY `FK_sfjfhwfwshiowse8975430` (`positionboId`),
- CONSTRAINT `FK_sfjfhwfwshiowse8975430` FOREIGN KEY (`positionboId`) REFERENCES `position` (`boId`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  KEY `FK_s9fhuowafoeiihfi34820` (`departmentboId`),
+  CONSTRAINT `FK_s9fhuowafoeiihfi34820` FOREIGN KEY (`departmentboId`) REFERENCES `department` (`boId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
