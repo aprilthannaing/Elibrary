@@ -6,34 +6,71 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "book")
-public class Book extends AbstractReadingObject implements Serializable{
+public class Book extends AbstractReadingObject implements Serializable {
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private String ISBN;
+
+	private String publisher;
+
+	private int edition;
+
+	private String publishedYear;
+
+	private String pdfLink;
+
+	private String sort;
+
+	private String path;
+
+	private String seriesIndex;
+
+	private String size;
+	
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "categoryboId")
 	private Category category;
 	
-	private String ISBN;
-	
-	private String publisher;
-	
-	private int edition;
-	
-	private String publishedYear;
-	
-	private String pdfLink;
-	
-    private String sort;
-    
-    private String path;
-    
-    private String seriesIndex;
-    
-    
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "categoryboId")
+	private SubCategory subCategory;
+
+	public String getSort() {
+		return sort;
+	}
+
+	public void setSort(String sort) {
+		this.sort = sort;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getSeriesIndex() {
+		return seriesIndex;
+	}
+
+	public void setSeriesIndex(String seriesIndex) {
+		this.seriesIndex = seriesIndex;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
+
 	public Category getCategory() {
 		return category;
 	}
@@ -81,9 +118,5 @@ public class Book extends AbstractReadingObject implements Serializable{
 	public void setPdfLink(String pdfLink) {
 		this.pdfLink = pdfLink;
 	}
-	
-	
-	
-	
 
 }

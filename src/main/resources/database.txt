@@ -1,7 +1,7 @@
 CREATE TABLE `category` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,
- `type` varchar(100) DEFAULT NULL,
+ `name` varchar(100) DEFAULT NULL,
  `entityStatus` varchar(100) DEFAULT NULL,
 PRIMARY KEY (`boId`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -22,6 +22,9 @@ CREATE TABLE `book` (
  `state` varchar(50) DEFAULT NULL,
  `modifiedDate` varchar(50) DEFAULT NULL,
  `createdDate` varchar(50) DEFAULT NULL,
+ `sort` varchar(50) DEFAULT NULL,
+ `path` varchar(255) DEFAULT NULL,
+ `` varchar(50) DEFAULT NULL,
  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`boId`),
   KEY `FK_s9y70mi0ken20v5xk44h573hd` (`categoryboId`),

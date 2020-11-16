@@ -40,4 +40,12 @@ public class AbstractEntity {
 	public void setEntityStatus(EntityStatus entityStatus) {
 		this.entityStatus = entityStatus;
 	}
+
+	public boolean isBoIdRequired(String boId) {
+		return SystemConstant.BOID_REQUIRED.equals(boId);
+	}
+	
+	public boolean isIdRequired(Long id) {
+		return SystemConstant.ID_REQUIRED.equals(Id);
+	}
 }

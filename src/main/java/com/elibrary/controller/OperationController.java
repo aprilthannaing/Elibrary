@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
-import com.elibrary.entity.CategoryType;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
@@ -20,6 +19,7 @@ import com.elibrary.entity.Journal;
 import com.elibrary.entity.Magazine;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.State;
+import com.elibrary.entity.SystemConstant;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.UserType;
@@ -115,7 +115,7 @@ public class OperationController {
 	@ResponseBody
 	@JsonView(Views.Detailed.class)
 	public Journal saveJournal(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		
+
 		Journal journal = new Journal();
 		journal.setId(1);
 		journal.setBoId("fksjaf;sj");
@@ -128,7 +128,7 @@ public class OperationController {
 		journal.setCreatedDate("12.02.2020");
 		journal.setEntityStatus(EntityStatus.ACTIVE);
 		journalService.save(journal);
-		
+
 //		String journalId = json.get("id").toString();
 //		String boId = json.get("boId").toString();
 //		String weeklyNo = json.get("weeklyNo").toString();
@@ -150,13 +150,13 @@ public class OperationController {
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public User saveUser() throws ServiceUnavailableException {
-		
+
 		Hluttaw hluttaw = new Hluttaw();
 		hluttaw.setBoId("iruewiro");
-		
+
 		Department department = new Department();
 		department.setBoId("94723824");
-		
+
 		Position position = new Position();
 		position.setBoId("fiowurwp");
 
@@ -183,18 +183,13 @@ public class OperationController {
 	@RequestMapping(value = "saveCategory", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public Category saveCategory() throws ServiceUnavailableException {
-
-		String categoryName = null;
-
+	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		Category category = new Category();
-		category.setId(001);
-		category.setBoId("50843730");
-		category.setType(CategoryType.Law);
+		category.setId(SystemConstant.ID_REQUIRED);
+		category.setBoId(SystemConstant.BOID_REQUIRED);
+		category.setName(json.get("name").toString());
 		category.setEntityStatus(EntityStatus.ACTIVE);
 		categoryService.save(category);
-
-		return category;
 	}
 
 	@RequestMapping(value = "saveAuthor", method = RequestMethod.POST)
@@ -212,7 +207,7 @@ public class OperationController {
 
 		return author;
 	}
-	
+
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -231,9 +226,7 @@ public class OperationController {
 //		journal.setEntityStatus(EntityStatus.INACTIVE);
 		journalService.delete(journal);
 		return message;
-		
-	}
 
-	
+	}
 
 }
