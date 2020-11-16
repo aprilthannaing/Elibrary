@@ -134,6 +134,9 @@ ALTER TABLE session ADD COLUMN paymentConfirmationDate varchar(255) DEFAULT NULL
 ALTER TABLE cbpaytransaction ADD COLUMN checkedDateTime varchar(255) DEFAULT NULL; 
 ALTER TABLE cbpaytransaction ADD COLUMN createdDateTime varchar(255) DEFAULT NULL;
 ALTER TABLE cbpaytransaction ADD COLUMN sessionId varchar(255) DEFAULT NULL;
+ALTER TABLE visa ADD COLUMN entityStatus enum('ACTIVE','INACTIVE') NOT NULL;
+ALTER TABLE cbpaytransaction ADD COLUMN entityStatus enum('ACTIVE','INACTIVE') NOT NULL;
+ALTER TABLE mpupaymenttransaction ADD COLUMN entityStatus enum('ACTIVE','INACTIVE') NOT NULL;
 
 
 //user
