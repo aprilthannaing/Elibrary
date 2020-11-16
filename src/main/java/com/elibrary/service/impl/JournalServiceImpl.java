@@ -1,15 +1,11 @@
 package com.elibrary.service.impl;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.elibrary.dao.BookDao;
 import com.elibrary.dao.JournalDao;
 import com.elibrary.dao.impl.JournalDaoImpl;
-import com.elibrary.entity.Book;
 import com.elibrary.entity.Journal;
 import com.elibrary.service.JournalService;
 import com.mchange.rmi.ServiceUnavailableException;

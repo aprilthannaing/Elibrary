@@ -6,6 +6,14 @@ CREATE TABLE `category` (
 PRIMARY KEY (`boId`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `subcategory` (
+ `id` bigint(20) NOT NULL,
+ `boId` varchar(255) NOT NULL,
+ `name` varchar(100) DEFAULT NULL,
+ `entityStatus` varchar(100) DEFAULT NULL,
+PRIMARY KEY (`boId`)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 CREATE TABLE `book` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,
@@ -82,6 +90,18 @@ CREATE TABLE `bookauthor` (
  KEY `70mi0ken87492384792873djfkjs8d` (`bookboId`),
  CONSTRAINT `efsjkdflsfsdljfsdu9w384234jb3km` FOREIGN KEY (`authorboId`) REFERENCES `author` (`boId`),
  CONSTRAINT `70mi0ken87492384792873djfkjs8d` FOREIGN KEY (`bookboId`) REFERENCES `book` (`boId`)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `category_subcategory` (
+ `id` bigint(20) NOT NULL,
+ `categoryBoId` varchar(255) DEFAULT NULL,
+ `subCategoryBoId` varchar(255) DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `efsjkdflsfsdljfsfdfsdu9w384234jb3km` (`categoryBoId`),
+ KEY `70mi0ken874923sfsdfsdf84792873djfkjs8d` (`subCategoryBoId`),
+ CONSTRAINT `efsjkdflsfsdljfsfdfsdu9w384234jb3km` FOREIGN KEY (`categoryBoId`) REFERENCES `category` (`boId`),
+ CONSTRAINT `70mi0ken874923sfsdfsdf84792873djfkjs8d` FOREIGN KEY (`subCategoryBoId`) REFERENCES `subcategory` (`boId`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 

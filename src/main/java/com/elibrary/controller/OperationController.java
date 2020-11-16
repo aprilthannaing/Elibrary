@@ -19,6 +19,7 @@ import com.elibrary.entity.Journal;
 import com.elibrary.entity.Magazine;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.State;
+import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.SystemConstant;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
@@ -29,6 +30,7 @@ import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.elibrary.service.JournalService;
 import com.elibrary.service.MagazineService;
+import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -51,6 +53,9 @@ public class OperationController {
 
 	@Autowired
 	private CategoryService categoryService;
+	
+	@Autowired
+	private SubCategoryService subCategoryService;
 
 	@Autowired
 	private AuthorService authorService;
@@ -180,16 +185,29 @@ public class OperationController {
 		return user;
 	}
 
-	@RequestMapping(value = "saveCategory", method = RequestMethod.POST)
+	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public void saveSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		Category category = new Category();
 		category.setId(SystemConstant.ID_REQUIRED);
 		category.setBoId(SystemConstant.BOID_REQUIRED);
+		category.setSubCategories(subCategories);
 		category.setName(json.get("name").toString());
 		category.setEntityStatus(EntityStatus.ACTIVE);
 		categoryService.save(category);
+	}
+	
+	@RequestMapping(value = "savesubcategory", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		SubCategory subCategory = new SubCategory();
+		subCategory.setId(SystemConstant.ID_REQUIRED);
+		subCategory.setBoId(SystemConstant.BOID_REQUIRED);
+		subCategory.setName(json.get("name").toString());
+		subCategory.setEntityStatus(EntityStatus.ACTIVE);
+		subCategoryService.save(subCategory);
 	}
 
 	@RequestMapping(value = "saveAuthor", method = RequestMethod.POST)
