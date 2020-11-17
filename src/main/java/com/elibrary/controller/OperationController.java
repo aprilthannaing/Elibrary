@@ -184,7 +184,13 @@ public class OperationController {
 //		journal.setEntityStatus(EntityStatus.INACTIVE);
 		journalService.delete(journal);
 		return message;
-
 	}
-
+	
+	@RequestMapping(value = "hluttawSetup", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public String hluttawSetup(@RequestBody JSONObject json){
+		String desc = json.get("description").toString();
+		return "";
+	}
 }
