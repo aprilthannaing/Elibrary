@@ -22,7 +22,7 @@ public class Category extends AbstractEntity implements Serializable {
 	private String name;
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "category_subcategory", joinColumns = @JoinColumn(name = "categoryBoId"), inverseJoinColumns = @JoinColumn(name = "subCategoryBoId"))
+	@JoinTable(name = "category_subcategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
 	private List<SubCategory> subCategories;
 
 	public List<SubCategory> getSubCategories() {

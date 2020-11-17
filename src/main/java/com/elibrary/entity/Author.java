@@ -1,8 +1,11 @@
 package com.elibrary.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -13,6 +16,17 @@ public class Author extends AbstractEntity implements Serializable {
 	private String myanmarName;
 
 	private AuthorType authorType;
+
+	@ManyToMany(mappedBy = "authors")
+	private List<Book> books = new ArrayList<Book>();
+
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	public void setBooks(List<Book> books) {
+		this.books = books;
+	}
 
 	public AuthorType getAuthorType() {
 		return authorType;

@@ -1,11 +1,15 @@
 package com.elibrary.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -42,6 +46,18 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "subcategoryboId")
 	private SubCategory subCategory;
+
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "bookBoId"), inverseJoinColumns = @JoinColumn(name = "authorBoId"))
+	private List<Author> authors = new ArrayList<Author>();
+
+	public List<Author> getAuthors() {
+		return authors;
+	}
+
+	public void setAuthors(List<Author> authors) {
+		this.authors = authors;
+	}
 
 	public String getCallNo() {
 		return callNo;

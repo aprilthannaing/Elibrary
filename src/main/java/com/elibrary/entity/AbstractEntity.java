@@ -3,6 +3,8 @@ package com.elibrary.entity;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
@@ -12,11 +14,12 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class AbstractEntity {
 
 	@Id
-	@Column(name = "Id", unique = true, nullable = false)
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name = "id", unique = true, nullable = false)
 	private long Id;
 
 	@JsonView(Views.Thin.class)
-	@Column(name = "boId", unique = true, nullable = false)
+	@Column(name = "boId",nullable = false)
 	private String boId;
 
 	@Column(name = "entityStatus")

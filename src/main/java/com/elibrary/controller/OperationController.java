@@ -29,7 +29,6 @@ import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.elibrary.service.JournalService;
-import com.elibrary.service.MagazineService;
 import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -124,15 +123,18 @@ public class OperationController {
 		return user;
 	}
 
-	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
 	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public void saveSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		Category category = new Category();
-		category.setId(SystemConstant.ID_REQUIRED);
-		category.setBoId(SystemConstant.BOID_REQUIRED);
-		category.setSubCategories(subCategoryService.getAll());
-		category.setName(json.get("name").toString());
+		//category.setId(SystemConstant.ID_REQUIRED);
+		category.setBoId("CATEGORY10001");
+		logger.info("subCategoryService.getAll()!!!!!!!!!!!" + subCategoryService.findByBoId("SUBCATEGORY10000").getName());
+		category.getSubCategories().add(subCategoryService.findByBoId("SUBCATEGORY10000"));
+		//category.setName(json.get("name").toString());
+		category.setName("test");
 		category.setEntityStatus(EntityStatus.ACTIVE);
 		categoryService.save(category);
 	}
@@ -144,7 +146,7 @@ public class OperationController {
 	public JSONObject saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = new SubCategory();
-		subCategory.setId(SystemConstant.ID_REQUIRED);
+		//subCategory.setId(SystemConstant.ID_REQUIRED);
 		subCategory.setBoId(SystemConstant.BOID_REQUIRED);
 		Object description = json.get("description");
 		if (description == null || description.toString().isEmpty()) {

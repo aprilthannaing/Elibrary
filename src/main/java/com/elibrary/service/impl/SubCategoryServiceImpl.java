@@ -49,7 +49,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	public String getBoId() {
-		return "CATEGORY" + plus();
+		return "SUBCATEGORY" + plus();
 	}
 
 	public List<SubCategory> getAll() {
@@ -58,6 +58,14 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;
 		return subCategories;
+	}
+	
+	public SubCategory findByBoId(String boId) {
+		String query = "select sub from SubCategory sub where boId='" + boId + "'";
+		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(subCategories))
+			return null;
+		return subCategories.get(0);
 	}
 
 }
