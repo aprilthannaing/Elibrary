@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.elibrary.dao.SubCategoryDao;
-import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.mchange.rmi.ServiceUnavailableException;
 

@@ -7,10 +7,20 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "author")
-public class Author extends AbstractEntity implements Serializable{
+public class Author extends AbstractEntity implements Serializable {
 	private String engName;
-	
+
 	private String myanmarName;
+
+	private AuthorType authorType;
+
+	public AuthorType getAuthorType() {
+		return authorType;
+	}
+
+	public void setAuthorType(AuthorType authorType) {
+		this.authorType = authorType;
+	}
 
 	public String getEngName() {
 		return engName;
@@ -27,6 +37,5 @@ public class Author extends AbstractEntity implements Serializable{
 	public void setMyanmarName(String myanmarName) {
 		this.myanmarName = myanmarName;
 	}
-	
-	
+
 }

@@ -53,7 +53,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	public List<SubCategory> getAll() {
-		String query = "select * from SubCategory";
+		String query = "select sub from SubCategory sub";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;

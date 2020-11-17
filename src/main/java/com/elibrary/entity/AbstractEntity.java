@@ -1,8 +1,12 @@
 package com.elibrary.entity;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 @MappedSuperclass
 public class AbstractEntity {
@@ -11,10 +15,12 @@ public class AbstractEntity {
 	@Column(name = "Id", unique = true, nullable = false)
 	private long Id;
 
+	@JsonView(Views.Thin.class)
 	@Column(name = "boId", unique = true, nullable = false)
 	private String boId;
 
 	@Column(name = "entityStatus")
+	@Enumerated(EnumType.STRING)
 	private EntityStatus entityStatus;
 
 	public long getId() {

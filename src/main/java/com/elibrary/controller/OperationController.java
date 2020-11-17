@@ -141,13 +141,22 @@ public class OperationController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "savesubcategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject result = new JSONObject();
 		SubCategory subCategory = new SubCategory();
 		subCategory.setId(SystemConstant.ID_REQUIRED);
 		subCategory.setBoId(SystemConstant.BOID_REQUIRED);
-		subCategory.setName(json.get("name").toString());
+		Object description = json.get("description");
+		if (description == null || description.toString().isEmpty()) {
+			result.put("status", "0");
+			return result;
+		}
+
+		subCategory.setName(description.toString());
 		subCategory.setEntityStatus(EntityStatus.ACTIVE);
 		subCategoryService.save(subCategory);
+		result.put("status", "1");
+		return result;
 	}
 
 	@RequestMapping(value = "saveAuthor", method = RequestMethod.POST)

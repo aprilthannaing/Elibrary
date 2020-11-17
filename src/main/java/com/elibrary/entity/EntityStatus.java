@@ -1,5 +1,5 @@
 package com.elibrary.entity;
 
 public enum EntityStatus {
-     ACTIVE, INACTIVE;
+     ACTIVE, INACTIVE, DELETED;
 }
