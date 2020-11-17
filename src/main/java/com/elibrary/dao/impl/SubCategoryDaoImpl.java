@@ -5,15 +5,15 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.elibrary.dao.SubCategoryDao;
+import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Repository
-public class SubCategoryDaoImpl  extends AbstractDaoImpl<SubCategory, String> implements SubCategoryDao {
+public class SubCategoryDaoImpl extends AbstractDaoImpl<SubCategory, String> implements SubCategoryDao {
 
-	protected SubCategoryDaoImpl(Class<SubCategory> entityClass) {
+	protected SubCategoryDaoImpl() {
 		super(SubCategory.class);
-		
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class SubCategoryDaoImpl  extends AbstractDaoImpl<SubCategory, String> im
 	@Override
 	public void delete(SubCategory e) throws ServiceUnavailableException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
