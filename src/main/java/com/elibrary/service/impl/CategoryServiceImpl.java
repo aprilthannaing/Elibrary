@@ -47,6 +47,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 	public String getBoId() {
 		return "CATEGORY" + plus();
-	}
+	}	
 
 }
