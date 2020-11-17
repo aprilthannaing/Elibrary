@@ -11,21 +11,17 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "author")
 public class Author extends AbstractEntity implements Serializable {
-	private String engName;
 
-	private String myanmarName;
+	private String name;
 
 	private AuthorType authorType;
 
-	@ManyToMany(mappedBy = "authors")
-	private List<Book> books = new ArrayList<Book>();
-
-	public List<Book> getBooks() {
-		return books;
+	public String getName() {
+		return name;
 	}
 
-	public void setBooks(List<Book> books) {
-		this.books = books;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public AuthorType getAuthorType() {
@@ -34,22 +30,6 @@ public class Author extends AbstractEntity implements Serializable {
 
 	public void setAuthorType(AuthorType authorType) {
 		this.authorType = authorType;
-	}
-
-	public String getEngName() {
-		return engName;
-	}
-
-	public void setEngName(String engName) {
-		this.engName = engName;
-	}
-
-	public String getMyanmarName() {
-		return myanmarName;
-	}
-
-	public void setMyanmarName(String myanmarName) {
-		this.myanmarName = myanmarName;
 	}
 
 }

@@ -1,5 +1,8 @@
 package com.elibrary.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,11 +131,18 @@ public class OperationController {
 	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public void saveSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json: " + json);
 		Category category = new Category();
-		category.setBoId("CATEGORY10001");
-		category.getSubCategories().add(subCategoryService.findByBoId("SUBCATEGORY10000"));
-		//category.setName(json.get("name").toString());
-		category.setName("test");
+		category.setBoId(SystemConstant.BOID_REQUIRED);
+		List<SubCategory> subCategoryList = new ArrayList<SubCategory>();		
+		List<Object> subCategories = (List<Object>) json.get("subcategories");
+		for(Object object : subCategories) {
+			SubCategory subCategory = subCategoryService.findByBoId(object.toString());
+			if(subCategory != null)
+				subCategoryList.add(subCategory);
+		}
+		category.getSubCategories().addAll(subCategoryList);
+		category.setName(json.get("category").toString());
 		category.setEntityStatus(EntityStatus.ACTIVE);
 		categoryService.save(category);
 	}
