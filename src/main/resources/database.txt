@@ -34,6 +34,7 @@ CREATE TABLE `book` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,
  `categoryboId` varchar(255) NOT NULL,
+ `subcategoryboId` varchar(255) NOT NULL, 
  `ISBN` varchar(150) DEFAULT NULL,
  `publisher` varchar(50) DEFAULT NULL,
  `edition` int(50) DEFAULT NULL,
@@ -48,47 +49,20 @@ CREATE TABLE `book` (
  `createdDate` varchar(50) DEFAULT NULL,
  `sort` varchar(50) DEFAULT NULL,
  `path` varchar(255) DEFAULT NULL,
- `` varchar(50) DEFAULT NULL,
+ `seriesIndex` varchar(50) DEFAULT NULL,
+ `size` varchar(50) DEFAULT NULL, 
+ `callNo` varchar(50) DEFAULT NULL, 
+ `accessionNo` varchar(50) DEFAULT NULL, 
  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`boId`),
   KEY `FK_s9y70mi0ken20v5xk44h573hd` (`categoryboId`),
-CONSTRAINT `FK_s9y70mi0ken20v5xk44h573hd` FOREIGN KEY (`categoryboId`) REFERENCES `category` (`boId`)
+  KEY `FK_s9y70fsdfsdfmi0ken20v5xk44h573hd` (`subcategoryboId`),  
+CONSTRAINT `FK_s9y70mi0ken20v5xk44h573hd` FOREIGN KEY (`categoryboId`) REFERENCES `category` (`boId`),
+CONSTRAINT `FK_s9y70fsdfsdfmi0ken20v5xk44h573hd` FOREIGN KEY (`subcategoryboId`) REFERENCES `subcategory` (`boId`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `magazine` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `monthlyNo` varchar(50) DEFAULT NULL,
- `title` varchar(100) DEFAULT NULL,
- `coverPhoto` varchar(255) DEFAULT NULL,
- `publishedDate` varchar(50) DEFAULT NULL,
- `volume` int(50) DEFAULT NULL,
- `state` varchar(50) DEFAULT NULL,
- `modifiedDate` varchar(50) DEFAULT NULL,
- `createdDate` varchar(50) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`boId`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-CREATE TABLE `journal` (
- `id` bigint(20) NOT NULL,
- `boId` varchar(255) NOT NULL,
- `weeklyNo` varchar(50) DEFAULT NULL,
- `title` varchar(100) DEFAULT NULL,
- `coverPhoto` varchar(255) DEFAULT NULL,
- `publishedDate` varchar(50) DEFAULT NULL,
- `volume` int(50) DEFAULT NULL,
- `state` varchar(50) DEFAULT NULL,
- `modifiedDate` varchar(50) DEFAULT NULL,
- `createdDate` varchar(50) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`boId`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-<<<<<<< HEAD
-=======
 CREATE TABLE `author` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,
@@ -123,7 +97,6 @@ CREATE TABLE `category_subcategory` (
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
->>>>>>> 2495caf767020ad4ebf23008aec098c6d4520cdb
 CREATE TABLE `history` (
  `id` bigint(20) NOT NULL,
  `boId` varchar(255) NOT NULL,

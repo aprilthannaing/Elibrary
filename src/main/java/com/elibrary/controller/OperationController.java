@@ -3,6 +3,7 @@ package com.elibrary.controller;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,7 +17,6 @@ import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Journal;
-import com.elibrary.entity.Magazine;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
@@ -43,9 +43,6 @@ public class OperationController {
 	private BookService bookService;
 
 	@Autowired
-	private MagazineService magazineService;
-
-	@Autowired
 	private JournalService journalService;
 
 	@Autowired
@@ -53,7 +50,7 @@ public class OperationController {
 
 	@Autowired
 	private CategoryService categoryService;
-	
+
 	@Autowired
 	private SubCategoryService subCategoryService;
 
@@ -90,64 +87,6 @@ public class OperationController {
 		bookService.save(book);
 
 		return book;
-
-	}
-
-	@RequestMapping(value = "saveMagazine", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Detailed.class)
-	public Magazine saveMagazine() throws ServiceUnavailableException {
-
-		Magazine magazine = new Magazine();
-		magazine.setId(001);
-		magazine.setBoId("qro24y12u4o");
-		magazine.setMonthlyNo("123");
-		magazine.setTitle("The Sample");
-		magazine.setCoverPhoto("magazine1.img");
-		magazine.setPublishedDate("12.02.2018");
-		magazine.setVolume(15);
-		magazine.setState(State.Publish);
-		magazine.setModifiedDate("10.03.2020");
-		magazine.setCreatedDate("15.06.2017");
-		magazine.setEntityStatus(EntityStatus.ACTIVE);
-		magazineService.save(magazine);
-
-		return magazine;
-
-	}
-
-	@RequestMapping(value = "saveJournal", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Detailed.class)
-	public Journal saveJournal(@RequestBody JSONObject json) throws ServiceUnavailableException {
-
-		Journal journal = new Journal();
-		journal.setId(1);
-		journal.setBoId("fksjaf;sj");
-		journal.setWeeklyNo("3");
-		journal.setTitle("Myanmar");
-		journal.setCoverPhoto("journal1.img");
-		journal.setPublishedDate("23.04.2020");
-		journal.setState(State.Publish);
-		journal.setModifiedDate("10.10.2020");
-		journal.setCreatedDate("12.02.2020");
-		journal.setEntityStatus(EntityStatus.ACTIVE);
-		journalService.save(journal);
-
-//		String journalId = json.get("id").toString();
-//		String boId = json.get("boId").toString();
-//		String weeklyNo = json.get("weeklyNo").toString();
-//		String title = json.get("title").toString();
-//		String coverPhoto = json.get("coverPhoto").toString();
-//		String publishedDate = json.get("publishedDate").toString();
-//		String volume = (String) json.get("volume");
-//		String state = json.get("state").toString();
-//		String modifiedDate = json.get("modifiedDate").toString();
-//		String createdDate = json.get("createdDate").toString();
-//		String entityStatus = json.get("entityStatus").toString();
-//		
-////	
-		return journal;
 
 	}
 
@@ -192,14 +131,15 @@ public class OperationController {
 		Category category = new Category();
 		category.setId(SystemConstant.ID_REQUIRED);
 		category.setBoId(SystemConstant.BOID_REQUIRED);
-		category.setSubCategories(subCategories);
+		category.setSubCategories(subCategoryService.getAll());
 		category.setName(json.get("name").toString());
 		category.setEntityStatus(EntityStatus.ACTIVE);
 		categoryService.save(category);
 	}
-	
-	@RequestMapping(value = "savesubcategory", method = RequestMethod.POST)
+
 	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "savesubcategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		SubCategory subCategory = new SubCategory();

@@ -1,8 +1,11 @@
 package com.elibrary.service.impl;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.SubCategoryDao;
 import com.elibrary.dao.impl.CategoryDaoImpl;
@@ -10,7 +13,7 @@ import com.elibrary.entity.SubCategory;
 import com.elibrary.service.SubCategoryService;
 import com.mchange.rmi.ServiceUnavailableException;
 
-@Service("categoryService")
+@Service("subCategoryService")
 public class SubCategoryServiceImpl implements SubCategoryService {
 
 	@Autowired
@@ -47,6 +50,14 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 
 	public String getBoId() {
 		return "CATEGORY" + plus();
+	}
+
+	public List<SubCategory> getAll() {
+		String query = "select * from SubCategory";
+		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(subCategories))
+			return null;
+		return subCategories;
 	}
 
 }

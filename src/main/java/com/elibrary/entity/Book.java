@@ -29,15 +29,43 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	private String seriesIndex;
 
+	private String callNo;
+
+	private String accessionNo;
+
 	private String size;
-	
+
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "categoryboId")
 	private Category category;
-	
+
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "categoryboId")
+	@JoinColumn(name = "subcategoryboId")
 	private SubCategory subCategory;
+
+	public String getCallNo() {
+		return callNo;
+	}
+
+	public void setCallNo(String callNo) {
+		this.callNo = callNo;
+	}
+
+	public String getAccessionNo() {
+		return accessionNo;
+	}
+
+	public void setAccessionNo(String accessionNo) {
+		this.accessionNo = accessionNo;
+	}
+
+	public SubCategory getSubCategory() {
+		return subCategory;
+	}
+
+	public void setSubCategory(SubCategory subCategory) {
+		this.subCategory = subCategory;
+	}
 
 	public String getSort() {
 		return sort;
