@@ -129,9 +129,7 @@ public class OperationController {
 	@JsonView(Views.Summary.class)
 	public void saveSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		Category category = new Category();
-		//category.setId(SystemConstant.ID_REQUIRED);
 		category.setBoId("CATEGORY10001");
-		logger.info("subCategoryService.getAll()!!!!!!!!!!!" + subCategoryService.findByBoId("SUBCATEGORY10000").getName());
 		category.getSubCategories().add(subCategoryService.findByBoId("SUBCATEGORY10000"));
 		//category.setName(json.get("name").toString());
 		category.setName("test");
@@ -146,7 +144,6 @@ public class OperationController {
 	public JSONObject saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = new SubCategory();
-		//subCategory.setId(SystemConstant.ID_REQUIRED);
 		subCategory.setBoId(SystemConstant.BOID_REQUIRED);
 		Object description = json.get("description");
 		if (description == null || description.toString().isEmpty()) {

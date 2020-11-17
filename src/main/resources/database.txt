@@ -14,20 +14,11 @@ CREATE TABLE `subcategory` (
 PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `category_subcategory` (
- `categoryId` varchar(255) NOT NULL,
- `subCategoryId` varchar(255) NOT NULL,
- KEY `efsjkdflsfsdljfsw384234jb3km` (`categoryId`),
- KEY `70mi0ken874923dfgdsfsdfjfkjs8d` (`subCategoryId`),
- CONSTRAINT `efsjkdflsfsdljfsw384234jb3km` FOREIGN KEY (`categoryId`) REFERENCES `category` (`id`),
- CONSTRAINT `70mi0ken874923dfgdsfsdfjfkjs8d` FOREIGN KEY (`subCategoryId`) REFERENCES `subcategory` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 CREATE TABLE category_subcategory(
-employeeId bigint(20) NOT NULL,
-workassignmentId bigint(20)NOT NULL,
-CONSTRAINT FOREIGN KEY (employeeId) REFERENCES category (id),
-CONSTRAINT FOREIGN KEY (workassignmentId) REFERENCES subcategory (id)
+categoryId bigint(20) NOT NULL,
+subcategoryId bigint(20)NOT NULL,
+CONSTRAINT FOREIGN KEY (categoryId) REFERENCES category (id),
+CONSTRAINT FOREIGN KEY (subcategoryId) REFERENCES subcategory (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `book` (
