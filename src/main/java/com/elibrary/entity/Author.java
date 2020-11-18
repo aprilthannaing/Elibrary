@@ -1,11 +1,11 @@
 package com.elibrary.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Entity
@@ -14,7 +14,19 @@ public class Author extends AbstractEntity implements Serializable {
 
 	private String name;
 
+	private String sort;
+
+	@Column(name = "authorType")
+	@Enumerated(EnumType.STRING)
 	private AuthorType authorType;
+
+	public String getSort() {
+		return sort;
+	}
+
+	public void setSort(String sort) {
+		this.sort = sort;
+	}
 
 	public String getName() {
 		return name;
