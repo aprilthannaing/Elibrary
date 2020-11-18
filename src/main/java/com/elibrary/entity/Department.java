@@ -18,7 +18,9 @@ public class Department extends AbstractEntity implements Serializable{
 	private Hluttaw hluttaw;
 	
 	private String name;
-
+	
+	private String code;
+	
 	public Hluttaw getHluttaw() {
 		return hluttaw;
 	}
@@ -33,5 +35,13 @@ public class Department extends AbstractEntity implements Serializable{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 }

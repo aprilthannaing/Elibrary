@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,6 +29,8 @@ import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.UserType;
 import com.elibrary.entity.Views;
+import com.elibrary.entity.listOfValue;
+import com.elibrary.entity.listOfValueObj;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
@@ -176,8 +179,8 @@ public class OperationController {
 		Author author = new Author();
 		author.setId(001);
 		author.setBoId("fdishfosd");
-		author.setEngName("Johnson");
-		author.setMyanmarName("ပုညခင္");
+		//author.setEngName("Johnson");
+		//author.setMyanmarName("ပုညခင္");
 		author.setEntityStatus(EntityStatus.ACTIVE);
 		authorService.save(author);
 
@@ -202,13 +205,5 @@ public class OperationController {
 //		journal.setEntityStatus(EntityStatus.INACTIVE);
 		journalService.delete(journal);
 		return message;
-	}
-	
-	@RequestMapping(value = "hluttawSetup", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Summary.class)
-	public String hluttawSetup(@RequestBody JSONObject json){
-		String desc = json.get("description").toString();
-		return "";
 	}
 }
