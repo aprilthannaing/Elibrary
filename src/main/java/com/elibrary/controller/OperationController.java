@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Author;
+import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.Department;
@@ -21,6 +22,7 @@ import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Journal;
 import com.elibrary.entity.Position;
+import com.elibrary.entity.Publisher;
 import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.SystemConstant;
@@ -168,20 +170,32 @@ public class OperationController {
 		return result;
 	}
 
-	@RequestMapping(value = "saveAuthor", method = RequestMethod.POST)
 	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "saveAuthor", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public Author saveAuthor() throws ServiceUnavailableException {
-
+	public void saveAuthor(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		Author author = new Author();
-		author.setId(001);
-		author.setBoId("fdishfosd");
-		author.setEngName("Johnson");
-		author.setMyanmarName("ပုညခင္");
+		author.setBoId(SystemConstant.BOID_REQUIRED);
+		author.setName(json.get("name").toString());
+		author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
+		author.setSort(json.get("sort").toString());
 		author.setEntityStatus(EntityStatus.ACTIVE);
 		authorService.save(author);
-
-		return author;
+	}
+	
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "savePublisher", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public void savePublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json!!!!!!!!!!!!!"+ json);
+		Publisher publisher = new Publisher();
+		publisher.setBoId(SystemConstant.BOID_REQUIRED);
+		publisher.setName(json.get("name").toString());
+		publisher.setSort(json.get("sort").toString());
+		publisher.setEntityStatus(EntityStatus.ACTIVE);
+		//authorService.save(publisher);
 	}
 
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
@@ -190,16 +204,6 @@ public class OperationController {
 	public String deleteJournal() throws ServiceUnavailableException {
 		String message = "success";
 		Journal journal = new Journal();
-//		journal.setId(1);
-//		journal.setBoId("fksjaf;sj");
-//		journal.setWeeklyNo("3");
-//		journal.setTitle("Myanmar");
-//		journal.setCoverPhoto("journal1.img");
-//		journal.setPublishedDate("23.04.2020");
-//		journal.setState(State.Publish);
-//		journal.setModifiedDate("10.10.2020");
-//		journal.setCreatedDate("12.02.2020");
-//		journal.setEntityStatus(EntityStatus.INACTIVE);
 		journalService.delete(journal);
 		return message;
 	}

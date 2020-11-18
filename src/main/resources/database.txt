@@ -55,12 +55,13 @@ CONSTRAINT `FK_s9y70fsdfsdfmi0ken20v5xk44h573hd` FOREIGN KEY (`subcategoryboId`)
 
 
 CREATE TABLE `author` (
- `id` bigint(20) NOT NULL,
+ `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
- `engName` varchar(50) DEFAULT NULL,
- `myanmarName` varchar(50) DEFAULT NULL,
+ `name` varchar(50) DEFAULT NULL,
+ `sort` varchar(50) DEFAULT NULL,
+ `authorType` varchar(50) DEFAULT NULL, 
  `entityStatus` varchar(100) DEFAULT NULL,
-PRIMARY KEY (`boId`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+PRIMARY KEY (`id`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `bookauthor` (
  `id` bigint(20) NOT NULL,

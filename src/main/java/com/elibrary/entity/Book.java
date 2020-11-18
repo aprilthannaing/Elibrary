@@ -39,6 +39,8 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	private String size;
 
+	private String downloadApproval;
+
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "categoryboId")
 	private Category category;
@@ -50,6 +52,14 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "bookBoId"), inverseJoinColumns = @JoinColumn(name = "authorBoId"))
 	private List<Author> authors = new ArrayList<Author>();
+
+	public String getDownloadApproval() {
+		return downloadApproval;
+	}
+
+	public void setDownloadApproval(String downloadApproval) {
+		this.downloadApproval = downloadApproval;
+	}
 
 	public List<Author> getAuthors() {
 		return authors;
