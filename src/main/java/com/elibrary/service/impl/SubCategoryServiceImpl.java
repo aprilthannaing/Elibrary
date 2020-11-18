@@ -68,4 +68,14 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 		return subCategories.get(0);
 	}
 
+	@Override
+	public SubCategory findSubCategoryById(String boId) throws ServiceUnavailableException {
+		
+		String query = "from SubCategory where boId='" + boId + "'";
+		List<SubCategory> subCategoryList = subCategoryDao.getEntitiesByQuery(query);
+		if(CollectionUtils.isEmpty(subCategoryList))
+			return null;
+		return subCategoryList.get(0);
+	}
+
 }

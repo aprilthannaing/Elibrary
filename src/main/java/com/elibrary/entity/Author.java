@@ -21,6 +21,8 @@ public class Author extends AbstractEntity implements Serializable {
 	@Column(name = "authorType")
 	@Enumerated(EnumType.STRING)
 	private AuthorType authorType;
+	
+	private String sort;
 
 	public String getProfilePicture() {
 		return profilePicture;
@@ -52,6 +54,14 @@ public class Author extends AbstractEntity implements Serializable {
 
 	public void setAuthorType(AuthorType authorType) {
 		this.authorType = authorType;
+	}
+
+	public String getSort() {
+		return sort;
+	}
+
+	public void setSort(String sort) {
+		this.sort = sort;
 	}
 
 }

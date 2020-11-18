@@ -10,5 +10,7 @@ public interface BookService {
 	public void save(Book book)throws ServiceUnavailableException;
 	
 //	public List<Book> findByDateRange(String startDate, String endDate);
+	
+	public Book findBookById(String boId)throws ServiceUnavailableException;
 
 }

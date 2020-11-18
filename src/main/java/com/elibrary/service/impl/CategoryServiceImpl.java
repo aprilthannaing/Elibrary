@@ -1,8 +1,11 @@
 package com.elibrary.service.impl;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.CategoryDao;
 import com.elibrary.dao.impl.CategoryDaoImpl;
@@ -47,6 +50,18 @@ public class CategoryServiceImpl implements CategoryService {
 
 	public String getBoId() {
 		return "CATEGORY" + plus();
+	}
+
+	@Override
+	public Category findCategoryById(String boId) throws ServiceUnavailableException {
+		
+		String query = "from Category where boId='" + boId + "'";
+		List<Category> categoryList = categoryDao.getEntitiesByQuery(query);
+		if(CollectionUtils.isEmpty(categoryList))
+			return null;
+		return categoryList.get(0);
 	}	
+	
+	
 
 }

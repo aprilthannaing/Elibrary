@@ -36,8 +36,9 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private String accessionNo;
 
 	private String size;
+	
+	private String downloadApproval;
 
-	private boolean downloadApproval;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "categoryboId")
@@ -48,16 +49,29 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private SubCategory subCategory;
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "bookBoId"), inverseJoinColumns = @JoinColumn(name = "authorBoId"))
+	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "authorId"))
 	private List<Author> authors = new ArrayList<Author>();
+	
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_publisher", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
+	private List<Publisher> publishers = new ArrayList<Publisher>();
+	
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_rating", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
+	private List<Rating> ratings = new ArrayList<Rating>();
+	
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_comment", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "commentId"))
+	private List<Comment> comments = new ArrayList<Comment>();
+	
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_category", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
+	private List<Category> categories = new ArrayList<Category>();
+	
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_subCategory", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
+	private List<SubCategory> subCategories = new ArrayList<SubCategory>();
 
-	public boolean isDownloadApproval() {
-		return downloadApproval;
-	}
-
-	public void setDownloadApproval(boolean downloadApproval) {
-		this.downloadApproval = downloadApproval;
-	}
 
 	public List<Author> getAuthors() {
 		return authors;
@@ -163,4 +177,63 @@ public class Book extends AbstractReadingObject implements Serializable {
 		this.publishedYear = publishedYear;
 	}
 
+<<<<<<< Updated upstream
+=======
+	public String getPdfLink() {
+		return pdfLink;
+	}
+
+	public void setPdfLink(String pdfLink) {
+		this.pdfLink = pdfLink;
+	}
+
+	public String getDownloadApproval() {
+		return downloadApproval;
+	}
+
+	public void setDownloadApproval(String downloadApproval) {
+		this.downloadApproval = downloadApproval;
+	}
+
+	public List<Publisher> getPublishers() {
+		return publishers;
+	}
+
+	public void setPublishers(List<Publisher> publishers) {
+		this.publishers = publishers;
+	}
+
+	public List<Rating> getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(List<Rating> ratings) {
+		this.ratings = ratings;
+	}
+
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public List<Category> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(List<Category> categories) {
+		this.categories = categories;
+	}
+
+	public List<SubCategory> getSubCategories() {
+		return subCategories;
+	}
+
+	public void setSubCategories(List<SubCategory> subCategories) {
+		this.subCategories = subCategories;
+	}
+
+>>>>>>> Stashed changes
 }

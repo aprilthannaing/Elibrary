@@ -5,5 +5,7 @@ import com.mchange.rmi.ServiceUnavailableException;
 
 public interface AuthorService {
 	public void save(Author author)throws ServiceUnavailableException;
-
+	
+	public Author findAuthorById(String boId)throws ServiceUnavailableException;
+	
 }

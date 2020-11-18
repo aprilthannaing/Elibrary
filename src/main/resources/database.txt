@@ -1,7 +1,8 @@
 CREATE TABLE `category` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
- `name` varchar(100) DEFAULT NULL,
+ `myanmarName` varchar(100) DEFAULT NULL,
+ `engName` varchar(100) DEFAULT NULL,
  `entityStatus` varchar(100) DEFAULT NULL,
 PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -25,9 +26,7 @@ CONSTRAINT FOREIGN KEY (subcategoryId) REFERENCES subcategory (id)
 
 CREATE TABLE `book` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `categoryboId` varchar(255) NOT NULL,
- `subcategoryboId` varchar(255) NOT NULL, 
+ `boId` varchar(255) NOT NULL, 
  `ISBN` varchar(150) DEFAULT NULL,
  `publisher` varchar(50) DEFAULT NULL,
  `edition` int(50) DEFAULT NULL,
@@ -60,24 +59,20 @@ CREATE TABLE `author` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
  `name` varchar(50) DEFAULT NULL,
+ `profilePicture` varchar(255) DEFAULT NULL,
  `sort` varchar(50) DEFAULT NULL,
  `authorType` varchar(50) DEFAULT NULL, 
- `profilePicture` varchar(255) DEFAULT NULL, 
  `entityStatus` varchar(100) DEFAULT NULL,
 PRIMARY KEY (`id`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `book_author` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `authorboId` varchar(255) DEFAULT NULL,
- `bookboId` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
- PRIMARY KEY (`id`),
- KEY `efsjkdflsfsdljfsdu9w384234jb3km` (`id`),
- KEY `70mi0ken87492384792873djfkjs8d` (`id`),
- CONSTRAINT `efsjkdflsfsdljfsdu9w384234jb3km` FOREIGN KEY (`id`) REFERENCES `author` (`id`),
- CONSTRAINT `70mi0ken87492384792873djfkjs8d` FOREIGN KEY (`id`) REFERENCES `book` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+CREATE TABLE book_author(
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+bookId bigint(20) NOT NULL,
+authorId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id),
+CONSTRAINT FOREIGN KEY (authorId) REFERENCES author (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `history` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -131,7 +126,6 @@ CONSTRAINT `FK_s9y70mfjwiqoafj94228` FOREIGN KEY (`id`) REFERENCES `hluttaw` (`i
 CREATE TABLE `position` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
- `departmentboId` varchar(255) NOT NULL,
  `name` varchar(255) DEFAULT NULL,
  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -175,18 +169,6 @@ CREATE TABLE `publisher` (
   PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `book_publisher` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `publisherId` varchar(255) DEFAULT NULL,
- `bookId` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
- PRIMARY KEY (`id`),
- KEY `lfkhasilfhskfjslhfsl32183` (`id`),
- KEY `lfdhaoireuwior927648lfkjs` (`id`),
- CONSTRAINT `lfkhasilfhskfjslhfsl32183` FOREIGN KEY (`id`) REFERENCES `publisher` (`id`),
- CONSTRAINT `lfdhaoireuwior927648lfkjs` FOREIGN KEY (`id`) REFERENCES `book` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `rating` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -197,37 +179,60 @@ CREATE TABLE `rating` (
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `book_rating` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `ratingId` varchar(255) DEFAULT NULL,
- `bookId` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
- PRIMARY KEY (`id`),
- KEY `fhwilufkhsdifhwsi8429347` (`id`),
- KEY `fkjdlshfis84972048320khs` (`id`),
- CONSTRAINT `fhwilufkhsdifhwsi8429347` FOREIGN KEY (`id`) REFERENCES `rating` (`id`),
- CONSTRAINT `fkjdlshfis84972048320khs` FOREIGN KEY (`id`) REFERENCES `book` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
 CREATE TABLE `comment` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
- `comment` varchar(255) DEFAULT NULL,
+ `description` varchar(255) DEFAULT NULL,
  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `book_comment` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `commentId` varchar(255) DEFAULT NULL,
- `bookId` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
- PRIMARY KEY (`id`),
- KEY `fkjldslfhsjlkfh8957430` (`id`),
- KEY `jfkshfsjhkfhs847290444` (`id`),
- CONSTRAINT `fkjldslfhsjlkfh8957430` FOREIGN KEY (`id`) REFERENCES `comment` (`id`),
- CONSTRAINT `jfkshfsjhkfhs847290444` FOREIGN KEY (`id`) REFERENCES `book` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+CREATE TABLE book_category(
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+bookId bigint(20) NOT NULL,
+categoryId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id),
+CONSTRAINT FOREIGN KEY (categoryId) REFERENCES category (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE book_subcategory(
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+bookId bigint(20) NOT NULL,
+subcategoryId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id),
+CONSTRAINT FOREIGN KEY (subcategoryId) REFERENCES subcategory (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE book_publisher(
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+bookId bigint(20) NOT NULL,
+publisherId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id),
+CONSTRAINT FOREIGN KEY (publisherId) REFERENCES publisher (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE book_comment(
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+bookId bigint(20) NOT NULL,
+commentId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id),
+CONSTRAINT FOREIGN KEY (commentId) REFERENCES comment (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE book_rating(
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+bookId bigint(20) NOT NULL,
+ratingId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id),
+CONSTRAINT FOREIGN KEY (ratingId) REFERENCES rating (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

@@ -1,8 +1,11 @@
 package com.elibrary.service.impl;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.UserDao;
 import com.elibrary.dao.impl.UserDaoImpl;
@@ -25,6 +28,16 @@ public class UserServiceImpl implements UserService{
 			logger.error("Error: "+ e.getMessage());
 			
 		}
+	}
+
+	@Override
+	public User findUserById(String boId) throws ServiceUnavailableException {
+		
+		String query = "from User where boId='" + boId + "'";
+		List<User> userList = userDao.getEntitiesByQuery(query);
+		if(CollectionUtils.isEmpty(userList))
+			return null;
+		return userList.get(0);
 	}
 
 }

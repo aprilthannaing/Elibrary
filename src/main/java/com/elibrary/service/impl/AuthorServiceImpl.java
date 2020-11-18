@@ -1,8 +1,11 @@
 package com.elibrary.service.impl;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.AuthorDao;
 import com.elibrary.dao.impl.AuthorDaoImpl;
@@ -48,6 +51,16 @@ public class AuthorServiceImpl implements AuthorService {
 
 	public String getBoId() {
 		return "AUTHOR" + plus();
+	}
+
+	@Override
+	public Author findAuthorById(String boId) throws ServiceUnavailableException {
+		String query = "from Author where boId='" + boId + "'";
+		List<Author> authorList = authorDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(authorList))
+		    return null;
+		return authorList.get(0);
+		
 	}
 
 }

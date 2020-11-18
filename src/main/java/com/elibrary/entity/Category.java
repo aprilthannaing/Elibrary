@@ -20,6 +20,11 @@ public class Category extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	private String name;
+	
+	private String myanmarName;
+	
+	private String engName;
+	
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "category_subcategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))

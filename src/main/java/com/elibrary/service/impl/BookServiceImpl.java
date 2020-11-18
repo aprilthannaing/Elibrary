@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.BookDao;
 import com.elibrary.dao.JournalDao;
@@ -29,6 +30,16 @@ public class BookServiceImpl implements BookService{
 			logger.error("Error: "+ e.getMessage());
 			
 		}
+	}
+
+	@Override
+	public Book findBookById(String boId) throws ServiceUnavailableException {
+		
+		String query = "from Book where boId='" + boId + "'";
+		List<Book> bookList = bookDao.getEntitiesByQuery(query);
+		if(CollectionUtils.isEmpty(bookList))
+			return null;
+		return bookList.get(0);
 	}
 	
 //	@Override
