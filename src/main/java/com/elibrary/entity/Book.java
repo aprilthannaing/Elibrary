@@ -24,7 +24,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private int edition;
 
 	private String publishedYear;
-	
+
 	private String sort;
 
 	private String path;
@@ -161,14 +161,6 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	public void setPublishedYear(String publishedYear) {
 		this.publishedYear = publishedYear;
-	}
-
-	public String getPdfLink() {
-		return pdfLink;
-	}
-
-	public void setPdfLink(String pdfLink) {
-		this.pdfLink = pdfLink;
 	}
 
 }
