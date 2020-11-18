@@ -24,9 +24,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private int edition;
 
 	private String publishedYear;
-
-	private String pdfLink;
-
+	
 	private String sort;
 
 	private String path;
@@ -39,7 +37,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	private String size;
 
-	private String downloadApproval;
+	private boolean downloadApproval;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "categoryboId")
@@ -53,11 +51,11 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "bookBoId"), inverseJoinColumns = @JoinColumn(name = "authorBoId"))
 	private List<Author> authors = new ArrayList<Author>();
 
-	public String getDownloadApproval() {
+	public boolean isDownloadApproval() {
 		return downloadApproval;
 	}
 
-	public void setDownloadApproval(String downloadApproval) {
+	public void setDownloadApproval(boolean downloadApproval) {
 		this.downloadApproval = downloadApproval;
 	}
 

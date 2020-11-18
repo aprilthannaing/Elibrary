@@ -1,5 +1,7 @@
 package com.elibrary.dao;
 
-public interface PublisherDao {
+import com.elibrary.entity.Publisher;
+
+public interface PublisherDao  extends AbstractDao<Publisher, String>{
 
 }

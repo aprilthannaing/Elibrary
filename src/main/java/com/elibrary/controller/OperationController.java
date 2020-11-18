@@ -37,6 +37,7 @@ import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.elibrary.service.JournalService;
+import com.elibrary.service.PublisherService;
 import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -63,6 +64,9 @@ public class OperationController {
 
 	@Autowired
 	private AuthorService authorService;
+	
+	@Autowired
+	private PublisherService publisherService;
 
 	private static Logger logger = Logger.getLogger(OperationController.class);
 
@@ -83,13 +87,13 @@ public class OperationController {
 		book.setEdition(3);
 		book.setPublishedYear("1999");
 		book.setPdfLink("http://rwqyireow;irwhe4892784612");
-		book.setTitle("Beyond the hills");
-		book.setCoverPhoto("book1.img");
-		book.setPublishedDate("12.01.1999");
-		book.setVolume(3);
-		book.setState(State.Publish);
-		book.setModifiedDate("02.12.2000");
-		book.setCreatedDate("16.10.2020");
+//		book.setTitle("Beyond the hills");
+//		book.setCoverPhoto("book1.img");
+//		book.setPublishedDate("12.01.1999");
+//		book.setVolume(3);
+//		book.setState(State.Publish);
+//		book.setModifiedDate("02.12.2000");
+//		book.setCreatedDate("16.10.2020");
 		book.setEntityStatus(EntityStatus.ACTIVE);
 		bookService.save(book);
 
@@ -193,13 +197,12 @@ public class OperationController {
 	@RequestMapping(value = "savePublisher", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public void savePublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		logger.info("json!!!!!!!!!!!!!"+ json);
 		Publisher publisher = new Publisher();
 		publisher.setBoId(SystemConstant.BOID_REQUIRED);
 		publisher.setName(json.get("name").toString());
 		publisher.setSort(json.get("sort").toString());
 		publisher.setEntityStatus(EntityStatus.ACTIVE);
-		//authorService.save(publisher);
+		publisherService.save(publisher);
 	}
 
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
