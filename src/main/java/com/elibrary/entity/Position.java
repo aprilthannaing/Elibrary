@@ -13,19 +13,13 @@ import javax.persistence.Table;
 @Table(name = "position")
 public class Position extends AbstractEntity implements Serializable{
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "departmentboId")
-	private Department department;
+	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	//@JoinColumn(name = "departmentboId")
+	//private Department department;
 	
 	private String name;
-
-	public Department getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
+	
+	private String code;
 
 	public String getName() {
 		return name;
@@ -34,6 +28,13 @@ public class Position extends AbstractEntity implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 	
 }

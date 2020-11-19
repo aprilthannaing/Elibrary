@@ -3,32 +3,76 @@ package com.elibrary.entity;
 import java.io.Serializable;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @Table(name = "user")
 public class User extends AbstractEntity implements Serializable {
 
+	@JsonView(Views.Thin.class)
 	private String name;
 
+	@JsonView(Views.Thin.class)
 	private String email;
 
+	@JsonView(Views.Thin.class)
 	private String phoneNo;
 
 	private String password;
 
+	@JsonView(Views.Thin.class)
+	@Column(name = "role")
+	@Enumerated(EnumType.STRING)
 	private UserRole role;
 
+	@JsonView(Views.Thin.class)
+	@Column(name = "type")
+	@Enumerated(EnumType.STRING)
 	private UserType type;
 
 	private String createdDate;
 
+	@JsonView(Views.Thin.class)
 	private String modifiedDate;
-
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String hlutawName;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String deptName;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String positionName;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private long hlutawType;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private long deptType;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private long positionType;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String status;
+	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "hluttawboId")
 	private Hluttaw hluttaw;
@@ -127,6 +171,62 @@ public class User extends AbstractEntity implements Serializable {
 
 	public void setModifiedDate(String modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public long getHlutawType() {
+		return hlutawType;
+	}
+
+	public void setHlutawType(long hlutawType) {
+		this.hlutawType = hlutawType;
+	}
+
+	public long getDeptType() {
+		return deptType;
+	}
+
+	public void setDeptType(long deptType) {
+		this.deptType = deptType;
+	}
+
+	public long getPositionType() {
+		return positionType;
+	}
+
+	public void setPositionType(long positionType) {
+		this.positionType = positionType;
+	}
+
+	public String getHlutawName() {
+		return hlutawName;
+	}
+
+	public void setHlutawName(String hlutawName) {
+		this.hlutawName = hlutawName;
+	}
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+
+	public String getPositionName() {
+		return positionName;
+	}
+
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
 	}
 
 }

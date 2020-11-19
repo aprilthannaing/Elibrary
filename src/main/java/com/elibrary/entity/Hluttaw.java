@@ -9,9 +9,7 @@ import javax.persistence.Table;
 @Table(name = "hluttaw")
 public class Hluttaw extends AbstractEntity implements Serializable{
 	
-	private String code;
 	private String name;
-	private String hboId;
 
 	public String getName() {
 		return name;
@@ -21,20 +19,4 @@ public class Hluttaw extends AbstractEntity implements Serializable{
 		this.name = name;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getHboId() {
-		return hboId;
-	}
-
-	public void setHboId(String hboId) {
-		this.hboId = hboId;
-	}
-	
 }
