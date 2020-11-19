@@ -54,7 +54,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	public List<SubCategory> getAll() {
-		String query = "select sub from SubCategory sub";
+		String query = "select sub from SubCategory sub where entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;

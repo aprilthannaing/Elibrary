@@ -60,7 +60,7 @@ public class AuthorServiceImpl implements AuthorService {
 	}
 
 	public List<Author> getAll() {
-		String query = "select author from Author author";
+		String query = "select author from Author author where entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;

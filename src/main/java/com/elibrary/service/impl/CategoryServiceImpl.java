@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	public List<Category> getAll() {
-		String query = "select category from Category category";
+		String query = "select category from Category category where entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Category> categories = categoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(categories))
 			return null;

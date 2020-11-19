@@ -57,7 +57,7 @@ public class PublisherServiceImpl implements PublisherService {
 	
 
 	public List<Publisher> getAll() {
-		String query = "select publisher from Publisher publisher";
+		String query = "select publisher from Publisher publisher where entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Publisher> publishers = publisherDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(publishers))
 			return null;

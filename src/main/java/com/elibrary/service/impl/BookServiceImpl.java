@@ -63,7 +63,7 @@ public class BookServiceImpl implements BookService {
 	}
 	
 	public List<Book> getAll() {
-		String query = "select book from Book book";
+		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "'";			
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
 			return null;
