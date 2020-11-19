@@ -1,7 +1,7 @@
 package com.elibrary.dao;
 
-import com.elibrary.entity.Header;
+import com.elibrary.entity.header;
 
-public interface ListOfValueDao extends AbstractDao<Header, String>{
+public interface ListOfValueDao extends AbstractDao<header, String>{
 
 }

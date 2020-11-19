@@ -374,77 +374,102 @@ public class OperationController {
 	@RequestMapping(value = "deleteAuthor", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String deleteAuthor(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	public JSONObject deleteAuthor(@RequestBody JSONObject json)throws ServiceUnavailableException{
 	
+		JSONObject resultJson = new JSONObject();
 		String authorId = json.get("authorId").toString();
 		Author author = authorService.findByBoId(authorId);
 		if(author == null) {
-			return "Author Id is invalid!!";
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Author Id is invalid!!");
+			return resultJson;
 		}
 		author.setEntityStatus(EntityStatus.DELETED);
 		authorService.save(author);
-		return "Your request is successful!!";
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Your request is successful!!");
+		return resultJson;
 	}
 	
 	@RequestMapping(value = "deleteBook", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String deleteBook(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	public JSONObject deleteBook(@RequestBody JSONObject json)throws ServiceUnavailableException{
 	
+		JSONObject resultJson = new JSONObject();
 		String bookId = json.get("bookId").toString();
 		Book book = bookService.findByBoId(bookId);
 		if(book == null) {
-			return "Book Id is invalid!!";
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Book Id is invalid!!");
+			return resultJson;
 		}
 		book.setEntityStatus(EntityStatus.DELETED);
 		bookService.save(book);
-		return "Your request is successful!!";
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Your request is successful!!");
+		return resultJson;
 	}
 	
 	@RequestMapping(value = "deleteCategory", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String deleteCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	public JSONObject deleteCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
 	
+		JSONObject resultJson = new JSONObject();
 		String categoryId = json.get("categoryboId").toString();
 		Category category = categoryService.findByBoId(categoryId);
 		if(category == null) {
-			return "Category Id is invalid!!";
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Category Id is invalid!!");
+			return resultJson;
 		}
 		category.setEntityStatus(EntityStatus.DELETED);
 		categoryService.save(category);
-		return "Your request is successful!!";
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Your request is successful!!");
+		return resultJson;
 	}
 	
 	
 	@RequestMapping(value = "deleteSubCategory", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String deleteSubCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	public JSONObject deleteSubCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
 	
+		JSONObject resultJson = new JSONObject();
 		String subCategoryId = json.get("subCategoryboId").toString();
 		SubCategory subCategory = subCategoryService.findByBoId(subCategoryId);
 		if(subCategory == null) {
-			return "SubCategory Id is invalid!!";
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Subcategory Id is invalid!!");
+			return resultJson;
 		}
 		subCategory.setEntityStatus(EntityStatus.DELETED);
 		subCategoryService.save(subCategory);
-		return "Your request is successful!!";
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Your request is successful!!");
+		return resultJson;
 	}
 	
 	@RequestMapping(value = "deleteUser", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String deleteUser(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	public JSONObject deleteUser(@RequestBody JSONObject json)throws ServiceUnavailableException{
 	
+		JSONObject resultJson = new JSONObject();
 		String userId = json.get("userboId").toString();
 		User user = userService.findByBoId(userId);
 		if(user == null) {
-			return "User Id is invalid!!";
+			resultJson.put("status", "0");
+			resultJson.put("msg", "User Id is invalid!!");
+			return resultJson;
 		}
 		user.setEntityStatus(EntityStatus.DELETED);
 		userService.save(user);
-		return "Your request is successful!!";
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Your request is successful!!");
+		return resultJson;
 	}
 	
 	

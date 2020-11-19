@@ -3,14 +3,14 @@ package com.elibrary.service;
 import java.util.List;
 
 import com.elibrary.entity.Department;
-import com.elibrary.entity.Header;
+import com.elibrary.entity.header;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Position;
 
 public interface ListOfValueService {
-	public String save(Header header);
+	public String save(header header);
 	public String saveHluttaw(Hluttaw req);
-	public Header checkData(String code);
+	public header checkData(String code);
 	public List<Hluttaw> checkHluttaw(String hboid);
 	public String saveDepartment(Department req);
 	public List<Department> checkDepartment(long hboid);

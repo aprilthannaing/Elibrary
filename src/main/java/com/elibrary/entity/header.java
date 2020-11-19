@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "header")
-public class Header extends AbstractEntity implements Serializable{
+public class header extends AbstractEntity implements Serializable{
 	@Column(name = "name")
 	public String name;
 

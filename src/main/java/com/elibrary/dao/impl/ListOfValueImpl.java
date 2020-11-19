@@ -3,14 +3,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 import com.elibrary.dao.ListOfValueDao;
-import com.elibrary.entity.Header;
+import com.elibrary.entity.header;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Repository
-public class ListOfValueImpl extends AbstractDaoImpl<Header, String> implements ListOfValueDao {
+public class ListOfValueImpl extends AbstractDaoImpl<header, String> implements ListOfValueDao {
 
 	protected ListOfValueImpl() {
-		super(Header.class);
+		super(header.class);
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class ListOfValueImpl extends AbstractDaoImpl<Header, String> implements 
 	}
 
 	@Override
-	public boolean saveUpdate(Header e) throws ServiceUnavailableException {
+	public boolean saveUpdate(header e) throws ServiceUnavailableException {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -38,7 +38,7 @@ public class ListOfValueImpl extends AbstractDaoImpl<Header, String> implements 
 	}
 
 	@Override
-	public void delete(Header e) throws ServiceUnavailableException {
+	public void delete(header e) throws ServiceUnavailableException {
 		// TODO Auto-generated method stub
 		
 	}

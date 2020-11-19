@@ -12,7 +12,7 @@ import com.elibrary.dao.PositionDao;
 import com.elibrary.dao.impl.BookDaoImpl;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
-import com.elibrary.entity.Header;
+import com.elibrary.entity.header;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Position;
 import com.elibrary.service.ListOfValueService;
@@ -32,7 +32,7 @@ import com.elibrary.service.ListOfValueService;
 	
 	public static Logger logger = Logger.getLogger(BookDaoImpl.class);
 	
-	public String save(Header req){
+	public String save(header req){
 		try {
 			if (req.isIdRequired(req.getId())) {
 				long[] longlist = getId();
@@ -97,10 +97,10 @@ import com.elibrary.service.ListOfValueService;
 		return hluttawDao.findLongByQueryString(query).get(0);
 	}
 	
-	public Header checkData(String boid) {
-		Header header = new Header();
+	public header checkData(String boid) {
+		header header = new header();
 		String query = "from Header where boId='" + boid + "' and entityStatus='" + EntityStatus.ACTIVE.toString() + "'";
-		List<Header> headerList = listOfValueDao.byQuery(query);
+		List<header> headerList = listOfValueDao.byQuery(query);
 		if (headerList.size() > 0) {
 			header = headerList.get(0);
 		}else header = null;

@@ -6,16 +6,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import com.elibrary.dao.UserDao;
-import com.elibrary.dao.impl.UserDaoImpl;
-<<<<<<< Updated upstream
-import com.elibrary.entity.Department;
-=======
-import com.elibrary.entity.Author;
 import com.elibrary.entity.EntityStatus;
->>>>>>> Stashed changes
 import com.elibrary.entity.User;
+import com.elibrary.dao.impl.UserDaoImpl;
 import com.elibrary.service.UserService;
 import com.mchange.rmi.ServiceUnavailableException;
 
