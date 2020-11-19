@@ -45,6 +45,7 @@ import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.elibrary.service.CommentService;
+import com.elibrary.service.EmailService;
 import com.elibrary.service.JournalService;
 import com.elibrary.service.PublisherService;
 import com.elibrary.service.SubCategoryService;
@@ -79,6 +80,11 @@ public class OperationController {
 
 	@Autowired
 	private CommentService commentService;
+
+	@Autowired
+	private EmailService emailService;
+
+
 
 	@Value("${IMAGEUPLOADURL}")
 	private String IMAGEUPLOADURL;
@@ -353,6 +359,7 @@ public class OperationController {
 		return message;
 	}
 
+
 	@RequestMapping(value = "hluttawSetup", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -362,4 +369,83 @@ public class OperationController {
 		return "";
 	}
 
+
+	
+	@RequestMapping(value = "deleteAuthor", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public String deleteAuthor(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	
+		String authorId = json.get("authorId").toString();
+		Author author = authorService.findByBoId(authorId);
+		if(author == null) {
+			return "Author Id is invalid!!";
+		}
+		author.setEntityStatus(EntityStatus.DELETED);
+		authorService.save(author);
+		return "Your request is successful!!";
+	}
+	
+	@RequestMapping(value = "deleteBook", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public String deleteBook(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	
+		String bookId = json.get("bookId").toString();
+		Book book = bookService.findByBoId(bookId);
+		if(book == null) {
+			return "Book Id is invalid!!";
+		}
+		book.setEntityStatus(EntityStatus.DELETED);
+		bookService.save(book);
+		return "Your request is successful!!";
+	}
+	
+	@RequestMapping(value = "deleteCategory", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public String deleteCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	
+		String categoryId = json.get("categoryboId").toString();
+		Category category = categoryService.findByBoId(categoryId);
+		if(category == null) {
+			return "Category Id is invalid!!";
+		}
+		category.setEntityStatus(EntityStatus.DELETED);
+		categoryService.save(category);
+		return "Your request is successful!!";
+	}
+	
+	
+	@RequestMapping(value = "deleteSubCategory", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public String deleteSubCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	
+		String subCategoryId = json.get("subCategoryboId").toString();
+		SubCategory subCategory = subCategoryService.findByBoId(subCategoryId);
+		if(subCategory == null) {
+			return "SubCategory Id is invalid!!";
+		}
+		subCategory.setEntityStatus(EntityStatus.DELETED);
+		subCategoryService.save(subCategory);
+		return "Your request is successful!!";
+	}
+	
+	@RequestMapping(value = "deleteUser", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public String deleteUser(@RequestBody JSONObject json)throws ServiceUnavailableException{
+	
+		String userId = json.get("userboId").toString();
+		User user = userService.findByBoId(userId);
+		if(user == null) {
+			return "User Id is invalid!!";
+		}
+		user.setEntityStatus(EntityStatus.DELETED);
+		userService.save(user);
+		return "Your request is successful!!";
+	}
+	
+	
 }

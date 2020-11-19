@@ -48,6 +48,8 @@ public class EmailServiceImpl implements EmailService{
 
 	public String getBoId() {
 		return "Email" + plus();
-	}	
+	}
+
+
 
 }

@@ -6,5 +6,6 @@ import com.mchange.rmi.ServiceUnavailableException;
 public interface EmailService {
 	
 	public void save(Email email)throws ServiceUnavailableException;
+	
 
 }

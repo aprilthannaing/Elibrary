@@ -11,6 +11,9 @@ import com.elibrary.dao.BookDao;
 import com.elibrary.dao.impl.BookDaoImpl;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
+
+import com.elibrary.entity.EntityStatus;
+
 import com.elibrary.service.BookService;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -67,5 +70,14 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+
+	@Override
+	public Book findByBoId(String boId) {
+		String query = "select book from Book book where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		if(CollectionUtils.isEmpty(books))
+		return null;
+		return books.get(0);
+	}
 
 }

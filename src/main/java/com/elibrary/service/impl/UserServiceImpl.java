@@ -9,7 +9,12 @@ import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.UserDao;
 import com.elibrary.dao.impl.UserDaoImpl;
+<<<<<<< Updated upstream
 import com.elibrary.entity.Department;
+=======
+import com.elibrary.entity.Author;
+import com.elibrary.entity.EntityStatus;
+>>>>>>> Stashed changes
 import com.elibrary.entity.User;
 import com.elibrary.service.UserService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -76,13 +81,15 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public User findUserById(String boId) throws ServiceUnavailableException {
-		
-		String query = "from User where boId='" + boId + "'";
-		List<User> userList = userDao.getEntitiesByQuery(query);
-		if(CollectionUtils.isEmpty(userList))
+	public User findByBoId(String boId) {
+		String query = "select user from User user where boId='" + boId + "'and entityStatus='"
+				+ EntityStatus.ACTIVE + "'";
+		List<User> users = userDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(users))
 			return null;
-		return userList.get(0);
+		return users.get(0);
 	}
 
+	
+	
 }
