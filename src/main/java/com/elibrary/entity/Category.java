@@ -48,4 +48,20 @@ public class Category extends AbstractEntity implements Serializable {
 		this.name = name;
 	}
 
+	public String getMyanmarName() {
+		return myanmarName;
+	}
+
+	public void setMyanmarName(String myanmarName) {
+		this.myanmarName = myanmarName;
+	}
+
+	public String getEngName() {
+		return engName;
+	}
+
+	public void setEngName(String engName) {
+		this.engName = engName;
+	}
+
 }
