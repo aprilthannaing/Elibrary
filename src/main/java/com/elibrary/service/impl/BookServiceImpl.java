@@ -8,47 +8,54 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.BookDao;
-import com.elibrary.dao.JournalDao;
 import com.elibrary.dao.impl.BookDaoImpl;
 import com.elibrary.entity.Book;
-import com.elibrary.entity.Journal;
 import com.elibrary.service.BookService;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Service("BookService")
-public class BookServiceImpl implements BookService{
-	
+public class BookServiceImpl implements BookService {
+
 	@Autowired
 	private BookDao bookDao;
-	
+
 	public static Logger logger = Logger.getLogger(BookDaoImpl.class);
-	
-	public void save(Book book)throws ServiceUnavailableException{
+
+	public void save(Book book) throws ServiceUnavailableException {
 		try {
+			if (book.isIdRequired(book.getId()))
+				book.setId(getId());
+
+			if (book.isBoIdRequired(book.getBoId()))
+				book.setBoId(getBoId());
+
 			bookDao.saveOrUpdate(book);
-		}catch(com.mchange.rmi.ServiceUnavailableException e){
-			logger.error("Error: "+ e.getMessage());
-			
+		} catch (com.mchange.rmi.ServiceUnavailableException e) {
+			logger.error("Error: " + e.getMessage());
 		}
 	}
 
-	@Override
-	public Book findBookById(String boId) throws ServiceUnavailableException {
-		
-		String query = "from Book where boId='" + boId + "'";
-		List<Book> bookList = bookDao.getEntitiesByQuery(query);
-		if(CollectionUtils.isEmpty(bookList))
-			return null;
-		return bookList.get(0);
+	private long getId() {
+		return countBook() + 1;
 	}
-	
-//	@Override
-//	public List<Book> findByDateRange(String startDate, String endDate) {
-//		String query = "from Book book where book.createdDate between " + startDate + "' and '" + endDate
-//				+ "'";
-//		List<Book> book = BookDao.getEntitiesByQuery(query);
-//		return book;
-//	
-//	}
-	
+
+	private Long plus() {
+		return countBook() + 10000;
+	}
+
+	public long countBook() {
+		String query = "select count(*) from Book";
+		return bookDao.findLongByQueryString(query).get(0);
+	}
+
+	public String getBoId() {
+		return "BOOK" + plus();
+	}
+
+	public boolean isDuplicateProfile(String fullProfile) {
+		String query = "select book from Book book where coverPhoto='" + fullProfile.trim() + "'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		return !CollectionUtils.isEmpty(books);
+	}
+
 }

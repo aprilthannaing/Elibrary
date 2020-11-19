@@ -1,12 +1,17 @@
 package com.elibrary.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,15 +30,12 @@ import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Journal;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.Publisher;
-import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.SystemConstant;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.UserType;
 import com.elibrary.entity.Views;
-import com.elibrary.entity.listOfValue;
-import com.elibrary.entity.listOfValueObj;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
@@ -66,7 +68,7 @@ public class OperationController {
 
 	@Autowired
 	private AuthorService authorService;
-	
+
 	@Autowired
 <<<<<<< Updated upstream
 	private PublisherService publisherService;
@@ -74,36 +76,96 @@ public class OperationController {
 	private EmailService emailService;
 >>>>>>> Stashed changes
 
+	@Value("${IMAGEUPLOADURL}")
+	private String IMAGEUPLOADURL;
+
 	private static Logger logger = Logger.getLogger(OperationController.class);
 
-	@RequestMapping(value = "saveBook", method = RequestMethod.POST)
 	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "saveBook", method = RequestMethod.POST)
 	@JsonView(Views.Detailed.class)
-	public Book saveBook() throws ServiceUnavailableException {
-
-		Category category = new Category();
-		category.setBoId("50843731");
+	public JSONObject saveBook(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
+		//logger.info("json: " + json);
+		JSONObject resultJson = new JSONObject();
+		List<Author> authors = new ArrayList<Author>();
+		List<Publisher> publishers = new ArrayList<Publisher>();
 
 		Book book = new Book();
-		book.setId(001);
-		book.setBoId("qr4824");
-		book.setCategory(category);
-		book.setISBN("2034962472");
-		book.setPublisher("John");
-		book.setEdition(3);
-		book.setPublishedYear("1999");
-		book.setPdfLink("http://rwqyireow;irwhe4892784612");
-//		book.setTitle("Beyond the hills");
-//		book.setCoverPhoto("book1.img");
-//		book.setPublishedDate("12.01.1999");
-//		book.setVolume(3);
-//		book.setState(State.Publish);
-//		book.setModifiedDate("02.12.2000");
-//		book.setCreatedDate("16.10.2020");
-		book.setEntityStatus(EntityStatus.ACTIVE);
+		book.setBoId(SystemConstant.BOID_REQUIRED);
+
+		Object categoryObject = json.get("category");
+		if (categoryObject == null || categoryObject.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please choose Category!");
+			return resultJson;
+		}
+		Category category = categoryService.findByBoId(categoryObject.toString());
+		if (category != null)
+			book.setCategory(category);
+
+		Object subCategoryObject = json.get("subCategory");
+		if (subCategoryObject == null || subCategoryObject.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please choose Sub-Category!");
+			return resultJson;
+		}
+
+		SubCategory subCategory = subCategoryService.findByBoId(subCategoryObject.toString());
+		if (subCategory != null)
+			book.setSubCategory(subCategory);
+
+		List<Object> authorObjects = (List<Object>) json.get("authors");
+		if (!CollectionUtils.isEmpty(authorObjects)) {
+			for (Object boId : authorObjects) {
+				Author author = authorService.findByBoId(boId.toString());
+				if (author != null)
+					authors.add(author);
+			}
+		}
+		book.setAuthors(authors);
+
+		List<Object> publisherObjects = (List<Object>) json.get("publishers");
+		if (!CollectionUtils.isEmpty(publisherObjects)) {
+			for (Object boId : publisherObjects) {
+				Publisher publisher = publisherService.findByBoId(boId.toString());
+				if (publisher != null)
+					publishers.add(publisher);
+			}
+		}
+		book.setPublishers(publishers);
+		book.setCallNo(json.get("callNumber").toString());
+		book.setDownloadApproval(Boolean.valueOf(json.get("downloadApproval").toString()));
+		book.setEdition(json.get("edition").toString());
+		book.setPublishedDate(json.get("publishedDate").toString());
+		book.setSeriesIndex(json.get("seriesIndex").toString());
+		book.setSort(json.get("sort").toString());
+		book.setTitle(json.get("title").toString());
+		book.setVolume(json.get("volume").toString());
+		
+		
+		String imageSrc = json.get("imageSrc").toString();
+		imageSrc = imageSrc.split("base64")[1];
+
+		String filePath = IMAGEUPLOADURL.trim() + "BookProfile//";
+		String profileName = json.get("profileName").toString().split("\\\\")[2];
+		if (authorService.isDuplicateProfile(filePath + profileName)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This Profile Picture is already registered!");
+			return resultJson;
+
+		}
+
+		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
+		Path destinationFile = Paths.get(filePath, profileName);
+		Files.write(destinationFile, imageBytes);
+
+		/* to retrieve profile */
+		book.setCoverPhoto("/AuthorProfile/" + profileName);
+
 		bookService.save(book);
 
-		return book;
+		return resultJson;
 
 	}
 
@@ -149,15 +211,16 @@ public class OperationController {
 		logger.info("json: " + json);
 		Category category = new Category();
 		category.setBoId(SystemConstant.BOID_REQUIRED);
-		List<SubCategory> subCategoryList = new ArrayList<SubCategory>();		
+		List<SubCategory> subCategoryList = new ArrayList<SubCategory>();
 		List<Object> subCategories = (List<Object>) json.get("subcategories");
-		for(Object object : subCategories) {
+		for (Object object : subCategories) {
 			SubCategory subCategory = subCategoryService.findByBoId(object.toString());
-			if(subCategory != null)
+			if (subCategory != null)
 				subCategoryList.add(subCategory);
 		}
 		category.getSubCategories().addAll(subCategoryList);
-		category.setName(json.get("category").toString());
+		category.setMyanmarName(json.get("myaName").toString());
+		category.setEngName(json.get("engName").toString());
 		category.setEntityStatus(EntityStatus.ACTIVE);
 		categoryService.save(category);
 	}
@@ -187,17 +250,40 @@ public class OperationController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "saveAuthor", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public void saveAuthor(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject saveAuthor(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
+		JSONObject resultJson = new JSONObject();
+
 		Author author = new Author();
-		author.setId(001);
 		author.setBoId(SystemConstant.BOID_REQUIRED);
 		author.setName(json.get("name").toString());
 		author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
 		author.setSort(json.get("sort").toString());
 		author.setEntityStatus(EntityStatus.ACTIVE);
+		String imageSrc = json.get("imageSrc").toString();
+		imageSrc = imageSrc.split("base64")[1];
+
+		String filePath = IMAGEUPLOADURL.trim() + "AuthorProfile//";
+		String pictureName = json.get("profilePicture").toString().split("\\\\")[2];
+		if (authorService.isDuplicateProfile(filePath + pictureName)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This Profile Picture is already registered!");
+			return resultJson;
+
+		}
+
+		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
+		Path destinationFile = Paths.get(filePath, pictureName);
+		Files.write(destinationFile, imageBytes);
+
+		/* to retrieve profile */
+		author.setProfilePicture("/AuthorProfile/" + pictureName);
 		authorService.save(author);
+
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
 	}
-	
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "savePublisher", method = RequestMethod.POST)

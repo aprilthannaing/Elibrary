@@ -10,7 +10,7 @@ import org.springframework.util.CollectionUtils;
 import com.elibrary.dao.AuthorDao;
 import com.elibrary.dao.impl.AuthorDaoImpl;
 import com.elibrary.entity.Author;
-import com.elibrary.entity.SubCategory;
+import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.AuthorService;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -53,14 +53,27 @@ public class AuthorServiceImpl implements AuthorService {
 		return "AUTHOR" + plus();
 	}
 
-	@Override
-	public Author findAuthorById(String boId) throws ServiceUnavailableException {
-		String query = "from Author where boId='" + boId + "'";
-		List<Author> authorList = authorDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(authorList))
-		    return null;
-		return authorList.get(0);
-		
+	public boolean isDuplicateProfile(String fullProfile) {
+		String query = "select author from Author author where profilePicture='" + fullProfile.trim() + "'";
+		List<Author> authors = authorDao.getEntitiesByQuery(query);
+		return !CollectionUtils.isEmpty(authors);
+	}
+
+	public List<Author> getAll() {
+		String query = "select author from Author author";
+		List<Author> authors = authorDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(authors))
+			return null;
+		return authors;
+	}
+
+	public Author findByBoId(String boId) {
+		String query = "select author from Author author where boId='" + boId + "'and entityStatus='"
+				+ EntityStatus.ACTIVE + "'";
+		List<Author> authors = authorDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(authors))
+			return null;
+		return authors.get(0);
 	}
 
 }

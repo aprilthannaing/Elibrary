@@ -8,14 +8,19 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Entity
 @Table(name = "author")
 public class Author extends AbstractEntity implements Serializable {
 
+	@JsonView(Views.Thin.class)
 	private String name;
 
+	@JsonView(Views.Thin.class)
 	private String sort;
 
+	@JsonView(Views.Thin.class)
 	private String profilePicture;
 
 	@Column(name = "authorType")

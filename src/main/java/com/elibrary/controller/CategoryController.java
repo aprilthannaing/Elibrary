@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.elibrary.entity.EntityStatus;
-import com.elibrary.entity.SubCategory;
-import com.elibrary.entity.SystemConstant;
+import com.elibrary.entity.Category;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
@@ -24,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @RestController
-@RequestMapping("subcategory")
-public class SubCategoryController {
+@RequestMapping("category")
+public class CategoryController {
 
 	@Autowired
 	private BookService bookService;
@@ -53,8 +51,20 @@ public class SubCategoryController {
 	@JsonView(Views.Summary.class)
 	public JSONObject getAll() throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
-		result.put("subcategories", subCategoryService.getAll());
+		result.put("categories", categoryService.getAll());
 		return result;
 	}
 
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "boId", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject findByCategoryBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json: " + json);
+		JSONObject result = new JSONObject();
+		Category category = categoryService.findByBoId(json.get("category").toString().trim());
+		if (category != null)
+			result.put("subcategories", category.getSubCategories());
+		return result;
+	}
 }

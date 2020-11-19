@@ -19,33 +19,24 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class Category extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
-	private String name;
-	
 	private String myanmarName;
-	
-	private String engName;
-	
 
+	@JsonView(Views.Thin.class)
+	private String engName;
+
+	@JsonView(Views.Thin.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "category_subcategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
 	private List<SubCategory> subCategories;
 
 	public List<SubCategory> getSubCategories() {
-		if(subCategories == null)
+		if (subCategories == null)
 			subCategories = new ArrayList<SubCategory>();
 		return subCategories;
 	}
 
-	public void setSubCategories(List<SubCategory> subCategories) {		
+	public void setSubCategories(List<SubCategory> subCategories) {
 		this.subCategories = subCategories;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getMyanmarName() {

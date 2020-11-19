@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.SubCategoryDao;
 import com.elibrary.dao.impl.CategoryDaoImpl;
+import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.service.SubCategoryService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -61,7 +62,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 	
 	public SubCategory findByBoId(String boId) {
-		String query = "select sub from SubCategory sub where boId='" + boId + "'";
+		String query = "select sub from SubCategory sub where boId='" + boId + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;

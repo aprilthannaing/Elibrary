@@ -15,7 +15,7 @@ public class AbstractReadingObject extends AbstractEntity implements Serializabl
 	private String publishedDate;
 	
 	@Column(name = "volume")
-	private int volume;
+	private String volume;
 	
 	@Column(name = "state")
 	private State state;

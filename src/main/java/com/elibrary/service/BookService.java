@@ -1,16 +1,11 @@
 package com.elibrary.service;
 
-import java.util.List;
-
 import com.elibrary.entity.Book;
-import com.elibrary.entity.Journal;
 import com.mchange.rmi.ServiceUnavailableException;
 
 public interface BookService {
-	public void save(Book book)throws ServiceUnavailableException;
-	
-//	public List<Book> findByDateRange(String startDate, String endDate);
-	
-	public Book findBookById(String boId)throws ServiceUnavailableException;
+	public void save(Book book) throws ServiceUnavailableException;
+
+	public boolean isDuplicateProfile(String fullProfile);
 
 }

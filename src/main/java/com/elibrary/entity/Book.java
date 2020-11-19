@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -21,7 +22,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	private String publisher;
 
-	private int edition;
+	private String edition;
 
 	private String publishedYear;
 
@@ -36,73 +37,64 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private String accessionNo;
 
 	private String size;
-	
+
 	private String downloadApproval;
 
-
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "categoryboId")
-	private Category category;
-
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "subcategoryboId")
+	@JoinTable(name = "book_subcategory", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "subcategoryId"))
 	private SubCategory subCategory;
 
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_category", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
+	private Category category;
+
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "authorId"))
+
+	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "authorId"))
 	private List<Author> authors = new ArrayList<Author>();
-	
+
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_publisher", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
 	private List<Publisher> publishers = new ArrayList<Publisher>();
-	
+
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_rating", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
 	private List<Rating> ratings = new ArrayList<Rating>();
-	
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_comment", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "commentId"))
-	private List<Comment> comments = new ArrayList<Comment>();
-	
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_category", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
-	private List<Category> categories = new ArrayList<Category>();
-	
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_subCategory", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
-	private List<SubCategory> subCategories = new ArrayList<SubCategory>();
 
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "book_comment", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
+	private Comment comment;
 
-	public List<Author> getAuthors() {
-		return authors;
+	public String getISBN() {
+		return ISBN;
 	}
 
-	public void setAuthors(List<Author> authors) {
-		this.authors = authors;
+	public void setISBN(String iSBN) {
+		ISBN = iSBN;
 	}
 
-	public String getCallNo() {
-		return callNo;
+	public String getPublisher() {
+		return publisher;
 	}
 
-	public void setCallNo(String callNo) {
-		this.callNo = callNo;
+	public void setPublisher(String publisher) {
+		this.publisher = publisher;
 	}
 
-	public String getAccessionNo() {
-		return accessionNo;
+	public String getEdition() {
+		return edition;
 	}
 
-	public void setAccessionNo(String accessionNo) {
-		this.accessionNo = accessionNo;
+	public void setEdition(String edition) {
+		this.edition = edition;
 	}
 
-	public SubCategory getSubCategory() {
-		return subCategory;
+	public String getPublishedYear() {
+		return publishedYear;
 	}
 
-	public void setSubCategory(SubCategory subCategory) {
-		this.subCategory = subCategory;
+	public void setPublishedYear(String publishedYear) {
+		this.publishedYear = publishedYear;
 	}
 
 	public String getSort() {
@@ -129,12 +121,44 @@ public class Book extends AbstractReadingObject implements Serializable {
 		this.seriesIndex = seriesIndex;
 	}
 
+	public String getCallNo() {
+		return callNo;
+	}
+
+	public void setCallNo(String callNo) {
+		this.callNo = callNo;
+	}
+
+	public String getAccessionNo() {
+		return accessionNo;
+	}
+
+	public void setAccessionNo(String accessionNo) {
+		this.accessionNo = accessionNo;
+	}
+
 	public String getSize() {
 		return size;
 	}
 
 	public void setSize(String size) {
 		this.size = size;
+	}
+
+	public String getDownloadApproval() {
+		return downloadApproval;
+	}
+
+	public void setDownloadApproval(String downloadApproval) {
+		this.downloadApproval = downloadApproval;
+	}
+
+	public SubCategory getSubCategory() {
+		return subCategory;
+	}
+
+	public void setSubCategory(SubCategory subCategory) {
+		this.subCategory = subCategory;
 	}
 
 	public Category getCategory() {
@@ -145,54 +169,12 @@ public class Book extends AbstractReadingObject implements Serializable {
 		this.category = category;
 	}
 
-	public String getISBN() {
-		return ISBN;
+	public List<Author> getAuthors() {
+		return authors;
 	}
 
-	public void setISBN(String iSBN) {
-		ISBN = iSBN;
-	}
-
-	public String getPublisher() {
-		return publisher;
-	}
-
-	public void setPublisher(String publisher) {
-		this.publisher = publisher;
-	}
-
-	public int getEdition() {
-		return edition;
-	}
-
-	public void setEdition(int edition) {
-		this.edition = edition;
-	}
-
-	public String getPublishedYear() {
-		return publishedYear;
-	}
-
-	public void setPublishedYear(String publishedYear) {
-		this.publishedYear = publishedYear;
-	}
-
-<<<<<<< Updated upstream
-=======
-	public String getPdfLink() {
-		return pdfLink;
-	}
-
-	public void setPdfLink(String pdfLink) {
-		this.pdfLink = pdfLink;
-	}
-
-	public String getDownloadApproval() {
-		return downloadApproval;
-	}
-
-	public void setDownloadApproval(String downloadApproval) {
-		this.downloadApproval = downloadApproval;
+	public void setAuthors(List<Author> authors) {
+		this.authors = authors;
 	}
 
 	public List<Publisher> getPublishers() {
@@ -211,29 +193,12 @@ public class Book extends AbstractReadingObject implements Serializable {
 		this.ratings = ratings;
 	}
 
-	public List<Comment> getComments() {
-		return comments;
+	public Comment getComment() {
+		return comment;
 	}
 
-	public void setComments(List<Comment> comments) {
-		this.comments = comments;
+	public void setComment(Comment comment) {
+		this.comment = comment;
 	}
 
-	public List<Category> getCategories() {
-		return categories;
-	}
-
-	public void setCategories(List<Category> categories) {
-		this.categories = categories;
-	}
-
-	public List<SubCategory> getSubCategories() {
-		return subCategories;
-	}
-
-	public void setSubCategories(List<SubCategory> subCategories) {
-		this.subCategories = subCategories;
-	}
-
->>>>>>> Stashed changes
 }

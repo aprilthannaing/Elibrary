@@ -1,11 +1,17 @@
 package com.elibrary.service.impl;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.PublisherDao;
 import com.elibrary.dao.impl.CategoryDaoImpl;
+import com.elibrary.entity.Author;
+import com.elibrary.entity.Category;
+import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Publisher;
 import com.elibrary.service.PublisherService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -47,6 +53,23 @@ public class PublisherServiceImpl implements PublisherService {
 
 	public String getBoId() {
 		return "PUBLISHER" + plus();
+	}
+	
+
+	public List<Publisher> getAll() {
+		String query = "select publisher from Publisher publisher";
+		List<Publisher> publishers = publisherDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(publishers))
+			return null;
+		return publishers;
+	}
+	
+	public Publisher findByBoId(String boId) {
+		String query = "select publisher from Publisher publisher where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Publisher> publishers = publisherDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(publishers))
+			return null;
+		return publishers.get(0);
 	}
 
 }
