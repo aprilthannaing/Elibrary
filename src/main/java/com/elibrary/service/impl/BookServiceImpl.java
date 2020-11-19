@@ -22,9 +22,7 @@ public class BookServiceImpl implements BookService {
 	public static Logger logger = Logger.getLogger(BookDaoImpl.class);
 
 	public void save(Book book) throws ServiceUnavailableException {
-		try {
-			if (book.isIdRequired(book.getId()))
-				book.setId(getId());
+		try {		
 
 			if (book.isBoIdRequired(book.getBoId()))
 				book.setBoId(getBoId());
@@ -33,10 +31,6 @@ public class BookServiceImpl implements BookService {
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
 		}
-	}
-
-	private long getId() {
-		return countBook() + 1;
 	}
 
 	private Long plus() {
@@ -54,6 +48,12 @@ public class BookServiceImpl implements BookService {
 
 	public boolean isDuplicateProfile(String fullProfile) {
 		String query = "select book from Book book where coverPhoto='" + fullProfile.trim() + "'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		return !CollectionUtils.isEmpty(books);
+	}
+	
+	public boolean isDuplicatePDF(String fullProfile) {
+		String query = "select book from Book book where path='" + fullProfile.trim() + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		return !CollectionUtils.isEmpty(books);
 	}

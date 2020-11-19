@@ -1,10 +1,14 @@
 package com.elibrary.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -23,13 +27,14 @@ import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
+import com.elibrary.entity.Comment;
 import com.elibrary.entity.Department;
-import com.elibrary.entity.Email;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Journal;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.Publisher;
+import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.SystemConstant;
 import com.elibrary.entity.User;
@@ -39,7 +44,7 @@ import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
-import com.elibrary.service.EmailService;
+import com.elibrary.service.CommentService;
 import com.elibrary.service.JournalService;
 import com.elibrary.service.PublisherService;
 import com.elibrary.service.SubCategoryService;
@@ -70,11 +75,10 @@ public class OperationController {
 	private AuthorService authorService;
 
 	@Autowired
-<<<<<<< Updated upstream
 	private PublisherService publisherService;
-=======
-	private EmailService emailService;
->>>>>>> Stashed changes
+
+	@Autowired
+	private CommentService commentService;
 
 	@Value("${IMAGEUPLOADURL}")
 	private String IMAGEUPLOADURL;
@@ -86,7 +90,7 @@ public class OperationController {
 	@RequestMapping(value = "saveBook", method = RequestMethod.POST)
 	@JsonView(Views.Detailed.class)
 	public JSONObject saveBook(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
-		//logger.info("json: " + json);
+		// logger.info("json: " + json);
 		JSONObject resultJson = new JSONObject();
 		List<Author> authors = new ArrayList<Author>();
 		List<Publisher> publishers = new ArrayList<Publisher>();
@@ -135,38 +139,80 @@ public class OperationController {
 		}
 		book.setPublishers(publishers);
 		book.setCallNo(json.get("callNumber").toString());
-		book.setDownloadApproval(Boolean.valueOf(json.get("downloadApproval").toString()));
+		book.setDownloadApproval(json.get("downloadApproval").toString());
 		book.setEdition(json.get("edition").toString());
-		book.setPublishedDate(json.get("publishedDate").toString());
+		book.setPublishedDate(json.get("publishedDate").toString().split("T")[0]);
 		book.setSeriesIndex(json.get("seriesIndex").toString());
 		book.setSort(json.get("sort").toString());
 		book.setTitle(json.get("title").toString());
 		book.setVolume(json.get("volume").toString());
-		
-		
+		book.setISBN(json.get("ISBN").toString());
+		book.setState(State.PENDING);
+		book.setEntityStatus(EntityStatus.ACTIVE);
+		Date date = new Date();
+		String createdDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
+		book.setCreatedDate(createdDate);
+
+		if (!setImage(json, book)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This Profile Picture is already registered!");
+			return resultJson;
+		}
+
+		if (!setPDFFile(json, book)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This File is already registered!");
+			return resultJson;
+		}
+
+		Comment comment = new Comment();
+		comment.setBoId(SystemConstant.BOID_REQUIRED);
+		comment.setDescription(json.get("description").toString());
+		commentService.save(comment);
+		book.setComment(comment);
+
+		setPDFFile(json, book);
+		bookService.save(book);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+
+	}
+
+	private boolean setImage(JSONObject json, Book book) throws IOException {
 		String imageSrc = json.get("imageSrc").toString();
 		imageSrc = imageSrc.split("base64")[1];
 
 		String filePath = IMAGEUPLOADURL.trim() + "BookProfile//";
 		String profileName = json.get("profileName").toString().split("\\\\")[2];
-		if (authorService.isDuplicateProfile(filePath + profileName)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "This Profile Picture is already registered!");
-			return resultJson;
-
+		if (bookService.isDuplicateProfile("/BookProfile/" + profileName.trim())) {
+			return false;
 		}
 
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, profileName);
 		Files.write(destinationFile, imageBytes);
+		book.setCoverPhoto("/BookProfile/" + profileName.trim());
+		return true;
+	}
 
-		/* to retrieve profile */
-		book.setCoverPhoto("/AuthorProfile/" + profileName);
+	private boolean setPDFFile(JSONObject json, Book book) throws IOException {
+		String pdf = json.get("pdf").toString();
+		pdf = pdf.split("base64")[1];
+		String pdfName = json.get("pdfName").toString().split("\\\\")[2];
+		if (bookService.isDuplicatePDF("/BookFile/" + pdfName.trim())) {
+			return false;
+		}
 
-		bookService.save(book);
+		byte[] decodedBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf);
+		String pdfFilePath = IMAGEUPLOADURL.trim() + "BookFile//";
 
-		return resultJson;
-
+		File file = new File(pdfFilePath + pdfName);
+		book.setSize((long)file.length()/ 1024 + "KB");
+		FileOutputStream fop = new FileOutputStream(file);
+		fop.write(decodedBytes);
+		book.setPath("/BookFile/" + pdfName.trim());
+		return true;
 	}
 
 	@RequestMapping(value = "saveUser", method = RequestMethod.POST)
@@ -297,7 +343,6 @@ public class OperationController {
 		publisherService.save(publisher);
 	}
 
-<<<<<<< Updated upstream
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -307,118 +352,14 @@ public class OperationController {
 		journalService.delete(journal);
 		return message;
 	}
-<<<<<<< Updated upstream
-=======
-=======
 
->>>>>>> Stashed changes
-	
 	@RequestMapping(value = "hluttawSetup", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String hluttawSetup(@RequestBody JSONObject json){
+
+	public String hluttawSetup(@RequestBody JSONObject json) {
 		String desc = json.get("description").toString();
 		return "";
 	}
-	
-	
-	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "saveEmail", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Detailed.class)
-	public Email saveEmail(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		
-		Email email = new Email();
-		
-		Hluttaw hluttaw = new Hluttaw();
-		hluttaw.setBoId(SystemConstant.BOID_REQUIRED.toString());
-		
-		email.setId(SystemConstant.ID_REQUIRED);
-		email.setBoId(SystemConstant.BOID_REQUIRED);
-		email.setEmailAddress(json.get("email").toString());
-		email.setHluttaw(hluttaw);
-		email.setEntityStatus(EntityStatus.ACTIVE);
-		emailService.save(email);
-		return email;
 
-	}
-	
-	@RequestMapping(value = "deleteAuthor", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Summary.class)
-	public String deleteAuthor(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
-		String authorId = json.get("authorId").toString();
-		Author author = authorService.findAuthorById(authorId);
-		if(author == null) {
-			return "Author Id is invalid!!";
-		}
-		author.setEntityStatus(EntityStatus.DELETED);
-		authorService.save(author);
-		return "Your request is successful!!";
-	}
-	
-	@RequestMapping(value = "deleteBook", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Summary.class)
-	public String deleteBook(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
-		String bookId = json.get("bookId").toString();
-		Book book = bookService.findBookById(bookId);
-		if(book == null) {
-			return "Book Id is invalid!!";
-		}
-		book.setEntityStatus(EntityStatus.DELETED);
-		bookService.save(book);
-		return "Your request is successful!!";
-	}
-	
-	@RequestMapping(value = "deleteCategory", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Summary.class)
-	public String deleteCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
-		String categoryId = json.get("categoryboId").toString();
-		Category category = categoryService.findCategoryById(categoryId);
-		if(category == null) {
-			return "Category Id is invalid!!";
-		}
-		category.setEntityStatus(EntityStatus.DELETED);
-		categoryService.save(category);
-		return "Your request is successful!!";
-	}
-	
-	
-	@RequestMapping(value = "deleteSubCategory", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Summary.class)
-	public String deleteSubCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
-		String subCategoryId = json.get("subCategoryboId").toString();
-		SubCategory subCategory = subCategoryService.findSubCategoryById(subCategoryId);
-		if(subCategory == null) {
-			return "SubCategory Id is invalid!!";
-		}
-		subCategory.setEntityStatus(EntityStatus.DELETED);
-		subCategoryService.save(subCategory);
-		return "Your request is successful!!";
-	}
-	
-	@RequestMapping(value = "deleteUser", method = RequestMethod.POST)
-	@ResponseBody
-	@JsonView(Views.Summary.class)
-	public String deleteUser(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
-		String userId = json.get("userboId").toString();
-		User user = userService.findUserById(userId);
-		if(user == null) {
-			return "User Id is invalid!!";
-		}
-		user.setEntityStatus(EntityStatus.DELETED);
-		userService.save(user);
-		return "Your request is successful!!";
-	}
-	
-	
->>>>>>> Stashed changes
 }

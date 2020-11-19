@@ -10,7 +10,7 @@ public interface SubCategoryService {
 	public void save(SubCategory subcategory) throws ServiceUnavailableException;
 
 	public List<SubCategory> getAll();
-	
-	public SubCategory findSubCategoryById(String boId) throws ServiceUnavailableException;
+
+	public SubCategory findByBoId(String boId);
 
 }

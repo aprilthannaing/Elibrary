@@ -1,5 +1,7 @@
 package com.elibrary.dao;
 
-public interface CommentDao {
+import com.elibrary.entity.Comment;
+
+public interface CommentDao extends AbstractDao<Comment, String> {
 
 }

@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -20,11 +22,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	private String ISBN;
 
-	private String publisher;
-
 	private String edition;
-
-	private String publishedYear;
 
 	private String sort;
 
@@ -54,11 +52,11 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private List<Author> authors = new ArrayList<Author>();
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_publisher", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
+	@JoinTable(name = "book_publisher", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
 	private List<Publisher> publishers = new ArrayList<Publisher>();
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_rating", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
+	@JoinTable(name = "book_rating", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
 	private List<Rating> ratings = new ArrayList<Rating>();
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -73,28 +71,12 @@ public class Book extends AbstractReadingObject implements Serializable {
 		ISBN = iSBN;
 	}
 
-	public String getPublisher() {
-		return publisher;
-	}
-
-	public void setPublisher(String publisher) {
-		this.publisher = publisher;
-	}
-
 	public String getEdition() {
 		return edition;
 	}
 
 	public void setEdition(String edition) {
 		this.edition = edition;
-	}
-
-	public String getPublishedYear() {
-		return publishedYear;
-	}
-
-	public void setPublishedYear(String publishedYear) {
-		this.publishedYear = publishedYear;
 	}
 
 	public String getSort() {

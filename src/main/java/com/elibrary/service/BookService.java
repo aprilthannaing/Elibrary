@@ -8,4 +8,6 @@ public interface BookService {
 
 	public boolean isDuplicateProfile(String fullProfile);
 
+	public boolean isDuplicatePDF(String fullProfile);
+
 }

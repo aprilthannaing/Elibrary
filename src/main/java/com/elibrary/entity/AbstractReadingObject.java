@@ -3,29 +3,32 @@ package com.elibrary.entity;
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class AbstractReadingObject extends AbstractEntity implements Serializable{
-	
+public class AbstractReadingObject extends AbstractEntity implements Serializable {
+
 	@Column(name = "title")
 	private String title;
-	
+
 	@Column(name = "publishedDate")
 	private String publishedDate;
-	
+
 	@Column(name = "volume")
 	private String volume;
-	
+
 	@Column(name = "state")
+	@Enumerated(EnumType.STRING)
 	private State state;
-	
+
 	@Column(name = "modifiedDate")
 	private String modifiedDate;
-	
+
 	@Column(name = "createdDate")
 	private String createdDate;
-	
+
 	@Column(name = "coverPhoto")
 	private String coverPhoto;
 
@@ -45,11 +48,11 @@ public class AbstractReadingObject extends AbstractEntity implements Serializabl
 		this.publishedDate = publishedDate;
 	}
 
-	public int getVolume() {
+	public String getVolume() {
 		return volume;
 	}
 
-	public void setVolume(int volume) {
+	public void setVolume(String volume) {
 		this.volume = volume;
 	}
 
@@ -84,7 +87,5 @@ public class AbstractReadingObject extends AbstractEntity implements Serializabl
 	public void setCoverPhoto(String coverPhoto) {
 		this.coverPhoto = coverPhoto;
 	}
-	
-	
-	
+
 }
