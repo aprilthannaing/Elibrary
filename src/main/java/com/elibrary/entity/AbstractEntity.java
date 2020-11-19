@@ -55,6 +55,6 @@ public class AbstractEntity {
 	}
 	
 	public boolean isIdRequired(Long id) {
-		return boId == null || SystemConstant.ID_REQUIRED.equals(Id);
+		return id == null || id == 0 || SystemConstant.ID_REQUIRED.equals(id);
 	}
 }

@@ -14,6 +14,7 @@ import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Position;
+import com.elibrary.entity.Request;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.Views;
@@ -49,7 +50,12 @@ public class UserController  extends AbstractController{
 						user.setRole(UserRole.User);
 						user.setCreatedDate(dateFormat());
 						user.setModifiedDate(dateFormat());
+						user.setName(req.getName());
+						user.setEmail(req.getEmail());
+						user.setPhoneNo(req.getPhoneNo());
+						user.setType(req.getType());
 						String status = req.getStatus();
+						user.setStatus(status);
 						if(status.equals("NEW"))
 							user.setEntityStatus(EntityStatus.NEW);
 						else if(status.equals("ACTIVE"))
@@ -115,9 +121,9 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "selectUserInfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public List<User> selectUserInfo(@RequestBody String json){
+	public List<User> selectUserInfo(@RequestBody Request req){
 		List<User> resList = new ArrayList<User>();
-		resList = userservice.selectUser();
+		resList = userservice.selectUser(req);
 		if(resList.size() > 0) {
 			User user = resList.get(0);
 		}
