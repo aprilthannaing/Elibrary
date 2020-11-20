@@ -9,12 +9,10 @@ import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.UserDao;
 import com.elibrary.dao.impl.UserDaoImpl;
-<<<<<<< Updated upstream
 import com.elibrary.entity.Department;
-=======
 import com.elibrary.entity.Author;
 import com.elibrary.entity.EntityStatus;
->>>>>>> Stashed changes
+import com.elibrary.entity.Request;
 import com.elibrary.entity.User;
 import com.elibrary.service.UserService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -46,10 +44,15 @@ public class UserServiceImpl implements UserService{
 		return idList.get(0) + 1;
 	} 
 	
-	public List<User> selectUser() {
+	public List<User> selectUser(Request req) {
 		List<User> response  = new ArrayList<User>();
 		String whereclause = "";
-		String query = "from User";
+		if(!req.getSearchText().equals("")) {
+			whereclause = " and (" + " name like '%" + req.getSearchText() + "%' or email like '%" + req.getSearchText() + "%' "
+					+ "or phoneNo like '%" + req.getSearchText() + "%' or role like '%" + req.getSearchText() + "%' "
+					+ "or type like '%" + req.getSearchText() + "%' or entityStatus like '%" + req.getSearchText() + "%' )";
+		}
+		String query = "from User where 1=1 " + whereclause;
 		List<User> userList = userDao.byQuery(query);
 		for (User row : userList) {
 			row.setDeptType(row.getDepartment().getId());
@@ -58,6 +61,7 @@ public class UserServiceImpl implements UserService{
 			row.setPositionName(row.getPosition().getName());
 			row.setHlutawType(row.getHluttaw().getId());
 			row.setHlutawName(row.getHluttaw().getName());
+			row.setStatus(row.getEntityStatus().name());
 			response.add(row);
 		}
 		return response;
@@ -74,13 +78,13 @@ public class UserServiceImpl implements UserService{
 			row.setPositionName(row.getPosition().getName());
 			row.setHlutawType(row.getHluttaw().getId());
 			row.setHlutawName(row.getHluttaw().getName());
+			row.setStatus(row.getEntityStatus().name());
 			response.add(row);
 		}
 		
 		return response.get(0);
 	}
 
-	@Override
 	public User findByBoId(String boId) {
 		String query = "select user from User user where boId='" + boId + "'and entityStatus='"
 				+ EntityStatus.ACTIVE + "'";
