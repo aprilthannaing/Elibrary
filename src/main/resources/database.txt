@@ -62,36 +62,37 @@ CREATE TABLE `session` (
  CONSTRAINT `70mfjwlofilskmofjfksokjs8d` FOREIGN KEY (`id`) REFERENCES `user` (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE `hluttaw` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `name` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `boId` varchar(255) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `department` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `hluttawboId` varchar(255) NOT NULL,
- `name` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `boId` varchar(255) NOT NULL,
+  `hluttawboId` bigint NOT NULL,
+  `code` varchar(20) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
- KEY `FK_s9y70mfjwiqoafj94228` (`id`),
-CONSTRAINT `FK_s9y70mfjwiqoafj94228` FOREIGN KEY (`id`) REFERENCES `hluttaw` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  KEY `FK_s9y70mfjwiqoafj94228` (`hluttawboId`),
+  CONSTRAINT `FK_s9y70mfjwiqoafj94228` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `position` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `name` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
- KEY `FK_s9fhuowafoeiihfi34820` (`id`),
-CONSTRAINT `FK_s9fhuowafoeiihfi34820` FOREIGN KEY (`id`) REFERENCES `department` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `boId` varchar(255) NOT NULL,
+  `code` varchar(20) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `user` (
