@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import com.elibrary.dao.BookDao;
 import com.elibrary.dao.impl.BookDaoImpl;
 import com.elibrary.entity.Book;
+import com.elibrary.entity.Category;
 import com.elibrary.service.BookService;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -57,5 +58,14 @@ public class BookServiceImpl implements BookService {
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		return !CollectionUtils.isEmpty(books);
 	}
+	
+	public List<Book> getAll() {
+		String query = "select book from Book book";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(books))
+			return null;
+		return books;
+	}
+
 
 }

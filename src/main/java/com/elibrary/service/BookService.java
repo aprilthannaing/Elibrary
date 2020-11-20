@@ -1,5 +1,7 @@
 package com.elibrary.service;
 
+import java.util.List;
+
 import com.elibrary.entity.Book;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -9,5 +11,7 @@ public interface BookService {
 	public boolean isDuplicateProfile(String fullProfile);
 
 	public boolean isDuplicatePDF(String fullProfile);
+
+	public List<Book> getAll();
 
 }

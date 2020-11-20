@@ -16,26 +16,37 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Entity
 @Table(name = "book")
 public class Book extends AbstractReadingObject implements Serializable {
 
+	@JsonView(Views.Thin.class)
 	private String ISBN;
 
+	@JsonView(Views.Thin.class)
 	private String edition;
 
+	@JsonView(Views.Thin.class)
 	private String sort;
 
+	@JsonView(Views.Thin.class)
 	private String path;
 
+	@JsonView(Views.Thin.class)
 	private String seriesIndex;
-
+	
+	@JsonView(Views.Thin.class)
 	private String callNo;
-
+	
+	@JsonView(Views.Thin.class)
 	private String accessionNo;
-
+	
+	@JsonView(Views.Thin.class)
 	private String size;
-
+	
+	@JsonView(Views.Thin.class)
 	private String downloadApproval;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -25,6 +25,7 @@ public class Author extends AbstractEntity implements Serializable {
 
 	@Column(name = "authorType")
 	@Enumerated(EnumType.STRING)
+	@JsonView(Views.Thin.class)
 	private AuthorType authorType;
 
 	public String getProfilePicture() {

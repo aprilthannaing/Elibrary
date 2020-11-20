@@ -7,28 +7,37 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @MappedSuperclass
 public class AbstractReadingObject extends AbstractEntity implements Serializable {
 
 	@Column(name = "title")
+	@JsonView(Views.Thin.class)
 	private String title;
 
 	@Column(name = "publishedDate")
+	@JsonView(Views.Thin.class)
 	private String publishedDate;
 
 	@Column(name = "volume")
+	@JsonView(Views.Thin.class)
 	private String volume;
 
 	@Column(name = "state")
+	@JsonView(Views.Thin.class)
 	@Enumerated(EnumType.STRING)
 	private State state;
 
 	@Column(name = "modifiedDate")
+	@JsonView(Views.Thin.class)
 	private String modifiedDate;
 
+	@JsonView(Views.Thin.class)
 	@Column(name = "createdDate")
 	private String createdDate;
 
+	@JsonView(Views.Thin.class)
 	@Column(name = "coverPhoto")
 	private String coverPhoto;
 
