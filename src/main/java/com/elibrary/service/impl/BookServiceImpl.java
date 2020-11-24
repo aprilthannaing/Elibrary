@@ -31,6 +31,7 @@ public class BookServiceImpl implements BookService {
 			if (book.isBoIdRequired(book.getBoId()))
 				book.setBoId(getBoId());
 
+			book.setEntityStatus(EntityStatus.ACTIVE);
 			bookDao.saveOrUpdate(book);
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
@@ -51,13 +52,13 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public boolean isDuplicateProfile(String fullProfile) {
-		String query = "select book from Book book where coverPhoto='" + fullProfile.trim() + "'";
+		String query = "select book from Book book where coverPhoto='" + fullProfile.trim() + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		return !CollectionUtils.isEmpty(books);
 	}
 	
 	public boolean isDuplicatePDF(String fullProfile) {
-		String query = "select book from Book book where path='" + fullProfile.trim() + "'";
+		String query = "select book from Book book where path='" + fullProfile.trim() + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		return !CollectionUtils.isEmpty(books);
 	}

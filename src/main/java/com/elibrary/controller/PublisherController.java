@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,6 +31,16 @@ public class PublisherController {
 	public JSONObject getAll() throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		result.put("publishers", publisherService.getAll());
+		return result;
+	}
+	
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "boId", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject getAll(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject result = new JSONObject();
+		result.put("publisher", publisherService.findByBoId(json.get("boId").toString()));
 		return result;
 	}
 }

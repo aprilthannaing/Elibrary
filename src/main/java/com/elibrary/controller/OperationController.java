@@ -84,47 +84,13 @@ public class OperationController {
 	@Autowired
 	private EmailService emailService;
 
-
-
 	@Value("${IMAGEUPLOADURL}")
 	private String IMAGEUPLOADURL;
 
 	private static Logger logger = Logger.getLogger(OperationController.class);
 
-	@ResponseBody
-	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "saveBook", method = RequestMethod.POST)
-	@JsonView(Views.Detailed.class)
-	public JSONObject saveBook(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
-		// logger.info("json: " + json);
-		JSONObject resultJson = new JSONObject();
+	private void setBookInfo(Book book, JSONObject json) throws ServiceUnavailableException, IOException {
 		List<Author> authors = new ArrayList<Author>();
-		List<Publisher> publishers = new ArrayList<Publisher>();
-
-		Book book = new Book();
-		book.setBoId(SystemConstant.BOID_REQUIRED);
-
-		Object categoryObject = json.get("category");
-		if (categoryObject == null || categoryObject.toString().isEmpty()) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "Please choose Category!");
-			return resultJson;
-		}
-		Category category = categoryService.findByBoId(categoryObject.toString());
-		if (category != null)
-			book.setCategory(category);
-
-		Object subCategoryObject = json.get("subCategory");
-		if (subCategoryObject == null || subCategoryObject.toString().isEmpty()) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "Please choose Sub-Category!");
-			return resultJson;
-		}
-
-		SubCategory subCategory = subCategoryService.findByBoId(subCategoryObject.toString());
-		if (subCategory != null)
-			book.setSubCategory(subCategory);
-
 		List<Object> authorObjects = (List<Object>) json.get("authors");
 		if (!CollectionUtils.isEmpty(authorObjects)) {
 			for (Object boId : authorObjects) {
@@ -134,7 +100,7 @@ public class OperationController {
 			}
 		}
 		book.setAuthors(authors);
-
+		List<Publisher> publishers = new ArrayList<Publisher>();
 		List<Object> publisherObjects = (List<Object>) json.get("publishers");
 		if (!CollectionUtils.isEmpty(publisherObjects)) {
 			for (Object boId : publisherObjects) {
@@ -155,33 +121,13 @@ public class OperationController {
 		book.setISBN(json.get("ISBN").toString());
 		book.setState(State.PENDING);
 		book.setEntityStatus(EntityStatus.ACTIVE);
-		Date date = new Date();
-		String createdDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
-		book.setCreatedDate(createdDate);
-
-		if (!setImage(json, book)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "This Profile Picture is already registered!");
-			return resultJson;
-		}
-
-		if (!setPDFFile(json, book)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "This File is already registered!");
-			return resultJson;
-		}
-
 		Comment comment = new Comment();
 		comment.setBoId(SystemConstant.BOID_REQUIRED);
 		comment.setDescription(json.get("description").toString());
 		commentService.save(comment);
-		book.setComment(comment);
+	//	book.setComment(comment);
 
 		setPDFFile(json, book);
-		bookService.save(book);
-		resultJson.put("status", "1");
-		resultJson.put("msg", "Success!");
-		return resultJson;
 
 	}
 
@@ -214,11 +160,126 @@ public class OperationController {
 		String pdfFilePath = IMAGEUPLOADURL.trim() + "BookFile//";
 
 		File file = new File(pdfFilePath + pdfName);
-		book.setSize((long)file.length()/ 1024 + "KB");
+		book.setSize((long) file.length() / 1024 + "KB");
 		FileOutputStream fop = new FileOutputStream(file);
 		fop.write(decodedBytes);
 		book.setPath("/BookFile/" + pdfName.trim());
 		return true;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "saveBook", method = RequestMethod.POST)
+	@JsonView(Views.Detailed.class)
+	public JSONObject saveBook(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
+		// logger.info("json: " + json);
+		JSONObject resultJson = new JSONObject();
+		Book book = new Book();
+		book.setBoId(SystemConstant.BOID_REQUIRED);
+
+		Object categoryObject = json.get("category");
+		if (categoryObject == null || categoryObject.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please choose Category!");
+			return resultJson;
+		}
+		Category category = categoryService.findByBoId(categoryObject.toString());
+		if (category != null) {
+			book.setCategory(category);
+			book.setAccessionNo(book.getCategory().getEngName().substring(0, 1) + (bookService.countBook() + 1));
+		}
+
+		Object subCategoryObject = json.get("subCategory");
+		if (subCategoryObject == null || subCategoryObject.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please choose Sub-Category!");
+			return resultJson;
+		}
+
+		SubCategory subCategory = subCategoryService.findByBoId(subCategoryObject.toString());
+		if (subCategory != null)
+			book.setSubCategory(subCategory);
+
+		Date date = new Date();
+		String createdDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
+		book.setCreatedDate(createdDate);
+
+		if (!setImage(json, book)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This Profile Picture is already registered!");
+			return resultJson;
+		}
+
+		if (!setPDFFile(json, book)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This File is already registered!");
+			return resultJson;
+		}
+
+		setBookInfo(book, json);
+		bookService.save(book);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "editBook", method = RequestMethod.POST)
+	@JsonView(Views.Detailed.class)
+	public JSONObject editBook(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
+		// logger.info("json: " + json);
+		JSONObject resultJson = new JSONObject();
+		Book book = bookService.findByBoId(json.get("boId").toString());
+
+		Object categoryObject = json.get("category");
+		if (categoryObject == null || categoryObject.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please choose Category!");
+			return resultJson;
+		}
+		Category category = categoryService.findByBoId(categoryObject.toString());
+		if (category != null)
+			book.setCategory(category);
+
+		Object subCategoryObject = json.get("subCategory");
+		if (subCategoryObject == null || subCategoryObject.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please choose Sub-Category!");
+			return resultJson;
+		}
+
+		SubCategory subCategory = subCategoryService.findByBoId(subCategoryObject.toString());
+		if (subCategory != null)
+			book.setSubCategory(subCategory);
+
+		Date date = new Date();
+		String modifiedDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
+		book.setModifiedDate(modifiedDate);
+
+		if (json.get("imageSrc").toString().contains("base64")) {
+			if (!setImage(json, book)) {
+				resultJson.put("status", "0");
+				resultJson.put("msg", "This Profile Picture is already registered!");
+				return resultJson;
+			}
+		}
+
+		Object pdf = json.get("pdf");
+		if (pdf != null && pdf.toString().contains("base64")) {
+			if (!setPDFFile(json, book)) {
+				resultJson.put("status", "0");
+				resultJson.put("msg", "This File is already registered!");
+				return resultJson;
+			}
+		}
+
+		bookService.save(book);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+
 	}
 
 	@RequestMapping(value = "saveUser", method = RequestMethod.POST)
@@ -255,47 +316,112 @@ public class OperationController {
 		return user;
 	}
 
-	@ResponseBody
-	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
-	@JsonView(Views.Summary.class)
-	public void saveSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		logger.info("json: " + json);
-		Category category = new Category();
-		category.setBoId(SystemConstant.BOID_REQUIRED);
+	private void setCategoryInfo(Category category, JSONObject json) {
+
 		List<SubCategory> subCategoryList = new ArrayList<SubCategory>();
-		List<Object> subCategories = (List<Object>) json.get("subcategories");
+		List<Object> subCategories = (List<Object>) json.get("categories");
 		for (Object object : subCategories) {
 			SubCategory subCategory = subCategoryService.findByBoId(object.toString());
 			if (subCategory != null)
 				subCategoryList.add(subCategory);
 		}
-		category.getSubCategories().addAll(subCategoryList);
-		category.setMyanmarName(json.get("myaName").toString());
+		category.setSubCategories(subCategoryList);
+		category.setMyanmarName(json.get("myanmarName").toString());
 		category.setEngName(json.get("engName").toString());
 		category.setEntityStatus(EntityStatus.ACTIVE);
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json: " + json);
+		Category category = new Category();
+		category.setBoId(SystemConstant.BOID_REQUIRED);
+		setCategoryInfo(category, json);
 		categoryService.save(category);
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "editcategory", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public void editCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json: " + json);
+		Category category = categoryService.findByBoId(json.get("boId").toString());
+		setCategoryInfo(category, json);
+		categoryService.save(category);
+	}
+
+	private boolean setSubCategoryInfo(SubCategory subCategory, JSONObject json) {
+		Object description = json.get("name");
+		if (description == null || description.toString().isEmpty())
+			return false;
+
+		subCategory.setName(description.toString());
+		subCategory.setEntityStatus(EntityStatus.ACTIVE);
+		return true;
 	}
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "savesubcategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject saveSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = new SubCategory();
 		subCategory.setBoId(SystemConstant.BOID_REQUIRED);
-		Object description = json.get("description");
-		if (description == null || description.toString().isEmpty()) {
+		if (!setSubCategoryInfo(subCategory, json)) {
 			result.put("status", "0");
 			return result;
 		}
-
-		subCategory.setName(description.toString());
-		subCategory.setEntityStatus(EntityStatus.ACTIVE);
 		subCategoryService.save(subCategory);
 		result.put("status", "1");
 		return result;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "editsubcategory", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject editSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject result = new JSONObject();
+		SubCategory subCategory = subCategoryService.findByBoId(json.get("boId").toString());
+		if (!setSubCategoryInfo(subCategory, json)) {
+			result.put("status", "0");
+			return result;
+		}
+		subCategoryService.save(subCategory);
+		result.put("status", "1");
+		return result;
+	}
+
+	private boolean setAuthorProfile(Author author, JSONObject json) throws IOException {
+		String imageSrc = json.get("imageSrc").toString();
+		imageSrc = imageSrc.split("base64")[1];
+
+		String filePath = IMAGEUPLOADURL.trim() + "AuthorProfile//";
+		String pictureName = json.get("profilePicture").toString().split("\\\\")[2];
+		if (authorService.isDuplicateProfile(filePath + pictureName))
+			return false;
+
+		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
+		Path destinationFile = Paths.get(filePath, pictureName);
+		Files.write(destinationFile, imageBytes);
+
+		/* to retrieve profile */
+		author.setProfilePicture("/AuthorProfile/" + pictureName);
+		return true;
+
+	}
+
+	private void setAuthorInfo(Author author, JSONObject json) {
+
+		author.setName(json.get("name").toString());
+		author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
+		author.setSort(json.get("sort").toString());
+		author.setEntityStatus(EntityStatus.ACTIVE);
 	}
 
 	@ResponseBody
@@ -307,30 +433,42 @@ public class OperationController {
 
 		Author author = new Author();
 		author.setBoId(SystemConstant.BOID_REQUIRED);
-		author.setName(json.get("name").toString());
-		author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
-		author.setSort(json.get("sort").toString());
-		author.setEntityStatus(EntityStatus.ACTIVE);
-		String imageSrc = json.get("imageSrc").toString();
-		imageSrc = imageSrc.split("base64")[1];
+		setAuthorInfo(author, json);
 
-		String filePath = IMAGEUPLOADURL.trim() + "AuthorProfile//";
-		String pictureName = json.get("profilePicture").toString().split("\\\\")[2];
-		if (authorService.isDuplicateProfile(filePath + pictureName)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "This Profile Picture is already registered!");
-			return resultJson;
-
+		if (json.get("imageSrc").toString().contains("base64")) {
+			if (!setAuthorProfile(author, json)) {
+				resultJson.put("status", "0");
+				resultJson.put("msg", "This Profile Picture is already registered!");
+				return resultJson;
+			}
 		}
 
-		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
-		Path destinationFile = Paths.get(filePath, pictureName);
-		Files.write(destinationFile, imageBytes);
-
-		/* to retrieve profile */
-		author.setProfilePicture("/AuthorProfile/" + pictureName);
 		authorService.save(author);
 
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "editAuthor", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject editAuthor(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
+		JSONObject resultJson = new JSONObject();
+
+		Author author = authorService.findByBoId(json.get("boId").toString());
+		setAuthorInfo(author, json);
+
+		if (json.get("imageSrc").toString().contains("base64")) {
+			if (!setAuthorProfile(author, json)) {
+				resultJson.put("status", "0");
+				resultJson.put("msg", "This Profile Picture is already registered!");
+				return resultJson;
+			}
+		}
+
+		authorService.save(author);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
 		return resultJson;
@@ -349,6 +487,18 @@ public class OperationController {
 		publisherService.save(publisher);
 	}
 
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "editPublisher", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public void editPublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		Publisher publisher = publisherService.findByBoId(json.get("boId").toString());
+		publisher.setName(json.get("name").toString());
+		publisher.setSort(json.get("sort").toString());
+		publisher.setEntityStatus(EntityStatus.ACTIVE);
+		publisherService.save(publisher);
+	}
+
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -359,7 +509,6 @@ public class OperationController {
 		return message;
 	}
 
-
 	@RequestMapping(value = "hluttawSetup", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -369,20 +518,20 @@ public class OperationController {
 		return "";
 	}
 
-
-	
-	@RequestMapping(value = "deleteAuthor", method = RequestMethod.POST)
 	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
-	public JSONObject deleteAuthor(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
+	@RequestMapping(value = "deleteAuthor", method = RequestMethod.POST)
+	public JSONObject deleteAuthor(@RequestBody JSONObject json) throws ServiceUnavailableException {
+
 		JSONObject resultJson = new JSONObject();
 		String authorId = json.get("authorId").toString();
 		Author author = authorService.findByBoId(authorId);
-		if(author == null) {
+		if (author == null) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Author Id is invalid!!");
 			return resultJson;
+
 		}
 		author.setEntityStatus(EntityStatus.DELETED);
 		authorService.save(author);
@@ -390,19 +539,43 @@ public class OperationController {
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;
 	}
-	
-	@RequestMapping(value = "deleteBook", method = RequestMethod.POST)
+
 	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
-	public JSONObject deleteBook(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
+	@RequestMapping(value = "deletePublisher", method = RequestMethod.POST)
+	public JSONObject deletePublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
+
+		JSONObject resultJson = new JSONObject();
+		String publisherboId = json.get("publisherboId").toString();
+		Publisher publisher = publisherService.findByBoId(publisherboId);
+		if (publisher == null) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "publisherboId Id is invalid!!");
+			return resultJson;
+
+		}
+		publisher.setEntityStatus(EntityStatus.DELETED);
+		publisherService.save(publisher);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Your request is successful!!");
+		return resultJson;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@JsonView(Views.Summary.class)
+	@RequestMapping(value = "deleteBook", method = RequestMethod.POST)
+	public JSONObject deleteBook(@RequestBody JSONObject json) throws ServiceUnavailableException {
+
 		JSONObject resultJson = new JSONObject();
 		String bookId = json.get("bookId").toString();
 		Book book = bookService.findByBoId(bookId);
-		if(book == null) {
+		if (book == null) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Book Id is invalid!!");
 			return resultJson;
+
 		}
 		book.setEntityStatus(EntityStatus.DELETED);
 		bookService.save(book);
@@ -410,19 +583,21 @@ public class OperationController {
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;
 	}
-	
-	@RequestMapping(value = "deleteCategory", method = RequestMethod.POST)
+
 	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
-	public JSONObject deleteCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
+	@RequestMapping(value = "deleteCategory", method = RequestMethod.POST)
+	public JSONObject deleteCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+
 		JSONObject resultJson = new JSONObject();
 		String categoryId = json.get("categoryboId").toString();
 		Category category = categoryService.findByBoId(categoryId);
-		if(category == null) {
+		if (category == null) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Category Id is invalid!!");
 			return resultJson;
+
 		}
 		category.setEntityStatus(EntityStatus.DELETED);
 		categoryService.save(category);
@@ -430,20 +605,21 @@ public class OperationController {
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;
 	}
-	
-	
-	@RequestMapping(value = "deleteSubCategory", method = RequestMethod.POST)
+
 	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
-	public JSONObject deleteSubCategory(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
+	@RequestMapping(value = "deleteSubCategory", method = RequestMethod.POST)
+	public JSONObject deleteSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+
 		JSONObject resultJson = new JSONObject();
 		String subCategoryId = json.get("subCategoryboId").toString();
 		SubCategory subCategory = subCategoryService.findByBoId(subCategoryId);
-		if(subCategory == null) {
+		if (subCategory == null) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Subcategory Id is invalid!!");
 			return resultJson;
+
 		}
 		subCategory.setEntityStatus(EntityStatus.DELETED);
 		subCategoryService.save(subCategory);
@@ -451,19 +627,20 @@ public class OperationController {
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;
 	}
-	
+
 	@RequestMapping(value = "deleteUser", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject deleteUser(@RequestBody JSONObject json)throws ServiceUnavailableException{
-	
+	public JSONObject deleteUser(@RequestBody JSONObject json) throws ServiceUnavailableException {
+
 		JSONObject resultJson = new JSONObject();
 		String userId = json.get("userboId").toString();
 		User user = userService.findByBoId(userId);
-		if(user == null) {
+		if (user == null) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "User Id is invalid!!");
 			return resultJson;
+
 		}
 		user.setEntityStatus(EntityStatus.DELETED);
 		userService.save(user);
@@ -471,6 +648,5 @@ public class OperationController {
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;
 	}
-	
-	
+
 }

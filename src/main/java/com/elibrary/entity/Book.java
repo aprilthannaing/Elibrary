@@ -49,27 +49,32 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String downloadApproval;
 
+	@JsonView(Views.Thin.class)
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_subcategory", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "subcategoryId"))
 	private SubCategory subCategory;
 
+	@JsonView(Views.Thin.class)
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_category", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
 	private Category category;
 
+	@JsonView(Views.Thin.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-
 	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "authorId"))
 	private List<Author> authors = new ArrayList<Author>();
 
+	@JsonView(Views.Thin.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_publisher", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
 	private List<Publisher> publishers = new ArrayList<Publisher>();
 
+	@JsonView(Views.Thin.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_rating", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
 	private List<Rating> ratings = new ArrayList<Rating>();
 
+	@JsonView(Views.Thin.class)
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_comment", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
 	private Comment comment;

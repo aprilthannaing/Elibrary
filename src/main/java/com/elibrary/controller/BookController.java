@@ -10,16 +10,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.elibrary.entity.EntityStatus;
-import com.elibrary.entity.SubCategory;
-import com.elibrary.entity.SystemConstant;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.elibrary.service.JournalService;
 import com.elibrary.service.SubCategoryService;
-import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -32,9 +28,6 @@ public class BookController {
 
 	@Autowired
 	private JournalService journalService;
-
-	@Autowired
-	private UserService userService;
 
 	@Autowired
 	private CategoryService categoryService;
@@ -54,6 +47,16 @@ public class BookController {
 	public JSONObject getAll() throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		result.put("books", bookService.getAll());
+		return result;
+	}
+	
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "boId", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject getAll(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject result = new JSONObject();
+		result.put("book", bookService.findByBoId(json.get("boId").toString()));
 		return result;
 	}
 

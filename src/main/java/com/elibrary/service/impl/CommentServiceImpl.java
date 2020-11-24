@@ -21,8 +21,6 @@ public class CommentServiceImpl implements CommentService {
 
 	public void save(Comment comment) throws ServiceUnavailableException {
 		try {
-			if (comment.isIdRequired(comment.getId()))
-				comment.setId(getId());
 
 			if (comment.isBoIdRequired(comment.getBoId()))
 				comment.setBoId(getBoId());
@@ -31,10 +29,6 @@ public class CommentServiceImpl implements CommentService {
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
 		}
-	}
-
-	private long getId() {
-		return CountComment() + 1;
 	}
 
 	private Long plus() {

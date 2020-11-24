@@ -32,9 +32,6 @@ public class CategoryController {
 	private JournalService journalService;
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private CategoryService categoryService;
 
 	@Autowired
@@ -65,6 +62,19 @@ public class CategoryController {
 		Category category = categoryService.findByBoId(json.get("category").toString().trim());
 		if (category != null)
 			result.put("subcategories", category.getSubCategories());
+		return result;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "byboId", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject byCategoryBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json: " + json);
+		JSONObject result = new JSONObject();
+		Category category = categoryService.findByBoId(json.get("boId").toString().trim());
+		if (category != null)
+			result.put("category", category);
 		return result;
 	}
 }

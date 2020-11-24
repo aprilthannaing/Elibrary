@@ -9,11 +9,13 @@ public interface BookService {
 	public void save(Book book) throws ServiceUnavailableException;
 
 	public boolean isDuplicateProfile(String fullProfile);
-	
+
 	public Book findByBoId(String boId);
 
 	public boolean isDuplicatePDF(String fullProfile);
 
 	public List<Book> getAll();
+
+	public long countBook();
 
 }

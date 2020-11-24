@@ -1,23 +1,19 @@
 package com.elibrary.service.impl;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
 import com.elibrary.dao.UserDao;
-
-import com.elibrary.entity.EntityStatus;
-
 import com.elibrary.dao.impl.UserDaoImpl;
-import com.elibrary.entity.Department;
-import com.elibrary.entity.Author;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Request;
-
 import com.elibrary.entity.User;
-import com.elibrary.dao.impl.UserDaoImpl;
 import com.elibrary.service.UserService;
 import com.mchange.rmi.ServiceUnavailableException;
 

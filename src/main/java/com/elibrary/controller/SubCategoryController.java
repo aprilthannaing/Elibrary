@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elibrary.entity.Category;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.SystemConstant;
@@ -54,6 +55,18 @@ public class SubCategoryController {
 	public JSONObject getAll() throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		result.put("subcategories", subCategoryService.getAll());
+		return result;
+	}
+	
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "boId", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject findByBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject result = new JSONObject();
+		SubCategory subCategory = subCategoryService.findByBoId(json.get("boId").toString().trim());
+		if (subCategory != null)
+			result.put("subCategory", subCategory);
 		return result;
 	}
 
