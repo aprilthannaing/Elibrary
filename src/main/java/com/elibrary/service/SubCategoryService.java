@@ -12,5 +12,7 @@ public interface SubCategoryService {
 	public List<SubCategory> getAll();
 
 	public SubCategory findByBoId(String boId);
+	
+	public long countSubCategory();
 
 }

@@ -1,5 +1,5 @@
 package com.elibrary.entity;
 
 public enum State {
-    DRAFT, PENDING, APPROVED;
+    DRAFT, PENDING, APPROVE;
 }

@@ -36,16 +36,16 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	private String seriesIndex;
-	
+
 	@JsonView(Views.Thin.class)
 	private String callNo;
-	
+
 	@JsonView(Views.Thin.class)
 	private String accessionNo;
-	
+
 	@JsonView(Views.Thin.class)
 	private String size;
-	
+
 	@JsonView(Views.Thin.class)
 	private String downloadApproval;
 
@@ -168,6 +168,9 @@ public class Book extends AbstractReadingObject implements Serializable {
 	}
 
 	public List<Author> getAuthors() {
+		if (authors == null) {
+			authors = new ArrayList<Author>();
+		}
 		return authors;
 	}
 
@@ -176,6 +179,9 @@ public class Book extends AbstractReadingObject implements Serializable {
 	}
 
 	public List<Publisher> getPublishers() {
+		if (publishers == null) {
+			publishers = new ArrayList<Publisher>();
+		}
 		return publishers;
 	}
 

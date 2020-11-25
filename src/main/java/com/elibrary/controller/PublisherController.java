@@ -43,4 +43,11 @@ public class PublisherController {
 		result.put("publisher", publisherService.findByBoId(json.get("boId").toString()));
 		return result;
 	}
+	
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "count", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public String getCount() throws ServiceUnavailableException {
+		return publisherService.countPublisher() + "";
+	}
 }

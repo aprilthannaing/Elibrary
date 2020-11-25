@@ -109,15 +109,14 @@ public class OperationController {
 					publishers.add(publisher);
 			}
 		}
+
 		book.setPublishers(publishers);
-		book.setCallNo(json.get("callNumber").toString());
 		book.setDownloadApproval(json.get("downloadApproval").toString());
-		book.setEdition(json.get("edition").toString());
+
 		book.setPublishedDate(json.get("publishedDate").toString().split("T")[0]);
 		book.setSeriesIndex(json.get("seriesIndex").toString());
 		book.setSort(json.get("sort").toString());
 		book.setTitle(json.get("title").toString());
-		book.setVolume(json.get("volume").toString());
 		book.setISBN(json.get("ISBN").toString());
 		book.setState(State.PENDING);
 		book.setEntityStatus(EntityStatus.ACTIVE);
@@ -125,9 +124,7 @@ public class OperationController {
 		comment.setBoId(SystemConstant.BOID_REQUIRED);
 		comment.setDescription(json.get("description").toString());
 		commentService.save(comment);
-	//	book.setComment(comment);
-
-		setPDFFile(json, book);
+		book.setComment(comment);
 
 	}
 
@@ -172,7 +169,7 @@ public class OperationController {
 	@RequestMapping(value = "saveBook", method = RequestMethod.POST)
 	@JsonView(Views.Detailed.class)
 	public JSONObject saveBook(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
-		// logger.info("json: " + json);
+
 		JSONObject resultJson = new JSONObject();
 		Book book = new Book();
 		book.setBoId(SystemConstant.BOID_REQUIRED);
@@ -217,6 +214,9 @@ public class OperationController {
 		}
 
 		setBookInfo(book, json);
+		book.setCallNo(json.get("callNumber").toString());
+		book.setEdition(json.get("edition").toString());
+		book.setVolume(json.get("volume").toString());
 		bookService.save(book);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
@@ -229,7 +229,6 @@ public class OperationController {
 	@RequestMapping(value = "editBook", method = RequestMethod.POST)
 	@JsonView(Views.Detailed.class)
 	public JSONObject editBook(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
-		// logger.info("json: " + json);
 		JSONObject resultJson = new JSONObject();
 		Book book = bookService.findByBoId(json.get("boId").toString());
 
@@ -275,6 +274,10 @@ public class OperationController {
 			}
 		}
 
+		book.setCallNo(json.get("callNumber") != null ? json.get("callNumber").toString() : book.getCallNo());
+		book.setEdition(json.get("edition") != null ? json.get("edition").toString() : book.getEdition());
+		book.setVolume(json.get("volume") != null ? json.get("volume").toString() : book.getVolume());
+		setBookInfo(book, json);
 		bookService.save(book);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");

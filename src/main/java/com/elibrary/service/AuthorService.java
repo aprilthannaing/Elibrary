@@ -14,4 +14,7 @@ public interface AuthorService {
 	public List<Author> getAll();
 
 	public Author findByBoId(String boId);
+	
+	public long countAuthor();
+
 }

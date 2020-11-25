@@ -12,5 +12,6 @@ public interface PublisherService {
 	public List<Publisher> getAll();
 
 	public Publisher findByBoId(String boId);
-
+	
+	public long countPublisher();
 }

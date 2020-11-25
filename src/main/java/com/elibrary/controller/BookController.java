@@ -59,5 +59,11 @@ public class BookController {
 		result.put("book", bookService.findByBoId(json.get("boId").toString()));
 		return result;
 	}
-
+	
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "count", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public String getCount() throws ServiceUnavailableException {
+		return bookService.countBook() + "";
+	}
 }

@@ -69,5 +69,12 @@ public class SubCategoryController {
 			result.put("subCategory", subCategory);
 		return result;
 	}
+	
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "count", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public String getCount() throws ServiceUnavailableException {
+		return subCategoryService.countSubCategory() + "";
+	}
 
 }

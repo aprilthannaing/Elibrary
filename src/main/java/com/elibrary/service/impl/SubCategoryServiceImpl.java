@@ -37,14 +37,14 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	private long getId() {
-		return countCategory() + 1;
+		return countSubCategory() + 1;
 	}
 
 	private Long plus() {
-		return countCategory() + 10000;
+		return countSubCategory() + 10000;
 	}
 
-	public long countCategory() {
+	public long countSubCategory() {
 		String query = "select count(*) from SubCategory";
 		return subCategoryDao.findLongByQueryString(query).get(0);
 	}

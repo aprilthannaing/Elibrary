@@ -11,5 +11,8 @@ public interface CategoryService {
 	public List<Category> getAll();
 
 	public Category findByBoId(String boId);
+	
+	public long countCategory();
+
 
 }

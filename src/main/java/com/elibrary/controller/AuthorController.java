@@ -43,4 +43,11 @@ public class AuthorController {
 		result.put("author", authorService.findByBoId(json.get("boId").toString()));
 		return result;
 	}
+	
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "count", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public String getCount() throws ServiceUnavailableException {
+		return authorService.countAuthor() + "";
+	}
 }
