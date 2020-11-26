@@ -20,7 +20,7 @@ public class History extends AbstractEntity implements Serializable {
 	@JoinColumn(name = "userboId")
 	private User user;
 
-	private String entityId;
+	private String bookId;
 
 	private String dateTime;
 
@@ -56,12 +56,12 @@ public class History extends AbstractEntity implements Serializable {
 		this.user = user;
 	}
 
-	public String getEntityId() {
-		return entityId;
+	public String getBookId() {
+		return bookId;
 	}
 
-	public void setEntityId(String entityId) {
-		this.entityId = entityId;
+	public void setBookId(String bookId) {
+		this.bookId = bookId;
 	}
 
 	public String getDateTime() {

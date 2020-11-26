@@ -112,7 +112,6 @@ public class OperationController {
 
 		book.setPublishers(publishers);
 		book.setDownloadApproval(json.get("downloadApproval").toString());
-
 		book.setPublishedDate(json.get("publishedDate").toString().split("T")[0]);
 		book.setSeriesIndex(json.get("seriesIndex").toString());
 		book.setSort(json.get("sort").toString());
@@ -173,6 +172,27 @@ public class OperationController {
 		JSONObject resultJson = new JSONObject();
 		Book book = new Book();
 		book.setBoId(SystemConstant.BOID_REQUIRED);
+
+		Object uploader = json.get("userId");
+		if (uploader == null || uploader.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please login first!");
+			return resultJson;
+		}
+
+		User user = userService.findByBoId(uploader.toString());
+		if (user == null) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Not registered User!");
+			return resultJson;
+		}
+		book.setUploader(user);
+		Object image = json.get("imageSrc");
+		if (image == null || image.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please select cover photo!");
+			return resultJson;
+		}
 
 		Object categoryObject = json.get("category");
 		if (categoryObject == null || categoryObject.toString().isEmpty()) {

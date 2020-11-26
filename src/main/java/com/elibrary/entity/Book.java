@@ -77,6 +77,18 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JoinTable(name = "book_comment", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
 	private Comment comment;
 
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "uploader")
+	private User uploader;
+
+	public User getUploader() {
+		return uploader;
+	}
+
+	public void setUploader(User uploader) {
+		this.uploader = uploader;
+	}
+
 	public String getISBN() {
 		return ISBN;
 	}

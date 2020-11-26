@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -118,6 +119,7 @@ public class ListOfValueController {
 	
 	@RequestMapping(value = "getHluttaw", method = RequestMethod.POST)
 	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
 	public JSONObject getHluttaw(@RequestBody String req){
 		JSONObject jsonResponse = new JSONObject();
