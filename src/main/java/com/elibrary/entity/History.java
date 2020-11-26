@@ -3,7 +3,10 @@ package com.elibrary.entity;
 import java.io.Serializable;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -11,19 +14,39 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "history")
-public class History extends AbstractEntity implements Serializable{
-	
+public class History extends AbstractEntity implements Serializable {
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "userboId")
 	private User user;
-	
+
 	private String entityId;
-	
+
 	private String dateTime;
-	
-	private String favouriteStatus;
-	
+
+	private String toUserId;
+
+	@Column(name = "workStatus")
+	@Enumerated(EnumType.STRING)
+	private WorkStatus workStatus;
+
 	private int count;
+
+	public String getToUserId() {
+		return toUserId;
+	}
+
+	public void setToUserId(String toUserId) {
+		this.toUserId = toUserId;
+	}
+
+	public WorkStatus getWorkStatus() {
+		return workStatus;
+	}
+
+	public void setWorkStatus(WorkStatus workStatus) {
+		this.workStatus = workStatus;
+	}
 
 	public User getUser() {
 		return user;
@@ -49,14 +72,6 @@ public class History extends AbstractEntity implements Serializable{
 		this.dateTime = dateTime;
 	}
 
-	public String getFavouriteStatus() {
-		return favouriteStatus;
-	}
-
-	public void setFavouriteStatus(String favouriteStatus) {
-		this.favouriteStatus = favouriteStatus;
-	}
-
 	public int getCount() {
 		return count;
 	}
@@ -64,6 +79,5 @@ public class History extends AbstractEntity implements Serializable{
 	public void setCount(int count) {
 		this.count = count;
 	}
-	
-	
+
 }

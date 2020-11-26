@@ -34,21 +34,6 @@ CREATE TABLE `author` (
  `entityStatus` varchar(100) DEFAULT NULL,
 PRIMARY KEY (`id`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `history` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `userboId` varchar(255) NOT NULL,
- `entityId` varchar(255) NOT NULL,
- `dateTime`varchar(255) DEFAULT NULL,
- `favouriteStatus` varchar(100) DEFAULT NULL,
- `count` int(100) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `70mi0kenmvfnjsldfksokjs8d` (`id`),
- CONSTRAINT `70mi0kenmvfnjsldfksokjs8d` FOREIGN KEY (`id`) REFERENCES `user` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-
 CREATE TABLE `session` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
@@ -120,6 +105,30 @@ CREATE TABLE `user` (
  CONSTRAINT `FK_sfjfhwfwshiowse8975430` FOREIGN KEY (`id`) REFERENCES `position` (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE `history` (
+ `id` bigint(20) NOT NULL AUTO_INCREMENT,
+ `boId` varchar(255) NOT NULL,
+ `dateTime`varchar(255) DEFAULT NULL,
+ `workStatus` varchar(100) DEFAULT NULL, 
+ `count` int(100) DEFAULT NULL,
+ `toUserId` varchar(50) DEFAULT NULL, 
+ `entityStatus` varchar(100) DEFAULT NULL,
+userId bigint(20) NOT NULL,
+bookId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (userId) REFERENCES user (id),
+CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE category_subcategory(
+`id` bigint(20) NOT NULL AUTO_INCREMENT,
+categoryId bigint(20) NOT NULL,
+subcategoryId bigint(20)NOT NULL,
+PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (categoryId) REFERENCES category (id),
+CONSTRAINT FOREIGN KEY (subcategoryId) REFERENCES subcategory (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `publisher` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
