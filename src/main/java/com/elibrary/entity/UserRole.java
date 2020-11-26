@@ -1,5 +1,5 @@
 package com.elibrary.entity;
 
 public enum UserRole {
-	Admin, Librarian, User;
+	Admin, Librarian, User,SuperLibrarian;
 }

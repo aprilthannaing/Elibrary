@@ -1,8 +1,11 @@
 package com.elibrary.entity;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 public class listOfValueObj {
 	String code;
 	String description;
+	@JsonView(Views.Thin.class)
 	listOfValue[] lov;
 	
 	public String getDescription() {

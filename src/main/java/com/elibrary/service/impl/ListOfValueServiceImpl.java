@@ -112,41 +112,79 @@ import com.elibrary.service.ListOfValueService;
 		List<Hluttaw> hluttawList = hluttawDao.byQuery(query);
 		return hluttawList;
 	}
-	//department
-	public String saveDepartment(Department req){
+	
+	public long saveDepartment(Department req){
 		try {
+			long id = 0;
 			if (req.isIdRequired(req.getId())) {
-				long[] longlist = getIdByDepartment();
+				id = getIdByDepartment();
+				req.setBoId("Dept" + id);
+				//long[] longlist = getIdByPosition();
 				//req.setId(longlist[0]);
-				req.setBoId("Dept" + longlist[1]);
-			}
+				//req.setBoId("P" + longlist[1]);
+			}else 
+				id = req.getId(); 
+			
 			if(departmentDao.checkSaveOrUpdate(req))
-				return req.getBoId();
+				return id;
 			else 
-				return "";
+				return 0;
 			
 		}catch(com.mchange.rmi.ServiceUnavailableException e){
 			logger.error("Error: "+ e.getMessage());
 			
 		}
-		return "";
+		return 0;
 	}
 	
-	private long[] getIdByDepartment() {
-		long[] longList = new long[2];
-		long id = countIdByDepartment();
-		longList[0] = id + 1;
-		longList[1] = id + 1000;
-		return  longList;
-	}
-	
-	public long countIdByDepartment() {
-		String query = "select count(*) from Department";
-		return departmentDao.findLongByQueryString(query).get(0);
-	}
+	public long getIdByDepartment() {
+		String query = "select max(id) from Department";
+		List<Long> idList = departmentDao.findLongByQueryString(query);
+		if(idList.get(0) == null)
+			return 1;
+		return idList.get(0) + 1;
+	} 
+	//department
+//	public String saveDepartment(Department req){
+//		try {
+//			if (req.isIdRequired(req.getId())) {
+//				long[] longlist = getIdByDepartment();
+//				//req.setId(longlist[0]);
+//				req.setBoId("Dept" + longlist[1]);
+//			}
+//			if(departmentDao.checkSaveOrUpdate(req))
+//				return req.getBoId();
+//			else 
+//				return "";
+//			
+//		}catch(com.mchange.rmi.ServiceUnavailableException e){
+//			logger.error("Error: "+ e.getMessage());
+//			
+//		}
+//		return "";
+//	}
+//	
+//	private long[] getIdByDepartment() {
+//		long[] longList = new long[2];
+//		long id = countIdByDepartment();
+//		longList[0] = id + 1;
+//		longList[1] = id + 1000;
+//		return  longList;
+//	}
+//	
+//	public long countIdByDepartment() {
+//		String query = "select count(*) from Department";
+//		return departmentDao.findLongByQueryString(query).get(0);
+//	}
 	
 	public List<Department> checkDepartment(long hboid) {
 		String query = "from Department where hluttawboId=" + hboid;
+		List<Department> deptList = departmentDao.byQuery(query);
+		return deptList;
+	}
+	
+	public List<Department> checkDepartmentAll() {
+		String query = "from Department";
 		List<Department> deptList = departmentDao.byQuery(query);
 		return deptList;
 	}
@@ -169,25 +207,35 @@ import com.elibrary.service.ListOfValueService;
 		return deptList;
 	}
 	//position
-	//department
-		public String savePosition(Position req){
+		public long savePosition(Position req){
 			try {
+				long id = 0;
 				if (req.isIdRequired(req.getId())) {
-					long[] longlist = getIdByPosition();
+					id = countPositionId();
+					req.setBoId("P" + id);
+					//long[] longlist = getIdByPosition();
 					//req.setId(longlist[0]);
-					req.setBoId("P" + longlist[1]);
+					//req.setBoId("P" + longlist[1]);
 				}
 				if(positionDao.checkSaveOrUpdate(req))
-					return req.getBoId();
+					return id;
 				else 
-					return "";
+					return 0;
 				
 			}catch(com.mchange.rmi.ServiceUnavailableException e){
 				logger.error("Error: "+ e.getMessage());
 				
 			}
-			return "";
+			return 0;
 		}
+		
+		public long countPositionId() {
+			String query = "select max(id) from Position";
+			List<Long> idList = positionDao.findLongByQueryString(query);
+			if(idList.get(0) == null)
+				return 1;
+			return idList.get(0) + 1;
+		} 
 		
 		private long[] getIdByPosition() {
 			long[] longList = new long[2];

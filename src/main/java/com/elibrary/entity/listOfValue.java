@@ -1,9 +1,15 @@
 package com.elibrary.entity;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 public class listOfValue {
-	String key;
+	@JsonView(Views.Thin.class)
 	String value;
-	String id;
+	@JsonView(Views.Thin.class)
+	String caption;
+	@JsonView(Views.Thin.class)
+	String code;
+	@JsonView(Views.Thin.class)
 	String status;
 	
 	public listOfValue() {
@@ -11,32 +17,32 @@ public class listOfValue {
 	}
 
 	void clearProperty() {
-		key = "";
 		value = "";
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
+		caption = "";
 	}
 
 	public String getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setValue(String key) {
+		this.value = key;
 	}
 
-	public String getId() {
-		return id;
+	public String getCaption() {
+		return caption;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setCaption(String value) {
+		this.caption = value;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getStatus() {

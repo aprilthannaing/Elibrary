@@ -1,23 +1,14 @@
 
 CREATE TABLE `session` (
  `id` bigint(20) NOT NULL auto_increment,
- `transactionId`varchar(150) DEFAULT NULL,
- `bankIdentifier` varchar(255) DEFAULT NULL,
- `currencyType` varchar(150) DEFAULT NULL,
- `totalAmount` varchar(255) DEFAULT NULL,
- `amount1` varchar(255) DEFAULT NULL,
- `amount2` varchar(255) DEFAULT NULL,
- `amountDescription1` varchar(255) DEFAULT NULL,
- `amountDescription2` varchar(255) DEFAULT NULL,
- `paymentReference` varchar(255) DEFAULT NULL,
- `paymentNote`varchar(255) DEFAULT NULL,
- `payerEmail` varchar(100) DEFAULT NULL,
- `payerPhone` varchar(100) DEFAULT NULL,
+ `sessionId`varchar(150) DEFAULT NULL,
+ `userId` bigint(20) NOT NULL,
  `startDate` varchar(50) DEFAULT NULL,
  `endDate` varchar(50) DEFAULT NULL,
- `sessionId` varchar(255) NOT NULL,
- `sessionStatus` enum('ACTIVE','INACTIVE') NOT NULL,
-  PRIMARY KEY (`id`)
+ `sessionStatus` varchar(100) NOT NULL,
+   PRIMARY KEY (`id`),
+    KEY `FK_s9y70mfjwiqoafj94228` (`userId`),
+  CONSTRAINT `FK_s9y70mfjwiqoafj94228` FOREIGN KEY (`userId`) REFERENCES `user` (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
   
   CREATE TABLE `visa` (

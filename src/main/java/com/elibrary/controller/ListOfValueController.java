@@ -30,83 +30,89 @@ public class ListOfValueController {
 	@RequestMapping(value = "departmentSetup", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String departmentSetup(@RequestBody listOfValueObj req){
+	public listOfValueObj departmentSetup(@RequestBody listOfValueObj req){
 		Department dept = new Department();
-		List<Hluttaw> htawList = listOfValueService.checkHluttawByBoId(req.getCode());
-		if(htawList.size() > 0) {
-			Hluttaw htaw = htawList.get(0);
+		Hluttaw htaw = listOfValueService.checkHluttawById(Long.parseLong(req.getCode()));
 			List<Department> deptList = listOfValueService.checkDepartment(htaw.getId());
 			if(deptList.size() > 0) {
 				for(int i = 0 ; i < req.getLov().length; i ++) {
 					for(int j = 0 ; j < deptList.size(); j ++) {
-						if(deptList.get(j).getBoId().equals(req.getLov()[i].getId())) {
-							if(req.getLov()[i].getStatus().equals("002"))
+						String id = String.valueOf(deptList.get(j).getId());
+						if(id.equals(req.getLov()[i].getValue())) {
+							if(req.getLov()[i].getStatus().equals("INACTIVE"))
 								deptList.get(j).setEntityStatus(EntityStatus.INACTIVE);
-							deptList.get(j).setCode(req.getLov()[i].getKey());
-							deptList.get(j).setName(req.getLov()[i].getValue());
-							listOfValueService.saveDepartment(deptList.get(j));
+							deptList.get(j).setCode(req.getLov()[i].getCode());
+							deptList.get(j).setName(req.getLov()[i].getCaption());
+							long value = listOfValueService.saveDepartment(deptList.get(j));
+							req.getLov()[i].setValue(value+"");
 						}
 					}
-					if(req.getLov()[i].getId().equals("")){
+					if(req.getLov()[i].getValue().equals("")){
 						dept = new Department();
 						dept.setHluttaw(htaw);
 						dept.setEntityStatus(EntityStatus.ACTIVE);
-						dept.setCode(req.getLov()[i].getKey());
-						dept.setName(req.getLov()[i].getValue());
-						listOfValueService.saveDepartment(dept);
+						dept.setCode(req.getLov()[i].getCode());
+						dept.setName(req.getLov()[i].getCaption());
+						long value = listOfValueService.saveDepartment(dept);
+						req.getLov()[i].setValue(value+"");
+						req.getLov()[i].setStatus(dept.getEntityStatus().name());
 					}
 				}
-				return "Update Successfully";
+				return req;
 			}
 			for(int i = 0 ; i < req.getLov().length; i ++) {
 				dept = new Department();
 				dept.setHluttaw(htaw);
 				dept.setEntityStatus(EntityStatus.ACTIVE);
-				dept.setCode(req.getLov()[i].getKey());
-				dept.setName(req.getLov()[i].getValue());
-				listOfValueService.saveDepartment(dept);
+				dept.setCode(req.getLov()[i].getCode());
+				dept.setName(req.getLov()[i].getCaption());
+				long value = listOfValueService.saveDepartment(dept);
+				req.getLov()[i].setValue(value+"");
 			}
-			return "Insert Successfully";
-		}
-		return "Fail";
+			return req;
 		
 	}
 	
 	@RequestMapping(value = "positionSetup", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String positionSetup(@RequestBody listOfValueObj req){
+	public listOfValueObj positionSetup(@RequestBody listOfValueObj req){
 		Position position = new Position();
 			List<Position> postitionList = listOfValueService.checkPosition();
 			if(postitionList.size() > 0) {
 				for(int i = 0 ; i < req.getLov().length; i ++) {
 					for(int j = 0 ; j < postitionList.size(); j ++) {
-						if(postitionList.get(j).getBoId().equals(req.getLov()[i].getId())) {
-							if(req.getLov()[i].getStatus().equals("002"))
+						String id = String.valueOf(postitionList.get(j).getId());
+						if(id.equals(req.getLov()[i].getValue())) {
+							if(req.getLov()[i].getStatus().equals("INACTIVE"))
 								postitionList.get(j).setEntityStatus(EntityStatus.INACTIVE);
-							postitionList.get(j).setCode(req.getLov()[i].getKey());
-							postitionList.get(j).setName(req.getLov()[i].getValue());
-							listOfValueService.savePosition(postitionList.get(j));
+							postitionList.get(j).setCode(req.getLov()[i].getCode());
+							postitionList.get(j).setName(req.getLov()[i].getCaption());
+							long value = listOfValueService.savePosition(postitionList.get(j));
+							req.getLov()[i].setValue(value+"");
 						}
 					}
-					if(req.getLov()[i].getId().equals("")){
+					if(req.getLov()[i].getValue().equals("")){
 						position = new Position();
 						position.setEntityStatus(EntityStatus.ACTIVE);
-						position.setCode(req.getLov()[i].getKey());
-						position.setName(req.getLov()[i].getValue());
-						listOfValueService.savePosition(position);
+						position.setCode(req.getLov()[i].getCode());
+						position.setName(req.getLov()[i].getCaption());
+						long value = listOfValueService.savePosition(position);
+						req.getLov()[i].setValue(value+"");
+						req.getLov()[i].setStatus(position.getEntityStatus().name());
 					}
 				}
-				return "Update Successfully";
+				return req;
 			}
 			for(int i = 0 ; i < req.getLov().length; i ++) {
 				position = new Position();
 				position.setEntityStatus(EntityStatus.ACTIVE);
-				position.setCode(req.getLov()[i].getKey());
-				position.setName(req.getLov()[i].getValue());
-				listOfValueService.savePosition(position);
+				position.setCode(req.getLov()[i].getCode());
+				position.setName(req.getLov()[i].getCaption());
+				long value = listOfValueService.savePosition(position);
+				req.getLov()[i].setValue(value+"");
 			}
-			return "Insert Successfully";
+			return req;
 		
 	}
 	
@@ -139,6 +145,8 @@ public class ListOfValueController {
 			JSONObject json = new JSONObject();
 			json.put("value", deptList.get(i).getId());
 			json.put("caption", deptList.get(i).getName());
+			json.put("code", deptList.get(i).getCode());
+			json.put("status", deptList.get(i).getEntityStatus().name());
 			jsonArr[i] = json;
 		}
 		jsonResponse.put("refDept", jsonArr);
@@ -157,9 +165,31 @@ public class ListOfValueController {
 			JSONObject json = new JSONObject();
 			json.put("value", posList.get(i).getId());
 			json.put("caption", posList.get(i).getName());
+			json.put("code", posList.get(i).getCode());
+			json.put("status", posList.get(i).getEntityStatus().name());
 			jsonArr[i] = json;
 		}
 		jsonResponse.put("refPosition", jsonArr);
+		return jsonResponse;
+	}
+	@RequestMapping(value = "getDepartmentAll", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject getDepartmentAll(@RequestBody String req){
+		JSONObject jsonResponse = new JSONObject();
+		List<Department> deptList = listOfValueService.checkDepartmentAll();
+		JSONObject[] jsonArr = new JSONObject[deptList.size()];
+		for(int i=0; i< deptList.size(); i++) {
+			JSONObject json = new JSONObject();
+			json.put("value", deptList.get(i).getId());
+			json.put("caption", deptList.get(i).getName());
+			json.put("code", deptList.get(i).getCode());
+			json.put("status", deptList.get(i).getEntityStatus().name());
+			json.put("joinid",deptList.get(i).getHluttaw().getId());
+			jsonArr[i] = json;
+		}
+		jsonResponse.put("refDept", jsonArr);
+		
 		return jsonResponse;
 	}
 	

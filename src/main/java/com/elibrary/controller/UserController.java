@@ -3,6 +3,7 @@ package com.elibrary.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.Request;
+import com.elibrary.entity.Session;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.Views;
@@ -36,51 +38,52 @@ public class UserController  extends AbstractController{
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public String setuserinfo(@RequestBody User req){
+		String msg = "";
+		User user = new User();
 		try {
 			if (Validation(req)) {
 				Hluttaw htaw = listOfValueService.checkHluttawById(req.getHlutawType());
-				Department dept = listOfValueService.checkDepartmentbyId(req.getDeptType());
-				Position pos = listOfValueService.getPositionbyId(req.getPositionType());
+				Department dept = new Department();
+				Position pos = new Position();
+				dept = listOfValueService.checkDepartmentbyId(req.getDeptType());
+				pos = listOfValueService.getPositionbyId(req.getPositionType());
 				if(!req.getBoId().equals("")) {
-					User user  = userservice.selectUserByKey(req.getBoId());
-					if(user != null) {
-						user.setHluttaw(htaw);
-						user.setDepartment(dept);
-						user.setPosition(pos);
-						user.setRole(UserRole.User);
-						user.setCreatedDate(dateFormat());
-						user.setModifiedDate(dateFormat());
-						user.setName(req.getName());
-						user.setEmail(req.getEmail());
-						user.setPhoneNo(req.getPhoneNo());
-						user.setType(req.getType());
-						String status = req.getStatus();
-						user.setStatus(status);
-						if(status.equals("NEW"))
-							user.setEntityStatus(EntityStatus.NEW);
-						else if(status.equals("ACTIVE"))
-							user.setEntityStatus(EntityStatus.ACTIVE);
-						else if(status.equals("EXPIRED"))
-							user.setEntityStatus(EntityStatus.EXPIRED);
-						userservice.save(user);
-						return "Update Successfully";
-					}
+					user  = userservice.selectUserByKey(req.getBoId());
+					msg = "Update Successfully";
+				}else {
+					user.setSessionStatus(EntityStatus.NEW);
+					user.setCreatedDate(dateFormat());
+					user.setPassword(getRandomNumberString());
+					msg = "Insert Successfully";
 				}
-				req.setHluttaw(htaw);
-				req.setDepartment(dept);
-				req.setPosition(pos);
-				req.setRole(UserRole.User);
-				req.setCreatedDate(dateFormat());
-				req.setModifiedDate(dateFormat());
+				user.setModifiedDate(dateFormat());
+				user.setHluttaw(htaw);
+				user.setDepartment(dept);
+				user.setPosition(pos);
+				user.setName(req.getName());
+				user.setEmail(req.getEmail());
+				user.setPhoneNo(req.getPhoneNo());
+				user.setType(req.getType());
 				String status = req.getStatus();
+				user.setStatus(status);
+				//Role
+				if(req.getRoleType().equals("Admin"))
+					user.setRole(UserRole.Admin);
+				if(req.getRoleType().equals("Librarian"))
+					user.setRole(UserRole.Librarian);
+				if(req.getRoleType().equals("SuperLibrarian"))
+					user.setRole(UserRole.SuperLibrarian);
+				if(req.getRoleType().equals("User"))
+					user.setRole(UserRole.User);
+				//Status
 				if(status.equals("NEW"))
-					req.setEntityStatus(EntityStatus.NEW);
+					user.setEntityStatus(EntityStatus.NEW);
 				else if(status.equals("ACTIVE"))
-					req.setEntityStatus(EntityStatus.ACTIVE);
+					user.setEntityStatus(EntityStatus.ACTIVE);
 				else if(status.equals("EXPIRED"))
-					req.setEntityStatus(EntityStatus.EXPIRED);
-					userservice.save(req);
-				return "Insert Successfully";
+					user.setEntityStatus(EntityStatus.EXPIRED);
+				userservice.save(user);
+				return msg;
 			}
 		} catch (ServiceUnavailableException e) {
 			e.printStackTrace();
@@ -136,5 +139,94 @@ public class UserController  extends AbstractController{
 	public User selectUserbykey(@RequestBody String key){
 		User user = userservice.selectUserByKey(key);
 		return  user;
+	}
+	
+	@RequestMapping(value = "getLogin", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject getLogin(@RequestBody JSONObject reqJson) throws ServiceUnavailableException{
+		JSONObject resJson = new JSONObject();
+		String message = "";
+		String email 	= reqJson.get("_email").toString();
+		String password = reqJson.get("_psw").toString();
+		message = this.goValidation(email, password); 
+		if(!message.equals("")) {
+			resJson.put("desc", message);
+			resJson.put("code", "001");
+			return resJson;
+		}
+		User user = userservice.getLogin(email, password);
+		if(user != null) {
+			if(user.getSessionStatus().equals(EntityStatus.NEW)) {
+				resJson.put("desc", "first time login");
+				resJson.put("code", "002");
+				resJson.put("userId", user.getBoId());
+				return resJson;
+			}
+			//String sessionid = userservice.checkSession(user);
+			//session
+			String sessionId = saveSession(user);
+			resJson.put("desc", message);
+			resJson.put("code", "000");
+			resJson.put("role", user.getRole().name());
+			resJson.put("name", user.getName());
+			resJson.put("sessionId", sessionId);
+			resJson.put("userId", user.getBoId());
+			return resJson;
+		}
+		resJson.put("desc", "User not found!");
+		resJson.put("code", "001");
+			
+	return resJson;
+	}
+	public String saveSession(User user) {
+		Session session = new Session();
+		session.setEntityStatus(EntityStatus.ACTIVE);
+		session.setStartDate(dateFormat());
+		session.setEndDate(dateFormat());
+		session.setUser(user);
+		return userservice.save(session);
+	}
+	@RequestMapping(value = "goChangepwd", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject goChangepwd(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
+		JSONObject resJson = new JSONObject();
+		String oldpwd 	= reqJson.get("oldpwd").toString();
+		String newpwd = reqJson.get("newpwd").toString();
+		String userId = reqJson.get("userId").toString();
+		User user  = userservice.selectUserByKey(userId);
+		if(user != null) {
+			if(user.getPassword().equals(newpwd) || !user.getPassword().equals(oldpwd)) {
+				resJson.put("message", "Your new password cannot be the same as your old password. Please enter a different password");
+				resJson.put("code", "001");
+				return resJson;
+			}
+			user.setPassword(newpwd);
+			user.setSessionStatus(EntityStatus.ACTIVE);
+			userservice.save(user);
+			String sessionId = saveSession(user);
+			resJson.put("desc", "Update Successfully");
+			resJson.put("code", "000");
+			resJson.put("role", user.getRole().name());
+			resJson.put("name", user.getName());
+			resJson.put("sessionId", sessionId);
+			resJson.put("userId", user.getBoId());
+		}
+		return resJson;
+	}
+	
+	
+	
+	public String goValidation(String email,String password) {
+		if(email.equals("") && password.equals(""))
+		    return "Please enter your email address and password";
+		if(email.equals(""))
+			return "Please enter your email address";
+		if(!email.contains("@"))
+			return "Your email address is incorrect";
+		if(password.equals(""))
+			return "Please enter your password";
+		return "";
 	}
 }

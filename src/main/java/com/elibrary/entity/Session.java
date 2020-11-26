@@ -14,15 +14,13 @@ import javax.persistence.Table;
 public class Session extends AbstractEntity implements Serializable{
 	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "userboId")
+	@JoinColumn(name = "userId")
 	private User user;
 	
 	private String startDate;
 	
 	private String endDate;
 	
-	private int count;
-
 	public User getUser() {
 		return user;
 	}
@@ -47,11 +45,4 @@ public class Session extends AbstractEntity implements Serializable{
 		this.endDate = endDate;
 	}
 
-	public int getCount() {
-		return count;
-	}
-
-	public void setCount(int count) {
-		this.count = count;
-	}
 }

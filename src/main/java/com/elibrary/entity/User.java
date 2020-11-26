@@ -71,7 +71,13 @@ public class User extends AbstractEntity implements Serializable {
 	
 	@Transient
 	@JsonView(Views.Thin.class)
+	private String roleType;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
 	private String status;
+	
+	private EntityStatus sessionStatus;
 	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "hluttawboId")
@@ -84,7 +90,7 @@ public class User extends AbstractEntity implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "positionboId")
 	private Position position;
-
+	
 	public Hluttaw getHluttaw() {
 		return hluttaw;
 	}
@@ -227,6 +233,22 @@ public class User extends AbstractEntity implements Serializable {
 
 	public void setPositionName(String positionName) {
 		this.positionName = positionName;
+	}
+
+	public String getRoleType() {
+		return roleType;
+	}
+
+	public void setRoleType(String roleType) {
+		this.roleType = roleType;
+	}
+
+	public EntityStatus getSessionStatus() {
+		return sessionStatus;
+	}
+
+	public void setSessionStatus(EntityStatus sessionStatus) {
+		this.sessionStatus = sessionStatus;
 	}
 
 }
