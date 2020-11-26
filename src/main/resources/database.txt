@@ -33,20 +33,7 @@ CREATE TABLE `author` (
  `authorType` varchar(50) DEFAULT NULL, 
  `entityStatus` varchar(100) DEFAULT NULL,
 PRIMARY KEY (`id`))ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-CREATE TABLE `session` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `userboId` varchar(255) NOT NULL,
- `startDate` varchar(150) DEFAULT NULL,
- `endDate` varchar(150) DEFAULT NULL,
- `count` int(100) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `70mfjwlofilskmofjfksokjs8d` (`id`),
- CONSTRAINT `70mfjwlofilskmofjfksokjs8d` FOREIGN KEY (`id`) REFERENCES `user` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
+//updated
 CREATE TABLE `hluttaw` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `boId` varchar(255) NOT NULL,
@@ -54,7 +41,6 @@ CREATE TABLE `hluttaw` (
   `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-
 
 CREATE TABLE `department` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -66,9 +52,7 @@ CREATE TABLE `department` (
   PRIMARY KEY (`id`),
   KEY `FK_s9y70mfjwiqoafj94228` (`hluttawboId`),
   CONSTRAINT `FK_s9y70mfjwiqoafj94228` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
-
-
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `position` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -77,34 +61,46 @@ CREATE TABLE `position` (
   `name` varchar(255) DEFAULT NULL,
   `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `user` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `boId` varchar(255) NOT NULL,
- `hluttawboId` varchar(255) NOT NULL,
- `departmentboId` varchar(255) NOT NULL,
- `positionboId` varchar(255) NOT NULL,
- `name` varchar(100) DEFAULT NULL,
- `email`  varchar(100) DEFAULT NULL,
- `phoneNo`  varchar(100) DEFAULT NULL,
- `password`  varchar(255) DEFAULT NULL,
- `role`  varchar(100) DEFAULT NULL,
- `type` varchar(255) DEFAULT NULL,
- `expiredDate` varchar(100) DEFAULT NULL,
- `createdDate` varchar(255) DEFAULT NULL,
- `modifiedDate` varchar(255) DEFAULT NULL,
- `entityStatus` varchar(100) DEFAULT NULL,
- PRIMARY KEY (`id`),
- KEY `FK_s9ffjsajfkhsj89797` (`id`),
- CONSTRAINT `FK_s9ffjsajfkhsj89797` FOREIGN KEY (`id`) REFERENCES `hluttaw` (`id`),
- KEY `FK_s9fffjwbesflkjso987` (`id`),
- CONSTRAINT `FK_s9fffjwbesflkjso987` FOREIGN KEY (`id`) REFERENCES `department` (`id`),
- KEY `FK_sfjfhwfwshiowse8975430` (`id`),
- CONSTRAINT `FK_sfjfhwfwshiowse8975430` FOREIGN KEY (`id`) REFERENCES `position` (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `boId` varchar(255) NOT NULL,
+  `hluttawboId` bigint NOT NULL,
+  `departmentboId` bigint NOT NULL,
+  `positionboId` bigint NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `phoneNo` varchar(100) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `role` varchar(100) DEFAULT NULL,
+  `type` varchar(255) DEFAULT NULL,
+  `expiredDate` varchar(100) DEFAULT NULL,
+  `createdDate` varchar(255) DEFAULT NULL,
+  `modifiedDate` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  `sessionStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_s9ffjsajfkhsj89797` (`hluttawboId`),
+  KEY `FK_s9fffjwbesflkjso987` (`departmentboId`),
+  KEY `FK_sfjfhwfwshiowse8975430` (`positionboId`),
+  CONSTRAINT `FK_s9fffjwbesflkjso987` FOREIGN KEY (`departmentboId`) REFERENCES `department` (`id`),
+  CONSTRAINT `FK_s9ffjsajfkhsj89797` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`id`),
+  CONSTRAINT `FK_sfjfhwfwshiowse8975430` FOREIGN KEY (`positionboId`) REFERENCES `position` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `session` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `boId` varchar(255) NOT NULL,
+  `userId` bigint NOT NULL,
+  `startDate` varchar(50) NOT NULL,
+  `endDate` varchar(50) NOT NULL,
+  `entityStatus` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `123` (`userId`),
+  CONSTRAINT `123` FOREIGN KEY (`userId`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+//updated end
 
 CREATE TABLE `history` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
