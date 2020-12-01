@@ -21,6 +21,7 @@ import com.elibrary.entity.Session;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.Views;
+import com.elibrary.service.HistoryService;
 import com.elibrary.service.ListOfValueService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -35,6 +36,9 @@ public class UserController  extends AbstractController{
 	@Autowired
 	private UserService userservice;
 	
+	@Autowired
+	private HistoryService historyService;
+	
 	@RequestMapping(value = "setuserinfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -43,6 +47,11 @@ public class UserController  extends AbstractController{
 		User user = new User();
 		try {
 			if (Validation(req)) {
+				String loginUserid = userservice.sessionActive(req.getSessionId());
+				if(loginUserid.equals("")) {
+					msg = "Session Fail";
+					return msg;
+				}
 				Hluttaw htaw = listOfValueService.checkHluttawById(req.getHlutawType());
 				Department dept = new Department();
 				Position pos = new Position();
@@ -55,6 +64,7 @@ public class UserController  extends AbstractController{
 					user.setSessionStatus(EntityStatus.NEW);
 					user.setCreatedDate(dateFormat());
 					user.setPassword(getRandomNumberString());
+					user.setFromUserId(loginUserid);
 					msg = "Insert Successfully";
 				}
 				user.setModifiedDate(dateFormat());
@@ -84,6 +94,7 @@ public class UserController  extends AbstractController{
 				else if(status.equals("EXPIRED"))
 					user.setEntityStatus(EntityStatus.EXPIRED);
 				userservice.save(user);
+				//saveHistory(user.getBoId(),loginUserid);
 				return msg;
 			}
 		} catch (ServiceUnavailableException e) {
@@ -91,6 +102,21 @@ public class UserController  extends AbstractController{
 		}
 		return "fail";
 	}
+//	public void saveHistory(String id,String loginUserid) {
+//		try {
+//			User user = userservice.selectUserbyId(loginUserid);
+//			userservice.sessionActive(loginUserid);
+//			History his = new History();
+//			his.setEntityStatus(EntityStatus.ACTIVE);
+//			his.setWorkStatus(WorkStatus.);
+//			his.setDateTime(dateFormat());
+//			his.setUser(user);
+//			his.setToUserId(id);
+//			historyService.save(his);
+//		} catch (ServiceUnavailableException e) {
+//			e.printStackTrace();
+//		}
+//	}
 	
 	public boolean Validation(User user) {
 		if(user.getName().equals("") || user.getName().equals(null)) {

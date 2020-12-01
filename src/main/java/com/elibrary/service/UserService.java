@@ -16,6 +16,8 @@ public interface UserService {
 
 	public User selectUserByKey(String key);
 	public User getLogin(String email,String password);
-	public String checkSession(User user) throws ServiceUnavailableException;
+	//public String checkSession(User user) throws ServiceUnavailableException;
 	public String save(Session session);
+	public String sessionActive(String sessionId);
+	public User selectUserbyId(String key);
 }

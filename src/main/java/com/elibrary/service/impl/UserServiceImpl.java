@@ -92,6 +92,14 @@ public class UserServiceImpl extends AbstractController implements UserService {
 
 		return response.get(0);
 	}
+	
+	public User selectUserbyId(String key) {
+		String query = "from User where id="+ key;
+		List<User> userList = userDao.byQuery(query);
+		if(CollectionUtils.isEmpty(userList))
+			return null;
+	return userList.get(0);
+	}
 
 	public User findByBoId(String boId) {
 		String query = "select user from User user where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE
@@ -110,6 +118,7 @@ public class UserServiceImpl extends AbstractController implements UserService {
 			return null;
 		return users.get(0);
 	}
+<<<<<<< Updated upstream
 
 	public String checkSession(User user) throws ServiceUnavailableException {
 		Session session = new Session();
@@ -124,6 +133,22 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		return save(session);
 	}
 
+=======
+	
+//	public String checkSession(User user) throws ServiceUnavailableException {
+//		Session session = new Session();
+//		String query = "from Session where userid=" + user.getId();
+//		List<Session> sessionList = sessionDao.getEntitiesByQuery(query);
+//		if (CollectionUtils.isEmpty(sessionList))
+//			return "";
+//		session.setEntityStatus(EntityStatus.ACTIVE);
+//		session.setStartDate(dateFormat());
+//		session.setEndDate(dateFormat());
+//		session.setUser(user);
+//		return save(session);
+//	}
+	
+>>>>>>> Stashed changes
 	public String save(Session session) {
 		try {
 			if (session.isIdRequired(session.getId()))
@@ -144,6 +169,19 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		if (idList.get(0) == null)
 			return 1;
 		return idList.get(0) + 1;
+<<<<<<< Updated upstream
 	}
 
+=======
+	} 
+	
+	public String sessionActive(String sessionId){
+	String query = "from Session where boId='" + sessionId + "' And entityStatus='" + EntityStatus.ACTIVE +"'";
+	List<Session> sessionList = sessionDao.getEntitiesByQuery(query);
+	if (CollectionUtils.isEmpty(sessionList))
+		return "";
+	return String.valueOf(sessionList.get(0).getUser().getId());
+}
+	
+>>>>>>> Stashed changes
 }

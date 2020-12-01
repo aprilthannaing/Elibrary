@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Entity
 @Table(name = "user")
 public class User extends AbstractEntity implements Serializable {
+	
+	private String fromUserId;
 
 	@JsonView(Views.Thin.class)
 	private String name;
@@ -77,6 +79,10 @@ public class User extends AbstractEntity implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String status;
 	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String sessionId="";
+	
 	private EntityStatus sessionStatus;
 	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -91,6 +97,14 @@ public class User extends AbstractEntity implements Serializable {
 	@JoinColumn(name = "positionboId")
 	private Position position;
 	
+	public String getFromUserId() {
+		return fromUserId;
+	}
+
+	public void setFromUserId(String fromId) {
+		this.fromUserId = fromId;
+	}
+
 	public Hluttaw getHluttaw() {
 		return hluttaw;
 	}
@@ -249,6 +263,14 @@ public class User extends AbstractEntity implements Serializable {
 
 	public void setSessionStatus(EntityStatus sessionStatus) {
 		this.sessionStatus = sessionStatus;
+	}
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
 	}
 
 }
