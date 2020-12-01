@@ -82,6 +82,6 @@ public class CategoryController {
 	@RequestMapping(value = "count", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {
-		return categoryService.countCategory() + "";
+		return categoryService.countActiveCategory() + "";
 	}
 }

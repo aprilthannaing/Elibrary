@@ -24,8 +24,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 	public void save(Category category) throws ServiceUnavailableException {
 		try {
-			if (category.isIdRequired(category.getId()))
-				category.setId(getId());
 
 			if (category.isBoIdRequired(category.getBoId()))
 				category.setBoId(getBoId());
@@ -34,10 +32,6 @@ public class CategoryServiceImpl implements CategoryService {
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
 		}
-	}
-
-	private long getId() {
-		return countCategory() + 1;
 	}
 
 	private Long plus() {
@@ -49,12 +43,18 @@ public class CategoryServiceImpl implements CategoryService {
 		return categoryDao.findLongByQueryString(query).get(0);
 	}
 
+	public long countActiveCategory() {
+		String query = "select count(*) from Category where entityStatus='" + EntityStatus.ACTIVE + "'";
+		return categoryDao.findLongByQueryString(query).get(0);
+	}
+
 	public String getBoId() {
 		return "CATEGORY" + plus();
 	}
 
 	public List<Category> getAll() {
-		String query = "select category from Category category where entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select category from Category category where entityStatus='" + EntityStatus.ACTIVE
+				+ "' order by priority";
 		List<Category> categories = categoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(categories))
 			return null;

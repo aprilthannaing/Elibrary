@@ -26,8 +26,6 @@ public class PublisherServiceImpl implements PublisherService {
 
 	public void save(Publisher publisher) throws ServiceUnavailableException {
 		try {
-			if (publisher.isIdRequired(publisher.getId()))
-				publisher.setId(getId());
 
 			if (publisher.isBoIdRequired(publisher.getBoId()))
 				publisher.setBoId(getBoId());
@@ -36,10 +34,6 @@ public class PublisherServiceImpl implements PublisherService {
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
 		}
-	}
-
-	private long getId() {
-		return countPublisher() + 1;
 	}
 
 	private Long plus() {
@@ -54,7 +48,6 @@ public class PublisherServiceImpl implements PublisherService {
 	public String getBoId() {
 		return "PUBLISHER" + plus();
 	}
-	
 
 	public List<Publisher> getAll() {
 		String query = "select publisher from Publisher publisher where entityStatus='" + EntityStatus.ACTIVE + "'";
@@ -63,9 +56,10 @@ public class PublisherServiceImpl implements PublisherService {
 			return null;
 		return publishers;
 	}
-	
+
 	public Publisher findByBoId(String boId) {
-		String query = "select publisher from Publisher publisher where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select publisher from Publisher publisher where boId='" + boId + "'and entityStatus='"
+				+ EntityStatus.ACTIVE + "'";
 		List<Publisher> publishers = publisherDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(publishers))
 			return null;

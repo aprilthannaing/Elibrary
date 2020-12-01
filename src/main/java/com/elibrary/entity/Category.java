@@ -29,6 +29,17 @@ public class Category extends AbstractEntity implements Serializable {
 	@JoinTable(name = "category_subcategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
 	private List<SubCategory> subCategories;
 
+	@JsonView(Views.Thin.class)
+	private double priority;
+
+	public double getPriority() {
+		return priority;
+	}
+
+	public void setPriority(double priority) {
+		this.priority = priority;
+	}
+
 	public List<SubCategory> getSubCategories() {
 		if (subCategories == null)
 			subCategories = new ArrayList<SubCategory>();

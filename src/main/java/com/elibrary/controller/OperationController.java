@@ -351,6 +351,7 @@ public class OperationController {
 		category.setSubCategories(subCategoryList);
 		category.setMyanmarName(json.get("myanmarName").toString());
 		category.setEngName(json.get("engName").toString());
+		category.setPriority(Double.parseDouble(json.get("priority").toString()));
 		category.setEntityStatus(EntityStatus.ACTIVE);
 	}
 
@@ -359,7 +360,6 @@ public class OperationController {
 	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		logger.info("json: " + json);
 		Category category = new Category();
 		category.setBoId(SystemConstant.BOID_REQUIRED);
 		setCategoryInfo(category, json);
@@ -371,7 +371,6 @@ public class OperationController {
 	@RequestMapping(value = "editcategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public void editCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		logger.info("json: " + json);
 		Category category = categoryService.findByBoId(json.get("boId").toString());
 		setCategoryInfo(category, json);
 		categoryService.save(category);
@@ -381,8 +380,13 @@ public class OperationController {
 		Object description = json.get("name");
 		if (description == null || description.toString().isEmpty())
 			return false;
+		
+		Object priority = json.get("priority");
+		if (priority == null || priority.toString().isEmpty())
+			return false;
 
 		subCategory.setName(description.toString());
+		subCategory.setPriority(Double.parseDouble(json.get("priority").toString()));
 		subCategory.setEntityStatus(EntityStatus.ACTIVE);
 		return true;
 	}

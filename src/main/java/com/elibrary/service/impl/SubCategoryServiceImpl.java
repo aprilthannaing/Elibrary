@@ -24,20 +24,15 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 
 	public void save(SubCategory subCategory) throws ServiceUnavailableException {
 		try {
-			if (subCategory.isIdRequired(subCategory.getId()))
-				subCategory.setId(getId());
 
-			if (subCategory.isBoIdRequired(subCategory.getBoId()))
+			if (subCategory.isBoIdRequired(subCategory.getBoId())) {
 				subCategory.setBoId(getBoId());
+			}
 
 			subCategoryDao.saveOrUpdate(subCategory);
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
 		}
-	}
-
-	private long getId() {
-		return countSubCategory() + 1;
 	}
 
 	private Long plus() {
@@ -48,21 +43,27 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 		String query = "select count(*) from SubCategory";
 		return subCategoryDao.findLongByQueryString(query).get(0);
 	}
+	
+	public long countActiveSubCategory() {
+		String query = "select count(*) from SubCategory where entityStatus='" + EntityStatus.ACTIVE + "'";
+		return subCategoryDao.findLongByQueryString(query).get(0);
+	}
 
 	public String getBoId() {
 		return "SUBCATEGORY" + plus();
 	}
 
 	public List<SubCategory> getAll() {
-		String query = "select sub from SubCategory sub where entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select sub from SubCategory sub where entityStatus='" + EntityStatus.ACTIVE + "' order by priority";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;
 		return subCategories;
 	}
-	
+
 	public SubCategory findByBoId(String boId) {
-		String query = "select sub from SubCategory sub where boId='" + boId + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select sub from SubCategory sub where boId='" + boId + "' and entityStatus='"
+				+ EntityStatus.ACTIVE + "'";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;

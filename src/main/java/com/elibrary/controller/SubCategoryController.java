@@ -74,7 +74,7 @@ public class SubCategoryController {
 	@RequestMapping(value = "count", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {
-		return subCategoryService.countSubCategory() + "";
+		return subCategoryService.countActiveSubCategory() + "";
 	}
 
 }

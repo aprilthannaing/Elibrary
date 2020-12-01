@@ -171,6 +171,13 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		return idList.get(0) + 1;
 <<<<<<< Updated upstream
 	}
+	
+//	public List<User> getLibrarians() {
+//		
+//		
+//		
+//	}
+//	
 
 =======
 	} 

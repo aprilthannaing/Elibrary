@@ -24,8 +24,6 @@ public class AuthorServiceImpl implements AuthorService {
 
 	public void save(Author author) throws ServiceUnavailableException {
 		try {
-			if (author.isIdRequired(author.getId()))
-				author.setId(getId());
 
 			if (author.isBoIdRequired(author.getBoId()))
 				author.setBoId(getBoId());
@@ -34,10 +32,6 @@ public class AuthorServiceImpl implements AuthorService {
 			logger.error("Error: " + e.getMessage());
 		}
 
-	}
-
-	private long getId() {
-		return countAuthor() + 1;
 	}
 
 	private Long plus() {

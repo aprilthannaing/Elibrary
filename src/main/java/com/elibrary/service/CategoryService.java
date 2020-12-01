@@ -13,6 +13,7 @@ public interface CategoryService {
 	public Category findByBoId(String boId);
 	
 	public long countCategory();
-
+	
+	public long countActiveCategory();
 
 }

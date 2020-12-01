@@ -238,6 +238,12 @@ CONSTRAINT FOREIGN KEY (ratingId) REFERENCES rating (id)
 alter table book modify column edition varchar(50);
 alter table book modify column volume varchar(50);
 alter table book add column uploader varchar(50);
+alter table category add column priority double;
+alter table subcategory add column priority double;
+update category set priority=0;
+update subcategory set priority=0;
+
+
 
 
 
