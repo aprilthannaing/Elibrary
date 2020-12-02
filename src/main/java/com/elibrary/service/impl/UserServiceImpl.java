@@ -15,6 +15,7 @@ import com.elibrary.controller.AbstractController;
 import com.elibrary.dao.SessionDao;
 import com.elibrary.entity.Session;
 import com.elibrary.entity.User;
+import com.elibrary.entity.UserRole;
 import com.elibrary.service.UserService;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -163,4 +164,12 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		return String.valueOf(sessionList.get(0).getUser().getId());
 	}
 
+	public List<User> getLibrarians() {
+		String query = "From User user where role='" + UserRole.Librarian + "' and entityStatus='" + EntityStatus.ACTIVE
+				+ "' or entityStatus='" + EntityStatus.NEW + "'";
+		List<User> userList = userDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(userList))
+			return null;
+		return userList;
+	}
 }

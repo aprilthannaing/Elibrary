@@ -242,6 +242,8 @@ alter table category add column priority double;
 alter table subcategory add column priority double;
 update category set priority=0;
 update subcategory set priority=0;
+alter table user add column fromUserId varchar(50);
+
 
 
 

@@ -229,7 +229,7 @@ public class OperationController {
 
 		if (!setPDFFile(json, book)) {
 			resultJson.put("status", "0");
-			resultJson.put("msg", "This File is already registered!");
+			resultJson.put("msg", "This Book is already registered!");
 			return resultJson;
 		}
 
