@@ -89,7 +89,7 @@ public class BookServiceImpl implements BookService {
 			return new ArrayList<Book>();
 		return books;
 	}
-	
+
 	public long getBookCountByLibrarian(long librarianId) {
 		logger.info("librarianId: " + librarianId);
 		String query = "from Book book where uploader=" + librarianId;
@@ -97,6 +97,14 @@ public class BookServiceImpl implements BookService {
 		if (CollectionUtils.isEmpty(books))
 			return 0;
 		return books.size();
+	}
+
+	public List<Book> getBookBySearchTerms(String searchTerms) {
+		String query = "From Book book where searchTerms LIKE '%" + searchTerms + "%'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
 	}
 
 }

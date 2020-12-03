@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,7 +68,7 @@ public class DashBoardController {
 	public JSONObject getBookList(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 		List<List<Book>> bookList = new ArrayList<List<Book>>();
-		logger.info("index!!!!!!!!!!!!!!!!" + json.get("index"));
+		List<Book> books = new ArrayList<Book>();
 
 		List<User> librarianList = userService.getLibrarians();
 		if (librarianList == null) {
@@ -80,8 +81,22 @@ public class DashBoardController {
 			bookList.add(bookService.getBookListByLibrarian(librarian.getId()));
 		});
 
+		if (CollectionUtils.isEmpty(bookList)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "There is no Book!");
+			return resultJson;
+		}
+
+		int index = Integer.parseInt(json.get("index").toString());
+		if (index < 0) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "There is no Book!");
+			return resultJson;
+		}
+
+		books = bookList.get(index);
 		resultJson.put("status", "1");
-		resultJson.put("bookList", bookList.get(Integer.parseInt(json.get("index").toString())));
+		resultJson.put("bookList", books);
 		return resultJson;
 	}
 

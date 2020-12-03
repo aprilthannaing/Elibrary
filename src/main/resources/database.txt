@@ -245,7 +245,8 @@ update subcategory set priority=0;
 alter table user add column fromUserId varchar(50);
 
 
-
+ALTER table Book ADD column searchTerms varchar(1000);
+UPDATE Book book SET searchTerms = CONCAT_WS ( " ", boId, ISBN, publisher, edition, title, coverPhoto, publishedDate, volume, state, modifiedDate, createdDate, sort, path, seriesIndex, size, callNo, accessionNo, (select name from User user where user.id = book.uploader));
 
 
 

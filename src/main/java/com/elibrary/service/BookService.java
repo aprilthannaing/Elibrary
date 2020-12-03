@@ -17,9 +17,11 @@ public interface BookService {
 	public List<Book> getAll();
 
 	public long countBook();
-	
+
 	public List<Book> getBookListByLibrarian(long librarianId);
-	
+
 	public long getBookCountByLibrarian(long librarianId);
+
+	public List<Book> getBookBySearchTerms(String searchTerms);
 
 }
