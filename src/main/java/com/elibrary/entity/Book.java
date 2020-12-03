@@ -81,6 +81,50 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JoinColumn(name = "uploader")
 	private User uploader;
 
+	@JsonView(Views.Thin.class)
+	private String favouriteStatus;
+
+	@JsonView(Views.Thin.class)
+	private String bookMarkStatus;
+
+	@JsonView(Views.Thin.class)
+	private long ownRating;
+
+	@JsonView(Views.Thin.class)
+	private long averageRating;
+
+	public String getFavouriteStatus() {
+		return favouriteStatus;
+	}
+
+	public void setFavouriteStatus(String favouriteStatus) {
+		this.favouriteStatus = favouriteStatus;
+	}
+
+	public String getBookMarkStatus() {
+		return bookMarkStatus;
+	}
+
+	public void setBookMarkStatus(String bookMarkStatus) {
+		this.bookMarkStatus = bookMarkStatus;
+	}
+
+	public double getOwnRating() {
+		return ownRating;
+	}
+
+	public long getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(long averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public void setOwnRating(long ownRating) {
+		this.ownRating = ownRating;
+	}
+
 	public User getUploader() {
 		return uploader;
 	}

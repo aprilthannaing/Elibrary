@@ -24,4 +24,12 @@ public interface BookService {
 
 	public List<Book> getBookBySearchTerms(String searchTerms);
 
+	public Long getBookCountWriteByAuthor(long authorId);
+
+	public List<Book> getLatestBooksByCategoryId(long categoryId);
+
+	public Long getAverageRating(long bookId);
+
+	public Long getBookCountByCategory(long categoryId);
+
 }

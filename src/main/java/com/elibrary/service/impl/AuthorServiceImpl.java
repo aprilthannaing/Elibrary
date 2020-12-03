@@ -1,5 +1,6 @@
 package com.elibrary.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 import com.elibrary.dao.AuthorDao;
 import com.elibrary.dao.impl.AuthorDaoImpl;
 import com.elibrary.entity.Author;
+import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.AuthorService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -26,7 +28,7 @@ public class AuthorServiceImpl implements AuthorService {
 		try {
 			if (author.isBoIdRequired(author.getBoId()))
 				author.setBoId(getBoId());
-				authorDao.saveOrUpdate(author);
+			authorDao.saveOrUpdate(author);
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
 		}
@@ -67,6 +69,16 @@ public class AuthorServiceImpl implements AuthorService {
 		if (CollectionUtils.isEmpty(authors))
 			return null;
 		return authors.get(0);
+	}
+
+	public List<Author> getAuthorListByCategory(long categoryId, AuthorType authorType) {
+		String query = "select author from Author author where authorType='" + authorType
+				+ "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId="
+				+ categoryId + " ))";
+		List<Author> authors = authorDao.getEntitiesByQuery(query, 12);
+		if (CollectionUtils.isEmpty(authors))
+			return new ArrayList<Author>();
+		return authors;
 	}
 
 }

@@ -1,5 +1,8 @@
 package com.elibrary.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,6 @@ import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.elibrary.service.JournalService;
 import com.elibrary.service.SubCategoryService;
-import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -48,7 +50,13 @@ public class CategoryController {
 	@JsonView(Views.Summary.class)
 	public JSONObject getAll() throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
-		result.put("categories", categoryService.getAll());
+		List<Category> categoryList = categoryService.getAll();
+		categoryList.forEach(category -> {
+			category.setBookCount(bookService.getBookCountByCategory(category.getId()));
+		});
+
+		result.put("status", "true");
+		result.put("categories", categoryList);
 		return result;
 	}
 
@@ -77,7 +85,7 @@ public class CategoryController {
 			result.put("category", category);
 		return result;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "count", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)

@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -31,6 +32,18 @@ public class Category extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	private double priority;
+
+	@Transient
+	@JsonView(Views.Thin.class)
+	private long bookCount;
+
+	public long getBookCount() {
+		return bookCount;
+	}
+
+	public void setBookCount(long bookCount) {
+		this.bookCount = bookCount;
+	}
 
 	public double getPriority() {
 		return priority;

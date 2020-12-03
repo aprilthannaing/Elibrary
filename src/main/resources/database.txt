@@ -243,14 +243,34 @@ alter table subcategory add column priority double;
 update category set priority=0;
 update subcategory set priority=0;
 alter table user add column fromUserId varchar(50);
+alter table category add column icon varchar(255);
+alter table subcategory add column display varchar(255);
 
+alter table book add column favouriteStatus varchar(255);
+alter table book add column bookMarkStatus varchar(255);
+alter table book add column ownRating varchar(255);
+alter table book add column averageRating varchar(255);
 
-ALTER TABLE subcategory DROP COLUMN name;
-ALTER TABLE subcategory ADD myanmarName VARCHAR(255) DEFAULT NULL;
+update book set ownRating=0;
+update book set averageRating=0;
+update book set favouriteStatus="false";
+update book set bookMarkStatus="false";
+
+update author set profilePicture="AuthorProfile/author1.png";
+
+ALTER TABLE subcategory CHANGE name myanmarName VARCHAR(255) DEFAULT NULL;
 ALTER TABLE subcategory ADD engName VARCHAR(150) DEFAULT NULL;
 
 ALTER table Book ADD column searchTerms varchar(1000);
 UPDATE Book book SET searchTerms = CONCAT_WS ( " ", boId, ISBN, publisher, edition, title, coverPhoto, publishedDate, volume, state, modifiedDate, createdDate, sort, path, seriesIndex, size, callNo, accessionNo, (select name from User user where user.id = book.uploader));
 
+update subcategory set display="true" where id=7;
+
+update category set icon="CategoryIcon/englishbook.png" where id=4;
+update category set icon="CategoryIcon/infonote.png" where id=6;
+update category set icon="CategoryIcon/ministrybook.png" where id=2;
+update category set icon="CategoryIcon/myanmarbook.png" where id=1;
+update category set icon="CategoryIcon/organization.png" where id=3;
+update category set icon="CategoryIcon/periodicalbook.png" where id=5;
 
 

@@ -13,12 +13,23 @@ public class SubCategory extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	private String myanmarName;
-	
+
 	@JsonView(Views.Thin.class)
 	private String engName;
 
 	@JsonView(Views.Thin.class)
 	private double priority;
+
+	@JsonView(Views.Thin.class)
+	private String display;
+
+	public String getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(String display) {
+		this.display = display;
+	}
 
 	public double getPriority() {
 		return priority;
@@ -42,6 +53,10 @@ public class SubCategory extends AbstractEntity implements Serializable {
 
 	public void setEngName(String engName) {
 		this.engName = engName;
+	}
+
+	public boolean isDisplay() {
+		return Boolean.valueOf(getDisplay());
 	}
 
 }

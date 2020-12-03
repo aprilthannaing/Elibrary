@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.elibrary.dao.BookAuthorDao;
 import com.elibrary.dao.BookDao;
 import com.elibrary.dao.impl.BookDaoImpl;
 import com.elibrary.entity.Book;
@@ -20,6 +21,9 @@ public class BookServiceImpl implements BookService {
 
 	@Autowired
 	private BookDao bookDao;
+
+	@Autowired
+	private BookAuthorDao bookAuthorDao;
 
 	public static Logger logger = Logger.getLogger(BookDaoImpl.class);
 
@@ -82,7 +86,6 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public List<Book> getBookListByLibrarian(long librarianId) {
-		logger.info("librarianId: " + librarianId);
 		String query = "From Book book where uploader=" + librarianId;
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
@@ -105,6 +108,39 @@ public class BookServiceImpl implements BookService {
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Book>();
 		return books;
+	}
+
+	public Long getBookCountWriteByAuthor(long authorId) {
+		String query = "select count(*) from Book_Author where authorId=" + authorId;
+		List<Long> books = bookAuthorDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(books))
+			return (long) 0;
+		return (long) books.get(0);
+	}
+
+	public List<Book> getLatestBooksByCategoryId(long categoryId) {
+		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE
+				+ "' and book.id in (Select bookId from Book_Category bc where bc.categoryId=" + categoryId + ")";
+		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
+	public Long getAverageRating(long bookId) {
+		String query = "select ratingId from Book_Rating where bookId=" + bookId;
+		List<Long> ratings = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(ratings))
+			return (long) 0;
+		return ratings.get(0);
+	}
+	
+	public Long getBookCountByCategory(long categoryId) {
+		String query = "select count(*) from Book_Category where categoryId=" + categoryId;
+		List<Long> books = bookAuthorDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(books))
+			return (long) 0;
+		return (long) books.get(0);
 	}
 
 }

@@ -43,7 +43,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 		String query = "select count(*) from SubCategory";
 		return subCategoryDao.findLongByQueryString(query).get(0);
 	}
-	
+
 	public long countActiveSubCategory() {
 		String query = "select count(*) from SubCategory where entityStatus='" + EntityStatus.ACTIVE + "'";
 		return subCategoryDao.findLongByQueryString(query).get(0);
@@ -54,7 +54,8 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	public List<SubCategory> getAll() {
-		String query = "select sub from SubCategory sub where entityStatus='" + EntityStatus.ACTIVE + "' order by priority";
+		String query = "select sub from SubCategory sub where entityStatus='" + EntityStatus.ACTIVE
+				+ "' order by priority";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;
