@@ -244,6 +244,8 @@ update category set priority=0;
 update subcategory set priority=0;
 
 
-
+ALTER TABLE subcategory DROP COLUMN name;
+ALTER TABLE subcategory ADD myanmarName VARCHAR(255) DEFAULT NULL;
+ALTER TABLE subcategory ADD engName VARCHAR(150) DEFAULT NULL;
 
 

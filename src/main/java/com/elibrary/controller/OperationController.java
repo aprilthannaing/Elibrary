@@ -159,6 +159,7 @@ public class OperationController {
 		book.setSize((long) file.length() / 1024 + "KB");
 		FileOutputStream fop = new FileOutputStream(file);
 		fop.write(decodedBytes);
+		
 		book.setPath("/BookFile/" + pdfName.trim());
 		return true;
 	}
@@ -377,15 +378,17 @@ public class OperationController {
 	}
 
 	private boolean setSubCategoryInfo(SubCategory subCategory, JSONObject json) {
-		Object description = json.get("name");
-		if (description == null || description.toString().isEmpty())
+		Object myanmarName = json.get("myanmarName");
+		Object engName = json.get("engName");
+		if (myanmarName == null || myanmarName.toString().isEmpty() || engName ==null || engName.toString().isEmpty())
 			return false;
 		
 		Object priority = json.get("priority");
 		if (priority == null || priority.toString().isEmpty())
 			return false;
 
-		subCategory.setName(description.toString());
+		subCategory.setMyanmarName(myanmarName.toString());
+		subCategory.setEngName(engName.toString());
 		subCategory.setPriority(Double.parseDouble(json.get("priority").toString()));
 		subCategory.setEntityStatus(EntityStatus.ACTIVE);
 		return true;
@@ -430,7 +433,8 @@ public class OperationController {
 
 		String filePath = IMAGEUPLOADURL.trim() + "AuthorProfile//";
 		String pictureName = json.get("profilePicture").toString().split("\\\\")[2];
-		if (authorService.isDuplicateProfile(filePath + pictureName))
+		String profilePicture = "/AuthorProfile/" + pictureName;
+		if (authorService.isDuplicateProfile(profilePicture))
 			return false;
 
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));

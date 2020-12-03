@@ -74,6 +74,7 @@ public class ListOfValueController {
 		
 	}
 	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "positionSetup", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -117,6 +118,7 @@ public class ListOfValueController {
 		
 	}
 	
+	
 	@RequestMapping(value = "getHluttaw", method = RequestMethod.POST)
 	@ResponseBody
 	@CrossOrigin(origins = "*")
@@ -135,6 +137,7 @@ public class ListOfValueController {
 		return jsonResponse;
 	}
 	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "getDepartment", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -156,6 +159,7 @@ public class ListOfValueController {
 		return jsonResponse;
 	}
 	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "getPosition", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -174,6 +178,8 @@ public class ListOfValueController {
 		jsonResponse.put("refPosition", jsonArr);
 		return jsonResponse;
 	}
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "getDepartmentAll", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)

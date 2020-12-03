@@ -12,7 +12,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class SubCategory extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
-	private String name;
+	private String myanmarName;
+	
+	@JsonView(Views.Thin.class)
+	private String engName;
 
 	@JsonView(Views.Thin.class)
 	private double priority;
@@ -25,12 +28,20 @@ public class SubCategory extends AbstractEntity implements Serializable {
 		this.priority = priority;
 	}
 
-	public String getName() {
-		return name;
+	public String getMyanmarName() {
+		return myanmarName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setMyanmarName(String myanmarName) {
+		this.myanmarName = myanmarName;
+	}
+
+	public String getEngName() {
+		return engName;
+	}
+
+	public void setEngName(String engName) {
+		this.engName = engName;
 	}
 
 }

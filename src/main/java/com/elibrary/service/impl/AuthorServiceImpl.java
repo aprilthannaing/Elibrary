@@ -24,10 +24,9 @@ public class AuthorServiceImpl implements AuthorService {
 
 	public void save(Author author) throws ServiceUnavailableException {
 		try {
-
 			if (author.isBoIdRequired(author.getBoId()))
 				author.setBoId(getBoId());
-			authorDao.saveOrUpdate(author);
+				authorDao.saveOrUpdate(author);
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
 		}
@@ -47,8 +46,8 @@ public class AuthorServiceImpl implements AuthorService {
 		return "AUTHOR" + plus();
 	}
 
-	public boolean isDuplicateProfile(String fullProfile) {
-		String query = "select author from Author author where profilePicture='" + fullProfile.trim() + "'";
+	public boolean isDuplicateProfile(String profilePicture) {
+		String query = "select author from Author author where profilePicture='" + profilePicture.trim() + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		return !CollectionUtils.isEmpty(authors);
 	}
