@@ -25,4 +25,7 @@ public interface UserService {
 	public String sessionActive(String sessionId);
 
 	public User selectUserbyId(String key);
+	
+	public List<User> getLibrarians();
+
 }

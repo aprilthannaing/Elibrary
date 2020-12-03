@@ -242,10 +242,15 @@ alter table category add column priority double;
 alter table subcategory add column priority double;
 update category set priority=0;
 update subcategory set priority=0;
+alter table user add column fromUserId varchar(50);
 
 
 ALTER TABLE subcategory DROP COLUMN name;
 ALTER TABLE subcategory ADD myanmarName VARCHAR(255) DEFAULT NULL;
 ALTER TABLE subcategory ADD engName VARCHAR(150) DEFAULT NULL;
+
+ALTER table Book ADD column searchTerms varchar(1000);
+UPDATE Book book SET searchTerms = CONCAT_WS ( " ", boId, ISBN, publisher, edition, title, coverPhoto, publishedDate, volume, state, modifiedDate, createdDate, sort, path, seriesIndex, size, callNo, accessionNo, (select name from User user where user.id = book.uploader));
+
 
 
