@@ -25,6 +25,7 @@ public class User extends AbstractEntity implements Serializable {
 	private String name;
 
 	@JsonView(Views.Thin.class)
+	@Column(name = "email")
 	private String email;
 
 	@JsonView(Views.Thin.class)

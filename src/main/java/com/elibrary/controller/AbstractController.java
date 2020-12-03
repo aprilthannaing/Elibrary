@@ -15,7 +15,7 @@ import org.apache.commons.codec.binary.Hex;
 @Service
 public class AbstractController {
 	public String dateFormat() {
-    	DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    	DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     	LocalDateTime now = LocalDateTime.now();
     	return dateFormat.format(now);
     }

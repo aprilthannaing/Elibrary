@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,15 +43,19 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "setuserinfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public String setuserinfo(@RequestBody User req){
+	public JSONObject setuserinfo(@RequestBody User req){
+		JSONObject jsonRes = new JSONObject();
 		String msg = "";
 		User user = new User();
 		try {
-			if (Validation(req)) {
+			jsonRes = Validation(req);
+			if (jsonRes.get("code").equals("000")) {
 				String loginUserid = userservice.sessionActive(req.getSessionId());
-				if(loginUserid.equals("")) {
-					msg = "Session Fail";
-					return msg;
+				if(!loginUserid.equals("") || loginUserid.equals("000")) {
+				}else {
+					jsonRes.put("code", "001");
+					jsonRes.put("desc", "Session Fail");
+					return jsonRes;
 				}
 				Hluttaw htaw = listOfValueService.checkHluttawById(req.getHlutawType());
 				Department dept = new Department();
@@ -61,6 +66,13 @@ public class UserController  extends AbstractController{
 					user  = userservice.selectUserByKey(req.getBoId());
 					msg = "Update Successfully";
 				}else {
+					User user1 = userservice.selectUserbyEmail(req.getEmail());
+					if(user1 != null) {
+						msg = "Email is already exit";
+						jsonRes.put("code", "001");
+						jsonRes.put("desc", msg);
+						return jsonRes;
+					}
 					user.setSessionStatus(EntityStatus.NEW);
 					user.setCreatedDate(dateFormat());
 					user.setPassword(getRandomNumberString());
@@ -95,12 +107,15 @@ public class UserController  extends AbstractController{
 					user.setEntityStatus(EntityStatus.EXPIRED);
 				userservice.save(user);
 				//saveHistory(user.getBoId(),loginUserid);
-				return msg;
+				jsonRes.put("code", "000");
+				jsonRes.put("desc", msg);
+				jsonRes.put("userList", user);
+				return jsonRes;
 			}
 		} catch (ServiceUnavailableException e) {
 			e.printStackTrace();
 		}
-		return "fail";
+		return jsonRes;
 	}
 //	public void saveHistory(String id,String loginUserid) {
 //		try {
@@ -118,35 +133,26 @@ public class UserController  extends AbstractController{
 //		}
 //	}
 	
-	public boolean Validation(User user) {
+	public JSONObject Validation(User user) {
+		JSONObject jsonRes = new JSONObject();
+		String message = "";
 		if(user.getName().equals("") || user.getName().equals(null)) {
-			return false;
+			message = "Please fill correct User Name";
 		}
 		if(user.getEmail().equals("") || user.getEmail().equals(null)) {
-			return false;
+			message = "Please fill correct User Email";
 		}
 		if(user.getPhoneNo().equals("") || user.getPhoneNo().equals(null)) {
-			return false;
+			message = "Please fill correct User Phone No";
 		}
 		if(user.getType().equals("") || user.getType().equals(null)) {
-			return false;
+			message = "Choose User Level";
 		}
-		if(user.getHlutawType() <= 0) {
-			return false;
-		}
-		if(user.getDeptType() <= 0) {
-			return false;
-		}
-		
-		if(user.getPositionType() <= 0) {
-			return false;
-		}
-		
-		if(user.getStatus().equals("") || user.getStatus().equals(null)) {
-			return false;
-		}
-		
-		return true;
+		if(!message.equals(""))
+			jsonRes.put("code", "001");
+		else
+			jsonRes.put("code", "000");
+		return jsonRes;
 	}
 	@RequestMapping(value = "selectUserInfo", method = RequestMethod.POST)
 	@ResponseBody
@@ -154,9 +160,9 @@ public class UserController  extends AbstractController{
 	public List<User> selectUserInfo(@RequestBody Request req){
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUser(req);
-		if(resList.size() > 0) {
-			User user = resList.get(0);
-		}
+//		if(resList.size() > 0) {
+//			User user = resList.get(0);
+//		}
 		return  resList;
 	}
 	
@@ -244,8 +250,6 @@ public class UserController  extends AbstractController{
 		return resJson;
 	}
 	
-	
-	
 	public String goValidation(String email,String password) {
 		if(email.equals("") && password.equals(""))
 		    return "Please enter your email address and password";
@@ -256,5 +260,93 @@ public class UserController  extends AbstractController{
 		if(password.equals(""))
 			return "Please enter your password";
 		return "";
+	}
+	
+	@RequestMapping(value = "deleteUserinfo", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject deleteUserinfo(@RequestBody User req){
+		JSONObject jsonRes = new JSONObject();
+		String msg = "";
+		User user = new User();
+		try {
+				String loginUserid = userservice.sessionActive(req.getSessionId());
+				if(loginUserid.equals("")) {
+					jsonRes.put("desc", "001");
+					jsonRes.put("code", "Session Fail");
+					return jsonRes;
+				}
+				if(req.getBoId().equals("")) {
+					jsonRes.put("desc", "001");
+					jsonRes.put("code", "user not found");
+				}
+				user  = userservice.selectUserByKey(req.getBoId());
+				user.setModifiedDate(dateFormat());
+				user.setEntityStatus(EntityStatus.DELETED);
+				userservice.save(user);
+				jsonRes.put("desc", "000");
+				jsonRes.put("code", "Delete Successfully");
+				return jsonRes;
+		} catch (ServiceUnavailableException e) {
+			e.printStackTrace();
+		}
+		return jsonRes;
+	}
+	
+	@RequestMapping(value = "setusers", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject setusers(@RequestBody ArrayList<User> arrayList, @RequestParam("sessionId") String sessionId) {
+		JSONObject jsonRes = new JSONObject();
+		String msg = "";
+		User user = new User();
+		try {
+			String loginUserid = userservice.sessionActive(sessionId);
+			if (!loginUserid.equals("") || loginUserid.equals("000")) {
+			} else {
+				jsonRes.put("code", "001");
+				jsonRes.put("desc", "Session Fail");
+				return jsonRes;
+			}
+			for (int i = 0; i < arrayList.size(); i++) {
+				jsonRes = Validation(arrayList.get(i));
+				if (jsonRes.get("code").equals("000")) {
+					Hluttaw htaw = listOfValueService.checkHluttawById(arrayList.get(i).getHlutawType());
+					User user1 = userservice.selectUserbyEmail(arrayList.get(i).getEmail());
+					if (user1 != null) {
+						msg = "Email '" + user.getEmail() + "' is already exit.";
+						jsonRes.put("code", "001");
+						jsonRes.put("desc", msg);
+						return jsonRes;
+					}
+					Department dept = new Department();
+					Position pos = new Position();
+					dept = listOfValueService.checkDepartmentbyId(arrayList.get(i).getDeptType());
+					pos = listOfValueService.getPositionbyId(arrayList.get(i).getPositionType());
+					arrayList.get(i).setSessionStatus(EntityStatus.NEW);
+					arrayList.get(i).setCreatedDate(dateFormat());
+					arrayList.get(i).setModifiedDate(dateFormat());
+					arrayList.get(i).setPassword(getRandomNumberString());
+					arrayList.get(i).setFromUserId(loginUserid);
+					arrayList.get(i).setHluttaw(htaw);
+					arrayList.get(i).setDepartment(dept);
+					arrayList.get(i).setPosition(pos);
+					// Role
+					arrayList.get(i).setRole(UserRole.User);
+					// Status
+					arrayList.get(i).setEntityStatus(EntityStatus.NEW);
+					userservice.save(arrayList.get(i));
+				}
+
+			}
+			jsonRes.put("code", "000");
+			jsonRes.put("desc", "Insert Successfully");
+			jsonRes.put("userList", user);
+
+		} catch (ServiceUnavailableException e) {
+			e.printStackTrace();
+		}
+
+		return jsonRes;
 	}
 }

@@ -18,8 +18,6 @@ public interface UserService {
 
 	public User getLogin(String email, String password);
 
-	public String checkSession(User user) throws ServiceUnavailableException;
-
 	public String save(Session session);
 
 	public String sessionActive(String sessionId);
@@ -27,5 +25,6 @@ public interface UserService {
 	public User selectUserbyId(String key);
 	
 	public List<User> getLibrarians();
-
+	
+	public User selectUserbyEmail(String email);
 }

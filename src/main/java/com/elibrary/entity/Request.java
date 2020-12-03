@@ -4,6 +4,7 @@ public class Request {
 	String searchText;
 	String text1;
 	String text2;
+	String text3;
 	String fromDate;
 	String toDate;
 	public String getSearchText() {
@@ -36,5 +37,10 @@ public class Request {
 	public void setToDate(String toDate) {
 		this.toDate = toDate;
 	}
-	
+	public String getText3() {
+		return text3;
+	}
+	public void setText3(String text3) {
+		this.text3 = text3;
+	}
 }

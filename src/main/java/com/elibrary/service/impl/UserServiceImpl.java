@@ -52,13 +52,31 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	public List<User> selectUser(Request req) {
 		List<User> response = new ArrayList<User>();
 		String whereclause = "";
-		if (!req.getSearchText().equals("")) {
+		if (!req.getSearchText().trim().equals("")) {
 			whereclause = " and (" + " name like '%" + req.getSearchText() + "%' or email like '%" + req.getSearchText()
 					+ "%' " + "or phoneNo like '%" + req.getSearchText() + "%' or role like '%" + req.getSearchText()
 					+ "%' " + "or type like '%" + req.getSearchText() + "%' or entityStatus like '%"
 					+ req.getSearchText() + "%' )";
 		}
-		String query = "from User where 1=1 " + whereclause;
+		if(!req.getText1().trim().equals("")) {
+			whereclause += " and hluttawboId=" + req.getText1();
+		}
+		if(!req.getText2().trim().equals("")) {
+			whereclause += " and departmentboId=" + req.getText2();
+		}
+		if(!req.getText3().trim().equals("")) {
+			whereclause += " and positionboId=" + req.getText3();
+		}
+//		if(req.getFromDate().equals("") && req.getToDate().equals("")) {
+//			
+//		}
+		if(!req.getFromDate().trim().equals("")) {
+			whereclause += " and modifiedDate >='" + req.getFromDate() + "'";
+		}
+		if(!req.getToDate().trim().equals("")) {
+			whereclause += " and modifiedDate <='" + req.getToDate() + "'";
+		}
+		String query = "from User where entityStatus<>'DELETED' " + whereclause;
 		List<User> userList = userDao.byQuery(query);
 		for (User row : userList) {
 			row.setDeptType(row.getDepartment().getId());
@@ -101,6 +119,14 @@ public class UserServiceImpl extends AbstractController implements UserService {
 			return null;
 		return userList.get(0);
 	}
+	
+	public User selectUserbyEmail(String email) {
+		String query = "Select user from User user where email='"+ email + "'";
+		List<User> userList = userDao.byQuery(query);
+		if(userList.size() > 0)
+			return userList.get(0);
+	return null;
+	}
 
 	public User findByBoId(String boId) {
 		String query = "select user from User user where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE
@@ -119,20 +145,6 @@ public class UserServiceImpl extends AbstractController implements UserService {
 			return null;
 		return users.get(0);
 	}
-
-	public String checkSession(User user) throws ServiceUnavailableException {
-		Session session = new Session();
-		String query = "from Session where userid=" + user.getId();
-		List<Session> sessionList = sessionDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(sessionList))
-			return "";
-		session.setEntityStatus(EntityStatus.ACTIVE);
-		session.setStartDate(dateFormat());
-		session.setEndDate(dateFormat());
-		session.setUser(user);
-		return save(session);
-	}
-
 	public String save(Session session) {
 		try {
 			if (session.isIdRequired(session.getId()))
@@ -153,15 +165,6 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		if (idList.get(0) == null)
 			return 1;
 		return idList.get(0) + 1;
-
-	}
-
-	public String sessionActive(String sessionId) {
-		String query = "from Session where boId='" + sessionId + "' And entityStatus='" + EntityStatus.ACTIVE + "'";
-		List<Session> sessionList = sessionDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(sessionList))
-			return "";
-		return String.valueOf(sessionList.get(0).getUser().getId());
 	}
 
 	public List<User> getLibrarians() {
@@ -172,4 +175,18 @@ public class UserServiceImpl extends AbstractController implements UserService {
 			return null;
 		return userList;
 	}
+
+	public String sessionActive(String sessionId){
+	String query = "";
+	query = "from Session";
+	List<Session> sessionListAll = sessionDao.getEntitiesByQuery(query);
+	if (CollectionUtils.isEmpty(sessionListAll))
+		return "000";
+	query = "from Session where boId='" + sessionId + "' And entityStatus='" + EntityStatus.ACTIVE +"'";
+	List<Session> sessionList = sessionDao.getEntitiesByQuery(query);
+	if (CollectionUtils.isEmpty(sessionList))
+		return "";
+	return String.valueOf(sessionList.get(0).getUser().getId());
+}
+
 }
