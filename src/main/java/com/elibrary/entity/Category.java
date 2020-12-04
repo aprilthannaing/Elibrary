@@ -37,6 +37,17 @@ public class Category extends AbstractEntity implements Serializable {
 	@JsonView(Views.Thin.class)
 	private long bookCount;
 
+	@JsonView(Views.Thin.class)
+	private String icon;
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
 	public long getBookCount() {
 		return bookCount;
 	}

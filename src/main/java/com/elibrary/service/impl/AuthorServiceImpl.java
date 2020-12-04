@@ -1,5 +1,10 @@
 package com.elibrary.service.impl;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,10 +80,45 @@ public class AuthorServiceImpl implements AuthorService {
 		String query = "select author from Author author where authorType='" + authorType
 				+ "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId="
 				+ categoryId + " ))";
-		List<Author> authors = authorDao.getEntitiesByQuery(query, 12);
+		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return new ArrayList<Author>();
 		return authors;
+	}
+
+	public Author getAuthorListById(long authorId, AuthorType authorType) {
+		String query = "select author from Author author where authorType='" + authorType + "' and author.id="
+				+ authorId;
+		List<Author> authors = authorDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(authors))
+			return null;
+		return authors.get(0);
+	}
+
+	public List<Long> getAuthorIdByBookCount(long categoryId) throws SQLException, ClassNotFoundException {
+		List<Long> authorIds = new ArrayList<Long>();
+		String name, pass, url;
+		Connection con = null;
+		Class.forName("com.mysql.jdbc.Driver");
+		url = "jdbc:mysql://localhost:3306/elibrary";
+		name = "root";
+		pass = "root";
+		con = DriverManager.getConnection(url, name, pass);
+		String seeachStoredProc = "{call GET_BookCountByAuthor()}";
+		CallableStatement myCs = con.prepareCall(seeachStoredProc);
+
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				if (Long.parseLong(rs.getString("CAT_ID")) == categoryId) {
+					authorIds.add(Long.parseLong(rs.getString("AUTHOR_ID")));
+				}
+			}
+
+			con.close();
+		}
+		return authorIds;
 	}
 
 }

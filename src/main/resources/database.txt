@@ -274,3 +274,31 @@ update category set icon="CategoryIcon/organization.png" where id=3;
 update category set icon="CategoryIcon/periodicalbook.png" where id=5;
 
 
+
+USE elibrary;
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_BookCountByAuthor;
+CREATE PROCEDURE GET_BookCountByAuthor()
+BEGIN
+ SELECT
+    BC.categoryId AS 'CAT_ID',
+    A.id AS 'AUTHOR_ID',
+    A.name AS 'AUTHOR_NAME',
+    COUNT(BA.bookId) AS 'TOT_COUNT'
+  FROM book_author ba
+    INNER JOIN author a
+      ON A.id = BA.authorId
+    INNER JOIN book_category bc
+      ON BA.bookId = BC.bookId
+  GROUP BY BC.categoryId,
+           A.id,
+           A.name,
+           A.entityStatus
+  ORDER BY TOT_COUNT DESC;
+END
+//
+DELIMITER ;
+
+call GET_BookCountByAuthor()
+
+

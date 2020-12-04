@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +48,8 @@ public class HomeController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "book", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject getHomePage(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject getHomePage(@RequestBody JSONObject json)
+			throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 		Object categoryId = json.get("categoryId");
 		if (categoryId == null || categoryId.toString().isEmpty()) {
@@ -57,15 +59,26 @@ public class HomeController {
 		}
 
 		Category category = categoryService.findByBoId(categoryId.toString());
-		List<Author> localAuthors = authorService.getAuthorListByCategory(category.getId(), AuthorType.LOCAL);
-		List<Author> internationalAuthors = authorService.getAuthorListByCategory(category.getId(),
-				AuthorType.INTERNATIONAL);
-
-		resultJson.put("local_author", localAuthors);
-		resultJson.put("international_author", internationalAuthors);
+		resultJson.put("local_author", getAuthors(category, AuthorType.LOCAL));
+		resultJson.put("international_author", getAuthors(category, AuthorType.INTERNATIONAL));
 		resultJson.put("sub_category", getDisplaySubCategories(category));
 		resultJson.put("latest_book", getLatestBooks(category));
 		return resultJson;
+	}
+
+	private List<Author> getAuthors(Category category, AuthorType authorType)
+			throws ClassNotFoundException, SQLException {
+		List<Author> authors = new ArrayList<Author>();
+
+		List<Long> authorIdList = authorService.getAuthorIdByBookCount(category.getId());
+		for (Long authorId : authorIdList) {
+			if (authorId < 0 || authors.size() > 11)
+				break;
+			Author author = authorService.getAuthorListById(authorId, authorType);
+			if (author != null)
+				authors.add(author);
+		}
+		return authors;
 	}
 
 	private List<Book> getLatestBooks(Category category) {
@@ -87,6 +100,14 @@ public class HomeController {
 	}
 
 	private List<Author> getSortedAuthorsWritten(List<Author> authorsByCategory) {
+
+//		List<Author> authors = authorService.getAuthorListByCategory(category.getId(), AuthorType.LOCAL);
+//		List<Author> sortedLocalAuthorsWriteMaxBook = getSortedAuthorsWritten(authors);
+//		sortedLocalAuthorsWriteMaxBook.forEach(author -> {
+//			logger.info("local author: " + author.getName());
+//
+//		});
+
 		List<Long> bookCounts = new ArrayList<Long>();
 		Map<Long, Author> bookAuthorMap = new HashMap<Long, Author>();
 
