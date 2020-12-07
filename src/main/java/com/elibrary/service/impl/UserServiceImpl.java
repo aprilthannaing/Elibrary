@@ -76,7 +76,7 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		if(!req.getToDate().trim().equals("")) {
 			whereclause += " and modifiedDate <='" + req.getToDate() + "'";
 		}
-		String query = "from User where entityStatus<>'DELETED' " + whereclause;
+		String query = "from User where entityStatus<>'DELETED' " + whereclause + " order by id desc";
 		List<User> userList = userDao.byQuery(query);
 		for (User row : userList) {
 			row.setDeptType(row.getDepartment().getId());
@@ -111,9 +111,8 @@ public class UserServiceImpl extends AbstractController implements UserService {
 
 		return response.get(0);
 	}
-
 	public User selectUserbyId(String key) {
-		String query = "from User where id=" + key;
+		String query = "Select user from User user where id=" + Long.parseLong(key);
 		List<User> userList = userDao.byQuery(query);
 		if (CollectionUtils.isEmpty(userList))
 			return null;
@@ -122,6 +121,14 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	
 	public User selectUserbyEmail(String email) {
 		String query = "Select user from User user where email='"+ email + "'";
+		List<User> userList = userDao.byQuery(query);
+		if(userList.size() > 0)
+			return userList.get(0);
+	return null;
+	}
+	
+	public User selectUserbyVerCode(String loginUserid,String verificationCode) {
+		String query = "Select user from User user where id="+ loginUserid + " And verificationCode='"+ verificationCode +"'";
 		List<User> userList = userDao.byQuery(query);
 		if(userList.size() > 0)
 			return userList.get(0);
@@ -139,7 +146,7 @@ public class UserServiceImpl extends AbstractController implements UserService {
 
 	public User getLogin(String email, String password) {
 		String query = "from User where email='" + email + "' And password='" + password + "' And entityStatus='"
-				+ EntityStatus.ACTIVE + "'";
+				+ EntityStatus.ACTIVE + "' And role <>'"+ UserRole.User +"'";
 		List<User> users = userDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(users))
 			return null;
@@ -188,5 +195,38 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		return "";
 	return String.valueOf(sessionList.get(0).getUser().getId());
 }
+	
+	public List<User> selectUserbyStatus(Request req) {
+		List<User> response = new ArrayList<User>();
+		String whereclause = "";
+		if(!req.getFromDate().trim().equals("")) {
+			whereclause += " and modifiedDate >='" + req.getFromDate() + "'";
+		}
+		if(!req.getToDate().trim().equals("")) {
+			whereclause += " and modifiedDate <='" + req.getToDate() + "'";
+		}
+		String query = "from User where entityStatus='" + EntityStatus.NEW + "' " + whereclause + " order by id desc";
+		List<User> userList = userDao.byQuery(query);
+		for (User row : userList) {
+			row.setDeptType(row.getDepartment().getId());
+			row.setDeptName(row.getDepartment().getName());
+			row.setPositionType(row.getPosition().getId());
+			row.setPositionName(row.getPosition().getName());
+			row.setHlutawType(row.getHluttaw().getId());
+			row.setHlutawName(row.getHluttaw().getName());
+			row.setStatus(row.getEntityStatus().name());
+			//from user
+			row.setFromUser(fromUserbyId(row.getFromUserId()));
+			response.add(row);
+		}
+		return response;
+	}
+	public String fromUserbyId(String fromuserid) {
+		String query = "from User where id='"+ fromuserid + "'";
+		List<User> userList = userDao.byQuery(query);
+		if (CollectionUtils.isEmpty(userList))
+			return "";
+	return userList.get(0).getName();
+	}
 
 }

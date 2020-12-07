@@ -27,4 +27,8 @@ public interface UserService {
 	public List<User> getLibrarians();
 	
 	public User selectUserbyEmail(String email);
+	
+	public List<User> selectUserbyStatus(Request req);
+	
+	public User selectUserbyVerCode(String email,String verificationCode);
 }

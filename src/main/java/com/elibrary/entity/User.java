@@ -20,6 +20,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class User extends AbstractEntity implements Serializable {
 	
 	private String fromUserId;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String fromUser;
 
 	@JsonView(Views.Thin.class)
 	private String name;
@@ -98,6 +102,18 @@ public class User extends AbstractEntity implements Serializable {
 	@JoinColumn(name = "positionboId")
 	private Position position;
 	
+	@Column(name = "verificationCode")
+	private String verificationCode;
+	
+	
+	public String getVerificationCode() {
+		return verificationCode;
+	}
+
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
+	}
+
 	public String getFromUserId() {
 		return fromUserId;
 	}
@@ -272,6 +288,14 @@ public class User extends AbstractEntity implements Serializable {
 
 	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
+	}
+
+	public String getFromUser() {
+		return fromUser;
+	}
+
+	public void setFromUser(String fromUser) {
+		this.fromUser = fromUser;
 	}
 
 }
