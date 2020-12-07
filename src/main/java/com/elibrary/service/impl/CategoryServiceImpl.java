@@ -1,5 +1,6 @@
 package com.elibrary.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -53,17 +54,15 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	public List<Category> getAll() {
-		String query = "select category from Category category where entityStatus='" + EntityStatus.ACTIVE
-				+ "' order by priority";
+		String query = "select category from Category category where entityStatus='" + EntityStatus.ACTIVE + "' order by priority";
 		List<Category> categories = categoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(categories))
-			return null;
+			return new ArrayList<Category>();
 		return categories;
 	}
 
 	public Category findByBoId(String boId) {
-		String query = "select category from Category category where boId='" + boId + "'and entityStatus='"
-				+ EntityStatus.ACTIVE + "'";
+		String query = "select category from Category category where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Category> categories = categoryDao.getEntitiesByQuery(query);
 		if (!CollectionUtils.isEmpty(categories))
 			return categories.get(0);

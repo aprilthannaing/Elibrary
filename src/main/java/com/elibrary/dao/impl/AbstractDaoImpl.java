@@ -64,6 +64,13 @@ public abstract class AbstractDaoImpl<E, I extends Serializable> implements Abst
 		entityList = query.getResultList();
 		return entityList;
 	}
+	
+	public List<Long> findLongByQueryString(String queryString, int count) {
+		List<Long> entityList;
+		Query query = entityManager.createQuery(queryString).setMaxResults(count);
+		entityList = query.getResultList();
+		return entityList;
+	}
 
 	public List<Integer> findIntByQueryString(String queryString) {
 		List<Integer> entityList;

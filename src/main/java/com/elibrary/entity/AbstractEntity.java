@@ -14,12 +14,13 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class AbstractEntity {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@JsonView(Views.Thin.class)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true, nullable = false)
 	private long Id;
 
 	@JsonView(Views.Thin.class)
-	@Column(name = "boId",nullable = false)
+	@Column(name = "boId", nullable = false)
 	private String boId;
 
 	@Column(name = "entityStatus")
@@ -53,7 +54,7 @@ public class AbstractEntity {
 	public boolean isBoIdRequired(String boId) {
 		return SystemConstant.BOID_REQUIRED.equals(boId);
 	}
-	
+
 	public boolean isIdRequired(Long id) {
 		return id == null || id == 0 || SystemConstant.ID_REQUIRED.equals(id);
 	}

@@ -1,7 +1,9 @@
 package com.elibrary.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
+import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Book;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -31,5 +33,15 @@ public interface BookService {
 	public Long getAverageRating(long bookId);
 
 	public Long getBookCountByCategory(long categoryId);
+
+	public List<Book> getLatestBooks();
+
+	public List<Long> getMostReadingBookIds(ActionStatus actionStatus) throws SQLException, ClassNotFoundException;
+
+	public Book findById(Long Id);
+
+	public List<Book> getRecommendBook(Long userId);
+
+	public List<Book> getLatestBooksBySubCategoryId(long subcategoryId);
 
 }

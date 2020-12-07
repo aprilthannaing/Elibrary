@@ -68,8 +68,7 @@ public class AuthorServiceImpl implements AuthorService {
 	}
 
 	public Author findByBoId(String boId) {
-		String query = "select author from Author author where boId='" + boId + "'and entityStatus='"
-				+ EntityStatus.ACTIVE + "'";
+		String query = "select author from Author author where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;
@@ -77,9 +76,7 @@ public class AuthorServiceImpl implements AuthorService {
 	}
 
 	public List<Author> getAuthorListByCategory(long categoryId, AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType
-				+ "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId="
-				+ categoryId + " ))";
+		String query = "select author from Author author where authorType='" + authorType + "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId=" + categoryId + " ))";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return new ArrayList<Author>();
@@ -87,8 +84,7 @@ public class AuthorServiceImpl implements AuthorService {
 	}
 
 	public Author getAuthorListById(long authorId, AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType + "' and author.id="
-				+ authorId;
+		String query = "select author from Author author where authorType='" + authorType + "' and author.id=" + authorId;
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;
@@ -120,5 +116,30 @@ public class AuthorServiceImpl implements AuthorService {
 		}
 		return authorIds;
 	}
+	
+	public List<Long> getAuthorIdByBookCount() throws SQLException, ClassNotFoundException {
+		List<Long> authorIds = new ArrayList<Long>();
+		String name, pass, url;
+		Connection con = null;
+		Class.forName("com.mysql.jdbc.Driver");
+		url = "jdbc:mysql://localhost:3306/elibrary";
+		name = "root";
+		pass = "root";
+		con = DriverManager.getConnection(url, name, pass);
+		String seeachStoredProc = "{call GET_BookCountByAuthor()}";
+		CallableStatement myCs = con.prepareCall(seeachStoredProc);
+
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+					authorIds.add(Long.parseLong(rs.getString("AUTHOR_ID")));				
+			}
+
+			con.close();
+		}
+		return authorIds;
+	}
+
 
 }

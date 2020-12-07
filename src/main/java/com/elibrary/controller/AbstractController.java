@@ -14,18 +14,25 @@ import org.apache.commons.codec.binary.Hex;
 
 @Service
 public class AbstractController {
+
+	public final String authorization = "7M8N3SLQ8QIKDJOSEPXJKJDFOZIN1NBO";
+
+	public boolean isTokenRight(String token) {
+		return token.trim().equals(authorization);
+	}
+
 	public String dateFormat() {
-    	DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	LocalDateTime now = LocalDateTime.now();
-    	return dateFormat.format(now);
-    }
-	
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDateTime now = LocalDateTime.now();
+		return dateFormat.format(now);
+	}
+
 	public static String getRandomNumberString() {
 		Random rnd = new Random();
 		int number = rnd.nextInt(999999);
 		return String.format("%06d", number);
 	}
-	
+
 	public String generateSession(Long id) {
 
 		char[] chars = id.toString().toCharArray();
@@ -36,15 +43,15 @@ public class AbstractController {
 		PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 2);
 		SecretKeyFactory skf;
 		try {
-		    skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-		    byte[] hash = skf.generateSecret(spec).getEncoded();
-		    hashPass = Hex.encodeHexString(hash);
+			skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+			byte[] hash = skf.generateSecret(spec).getEncoded();
+			hashPass = Hex.encodeHexString(hash);
 		} catch (NoSuchAlgorithmException e) {
-		    e.printStackTrace();
+			e.printStackTrace();
 		} catch (InvalidKeySpecException e) {
-		    e.printStackTrace();
+			e.printStackTrace();
 		}
 		return hashPass;
-	    }
-	
+	}
+
 }

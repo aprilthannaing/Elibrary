@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,7 +25,7 @@ import com.mchange.rmi.ServiceUnavailableException;
 
 @RestController
 @RequestMapping("category")
-public class CategoryController {
+public class CategoryController extends AbstractController {
 
 	@Autowired
 	private BookService bookService;
@@ -47,14 +48,20 @@ public class CategoryController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "all", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
-	public JSONObject getAll() throws ServiceUnavailableException {
+	public JSONObject getAll(@RequestHeader("token") String token) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
+		if (!isTokenRight(token)) {
+			result.put("status", false);
+			result.put("err_msg", "Unauthorized Request");
+			return result;
+		}
+
 		List<Category> categoryList = categoryService.getAll();
 		categoryList.forEach(category -> {
 			category.setBookCount(bookService.getBookCountByCategory(category.getId()));
 		});
 
-		result.put("status", "true");
+		result.put("status", true);
 		result.put("categories", categoryList);
 		return result;
 	}

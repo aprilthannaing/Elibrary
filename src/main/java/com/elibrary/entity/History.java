@@ -17,50 +17,40 @@ import javax.persistence.Table;
 public class History extends AbstractEntity implements Serializable {
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "userboId")
-	private User user;
+	@JoinColumn(name = "userId")
+	private User userId;
 
-	private String bookId;
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "bookId")
+	private Book bookId;
 
 	private String dateTime;
 
-	private String toUserId;
-
-	@Column(name = "workStatus")
+	@Column(name = "actionStatus")
 	@Enumerated(EnumType.STRING)
-	private WorkStatus workStatus;
+	private ActionStatus actionStatus;
 
-	private int count;
-
-	public String getToUserId() {
-		return toUserId;
+	public ActionStatus getActionStatus() {
+		return actionStatus;
 	}
 
-	public void setToUserId(String toUserId) {
-		this.toUserId = toUserId;
+	public void setActionStatus(ActionStatus actionStatus) {
+		this.actionStatus = actionStatus;
 	}
 
-	public WorkStatus getWorkStatus() {
-		return workStatus;
+	public User getUserId() {
+		return userId;
 	}
 
-	public void setWorkStatus(WorkStatus workStatus) {
-		this.workStatus = workStatus;
+	public void setUserId(User userId) {
+		this.userId = userId;
 	}
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public String getBookId() {
+	public Book getBookId() {
 		return bookId;
 	}
 
-	public void setBookId(String bookId) {
+	public void setBookId(Book bookId) {
 		this.bookId = bookId;
 	}
 
@@ -72,12 +62,8 @@ public class History extends AbstractEntity implements Serializable {
 		this.dateTime = dateTime;
 	}
 
-	public int getCount() {
-		return count;
-	}
-
-	public void setCount(int count) {
-		this.count = count;
+	public static boolean isValidAction(ActionStatus status) {
+		return status == ActionStatus.BOOKMARK || status == ActionStatus.READ || status == ActionStatus.FAVOURITE;
 	}
 
 }

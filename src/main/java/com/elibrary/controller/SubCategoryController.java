@@ -1,19 +1,20 @@
 package com.elibrary.controller;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Category;
-import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.SubCategory;
-import com.elibrary.entity.SystemConstant;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
@@ -26,7 +27,7 @@ import com.mchange.rmi.ServiceUnavailableException;
 
 @RestController
 @RequestMapping("subcategory")
-public class SubCategoryController {
+public class SubCategoryController extends AbstractController {
 
 	@Autowired
 	private BookService bookService;
@@ -57,7 +58,61 @@ public class SubCategoryController {
 		result.put("subcategories", subCategoryService.getAll());
 		return result;
 	}
-	
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "byengcategory", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject byEngCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		Object mainCategory = json.get("main_category_id");
+		if (mainCategory == null || mainCategory.toString().isEmpty()) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Main Category is not valid!");
+			return resultJson;
+		}
+
+		Category category = categoryService.findByBoId("CATEGORY10004");
+		List<SubCategory> subCategories = category.getSubCategories();
+		subCategories.sort((s1, s2) -> s1.getMyanmarName().compareTo(s2.getMyanmarName()));
+		resultJson.put("status", true);
+		resultJson.put("subcategories", subCategories);
+		return resultJson;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "bymaincategory", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject byMainCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		Object mainCategory = json.get("main_category_id");
+		if (mainCategory == null || mainCategory.toString().isEmpty()) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Main Category is not valid!");
+			return resultJson;
+		}
+
+		Category category = categoryService.findByBoId(mainCategory.toString());
+		resultJson.put("status", true);
+		resultJson.put("subcategories", category.getSubCategories());
+		return resultJson;
+	}
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "boId", method = RequestMethod.POST)
@@ -69,7 +124,7 @@ public class SubCategoryController {
 			result.put("subCategory", subCategory);
 		return result;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "count", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)

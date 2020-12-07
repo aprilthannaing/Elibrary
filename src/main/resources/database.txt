@@ -105,14 +105,12 @@ CREATE TABLE `session` (
 CREATE TABLE `history` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
+  userId bigint(20) NOT NULL,
+  bookId bigint(20)NOT NULL,
+ `actionStatus` varchar(100) DEFAULT NULL,   
  `dateTime`varchar(255) DEFAULT NULL,
- `workStatus` varchar(100) DEFAULT NULL, 
- `count` int(100) DEFAULT NULL,
- `toUserId` varchar(50) DEFAULT NULL, 
  `entityStatus` varchar(100) DEFAULT NULL,
-userId bigint(20) NOT NULL,
-bookId bigint(20)NOT NULL,
-PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`),
 CONSTRAINT FOREIGN KEY (userId) REFERENCES user (id),
 CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -274,7 +272,8 @@ update category set icon="CategoryIcon/organization.png" where id=3;
 update category set icon="CategoryIcon/periodicalbook.png" where id=5;
 
 
-
+//Stored procedure
+------------------
 USE elibrary;
 DELIMITER //
 DROP PROCEDURE IF EXISTS GET_BookCountByAuthor;
@@ -301,4 +300,20 @@ DELIMITER ;
 
 call GET_BookCountByAuthor()
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS GetBookCountByActionStatus;
+CREATE PROCEDURE GetBookCountByActionStatus()
+BEGIN
+ SELECT 
+  H.bookId 'BOOK'
+,  SUM(CASE WHEN H.actionStatus="READ" THEN 1  -- END) AS 'TOT_COUNT' 
+  WHEN H.actionStatus="FAVOURITE" THEN 1  WHEN H.actionStatus="BOOKMARK" THEN 1  END) AS 'TOT_COUNT'
+,  H.actionStatus 
+  FROM history H
+  GROUP BY H.bookId
+ ,H.actionStatus
+  ORDER BY TOT_COUNT DESC;
+END
+//DELIMITER ;
 
+call GetBookCountByActionStatus()
