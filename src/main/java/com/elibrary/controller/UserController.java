@@ -214,6 +214,12 @@ public class UserController  extends AbstractController{
 			JSONObject json1= new JSONObject();
 			json1.put("id", user.getBoId());
 			json1.put("name", user.getName());
+			json1.put("email", user.getEmail());
+			json1.put("phoneNo", user.getPhoneNo());
+			json1.put("hluttaw", listOfValueService.checkHluttawById(user.getHluttaw().getId()).getName());
+			json1.put("department", listOfValueService.checkDepartmentbyId(user.getDepartment().getId()).getName());
+			json1.put("position", listOfValueService.getPositionbyId(user.getPosition().getId()).getName());
+			json1.put("type", user.getType());
 			json1.put("role", user.getRole().name());
 			resJson.put("data", json1);
 			return resJson;
