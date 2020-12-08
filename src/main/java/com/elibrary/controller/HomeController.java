@@ -4,10 +4,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -25,7 +23,6 @@ import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
-import com.elibrary.entity.History;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
