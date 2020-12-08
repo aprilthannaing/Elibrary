@@ -251,6 +251,7 @@ alter table book add column bookMarkStatus varchar(255);
 alter table book add column ownRating varchar(255);
 alter table book add column averageRating varchar(255);
 alter table user add column verificationCode varchar(6);
+alter table history add column ratingId varchar(50);
 
 update book set ownRating=0;
 update book set averageRating=0;

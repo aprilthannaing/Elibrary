@@ -23,6 +23,7 @@ import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.HistoryService;
+import com.elibrary.service.RatingService;
 import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -46,6 +47,9 @@ public class BookController extends AbstractController {
 
 	@Autowired
 	private HistoryService historyService;
+
+	@Autowired
+	private RatingService ratingService;
 
 	private static Logger logger = Logger.getLogger(SubCategoryController.class);
 
@@ -83,7 +87,7 @@ public class BookController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
 	@JsonView(Views.Thin.class)
 	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
@@ -115,13 +119,21 @@ public class BookController extends AbstractController {
 			resultJson.put("message", "This User or Author or Sub-Category is not found!");
 			return resultJson;
 		}
+
 		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
+
+		List<Book> books = getBooksByPaganation(json, bookList, pageNo);
+		if (books == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "This User or Author or Sub-Category is not found!");
+			return resultJson;
+		}
 
 		resultJson.put("status", true);
 		resultJson.put("current_page", pageNo);
 		resultJson.put("last_page", lastPageNo);
 		resultJson.put("total_count", bookList.size());
-		resultJson.put("books", getBooksByPaganation(bookList, pageNo));
+		resultJson.put("books", books);
 		return resultJson;
 	}
 
@@ -194,14 +206,22 @@ public class BookController extends AbstractController {
 
 	}
 
-	private List<Book> getBooksByPaganation(List<Book> bookList, int pageNo) {
+	private List<Book> getBooksByPaganation(JSONObject json, List<Book> bookList, int pageNo) {
+		User user = getUser(json);
+		if (user == null)
+			return null;
 		List<Book> resultBookList = new ArrayList<Book>();
 		int lastIndex = (bookList.size() - 1) - (pageNo * 10 - 10);
 		int substract = lastIndex < 9 ? lastIndex : 9;
 		int startIndex = lastIndex - substract;
 
-		for (int i = lastIndex; i >= startIndex; i--)
-			resultBookList.add(bookList.get(i));
+		for (int i = lastIndex; i >= startIndex; i--) {
+
+			Book book = bookList.get(i);
+			book.setAverageRating(ratingService.getAverageRating(book.getId()));
+			book.setOwnRating(ratingService.getOwnRating(user.getId(), book.getId()));
+			resultBookList.add(book);
+		}
 		return resultBookList;
 	}
 

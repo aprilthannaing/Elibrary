@@ -4,15 +4,16 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.elibrary.dao.SessionDao;
+import com.elibrary.dao.RatingDao;
+import com.elibrary.entity.Rating;
 import com.elibrary.entity.Session;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Repository
-public class SessionDaoImpl extends AbstractDaoImpl<Session, String> implements SessionDao {
+public class RatingDaoImpl extends AbstractDaoImpl<Rating, String> implements RatingDao {
 
-	protected SessionDaoImpl() {
-		super(Session.class);
+	protected RatingDaoImpl() {
+		super(Rating.class);
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public class SessionDaoImpl extends AbstractDaoImpl<Session, String> implements 
 	}
 
 	@Override
-	public boolean saveUpdate(Session e) throws ServiceUnavailableException {
+	public boolean saveUpdate(Rating e) throws ServiceUnavailableException {
 		return false;
 	}
 
@@ -36,7 +37,7 @@ public class SessionDaoImpl extends AbstractDaoImpl<Session, String> implements 
 	}
 
 	@Override
-	public void delete(Session e) throws ServiceUnavailableException {
+	public void delete(Rating e) throws ServiceUnavailableException {
 
 	}
 

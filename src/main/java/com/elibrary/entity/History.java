@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 @Entity
 @Table(name = "history")
 public class History extends AbstractEntity implements Serializable {
@@ -24,11 +26,22 @@ public class History extends AbstractEntity implements Serializable {
 	@JoinColumn(name = "bookId")
 	private Book bookId;
 
+	@JsonView(Views.Thin.class)
+	private long ratingId;
+
 	private String dateTime;
 
 	@Column(name = "actionStatus")
 	@Enumerated(EnumType.STRING)
 	private ActionStatus actionStatus;
+
+	public long getRatingId() {
+		return ratingId;
+	}
+
+	public void setRatingId(long ratingId) {
+		this.ratingId = ratingId;
+	}
 
 	public ActionStatus getActionStatus() {
 		return actionStatus;
@@ -63,7 +76,11 @@ public class History extends AbstractEntity implements Serializable {
 	}
 
 	public static boolean isValidAction(ActionStatus status) {
-		return status == ActionStatus.BOOKMARK || status == ActionStatus.READ || status == ActionStatus.FAVOURITE;
+		return status == ActionStatus.BOOKMARK || status == ActionStatus.READ || status == ActionStatus.FAVOURITE || status == ActionStatus.RATING;
+	}
+
+	public static boolean isRating(ActionStatus status) {
+		return status == ActionStatus.RATING;
 	}
 
 }

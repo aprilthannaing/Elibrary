@@ -32,7 +32,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String path;
 
-	//@JsonView(Views.Thin.class)
+	// @JsonView(Views.Thin.class)
 	private String seriesIndex;
 
 	@JsonView(Views.Thin.class)
@@ -41,10 +41,10 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String accessionNo;
 
-	//@JsonView(Views.Thin.class)
+	// @JsonView(Views.Thin.class)
 	private String size;
 
-	//@JsonView(Views.Thin.class)
+	// @JsonView(Views.Thin.class)
 	private String downloadApproval;
 
 	@JsonView(Views.Thin.class)
@@ -88,10 +88,10 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private String bookMarkStatus;
 
 	@JsonView(Views.Thin.class)
-	private long ownRating;
+	private double ownRating;
 
 	@JsonView(Views.Thin.class)
-	private long averageRating;
+	private double averageRating;
 
 	public String getFavouriteStatus() {
 		return favouriteStatus;
@@ -113,16 +113,16 @@ public class Book extends AbstractReadingObject implements Serializable {
 		return ownRating;
 	}
 
-	public long getAverageRating() {
+	public void setOwnRating(double ownRating) {
+		this.ownRating = ownRating;
+	}
+
+	public double getAverageRating() {
 		return averageRating;
 	}
 
-	public void setAverageRating(long averageRating) {
+	public void setAverageRating(double averageRating) {
 		this.averageRating = averageRating;
-	}
-
-	public void setOwnRating(long ownRating) {
-		this.ownRating = ownRating;
 	}
 
 	public User getUploader() {
