@@ -80,6 +80,8 @@ CREATE TABLE `user` (
   `modifiedDate` varchar(255) DEFAULT NULL,
   `entityStatus` varchar(100) DEFAULT NULL,
   `sessionStatus` varchar(100) DEFAULT NULL,
+  `fromUserId` varchar(255) DEFAULT NULL,
+  `verificationCode` varchar(6) DEFAULT NULL,//atn
   PRIMARY KEY (`id`),
   KEY `FK_s9ffjsajfkhsj89797` (`hluttawboId`),
   KEY `FK_s9fffjwbesflkjso987` (`departmentboId`),
@@ -87,7 +89,7 @@ CREATE TABLE `user` (
   CONSTRAINT `FK_s9fffjwbesflkjso987` FOREIGN KEY (`departmentboId`) REFERENCES `department` (`id`),
   CONSTRAINT `FK_s9ffjsajfkhsj89797` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`id`),
   CONSTRAINT `FK_sfjfhwfwshiowse8975430` FOREIGN KEY (`positionboId`) REFERENCES `position` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `session` (
   `id` bigint NOT NULL AUTO_INCREMENT,

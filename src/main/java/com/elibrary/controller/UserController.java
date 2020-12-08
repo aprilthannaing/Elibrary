@@ -181,7 +181,7 @@ public class UserController  extends AbstractController{
 		return  user;
 	}
 	
-	@RequestMapping(value = "getLogin", method = RequestMethod.POST)
+	@RequestMapping(value = "goLogin", method = RequestMethod.POST)
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
@@ -236,8 +236,8 @@ public class UserController  extends AbstractController{
 	@JsonView(Views.Summary.class)
 	public JSONObject goChangepwd(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
 		JSONObject resJson = new JSONObject();
-		String oldpwd 	= reqJson.get("old_password").toString();
-		String newpwd = reqJson.get("new_password").toString();
+		String oldpwd 	= reqJson.get("old_password").toString().trim();
+		String newpwd = reqJson.get("new_password").toString().trim();
 		String sessionId = reqJson.get("token").toString();
 		String loginUserid = userservice.sessionActive(sessionId);
 		if(!loginUserid.equals("") || loginUserid.equals("000")) {
