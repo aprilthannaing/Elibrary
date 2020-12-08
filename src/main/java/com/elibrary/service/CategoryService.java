@@ -15,5 +15,9 @@ public interface CategoryService {
 	public long countCategory();
 	
 	public long countActiveCategory();
+	
+	public Long findBySubCategoryId(String boId);
+	
+	public Category findByCategoryId(String id);
 
 }

@@ -11,8 +11,10 @@ import org.springframework.util.CollectionUtils;
 import com.elibrary.dao.CategoryDao;
 import com.elibrary.dao.impl.CategoryDaoImpl;
 import com.elibrary.entity.Category;
+import com.elibrary.entity.Category_Subcategory;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.CategoryService;
+import com.mchange.lang.ArrayUtils;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Service("categoryService")
@@ -66,6 +68,24 @@ public class CategoryServiceImpl implements CategoryService {
 		List<Category> categories = categoryDao.getEntitiesByQuery(query);
 		if (!CollectionUtils.isEmpty(categories))
 			return categories.get(0);
+		return null;
+	}
+	
+	@Override
+	public Long findBySubCategoryId(String id) {
+		String query = "select categorySub.categoryId from Category_Subcategory categorySub where categorySub.subcategoryId='" + id + "'";
+		List<Long> categoryList = categoryDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(categoryList))
+			return (long)0;
+		return categoryList.get(0);
+	}
+
+	@Override
+	public Category findByCategoryId(String id) {
+		String query = "select category from Category category where id='" + id + "'";
+		List<Category> category = categoryDao.getEntitiesByQuery(query);
+		if (!CollectionUtils.isEmpty(category))
+			return category.get(0);
 		return null;
 	}
 

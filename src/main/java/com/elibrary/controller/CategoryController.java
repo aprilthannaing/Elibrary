@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Category;
+import com.elibrary.entity.Category_Subcategory;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
@@ -97,5 +98,35 @@ public class CategoryController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {
 		return categoryService.countActiveCategory() + "";
+	}
+	
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "bySubcategoryId", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject findBySubCategoryBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json: " + json);
+		JSONObject result = new JSONObject();
+		Long category = categoryService.findBySubCategoryId(json.get("id").toString().trim());
+		String categoryId = String.valueOf(category);
+		if (category != null) {
+			result.put("categoryId", categoryId);
+		}	
+		return result;
+	}
+	
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "byId", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject findByCategoryId(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		logger.info("json: " + json);
+		JSONObject result = new JSONObject();
+		Category category = categoryService.findByCategoryId(json.get("id").toString().trim());
+		if (category != null) {
+			result.put("category", category);
+		}
+			
+		return result;
 	}
 }
