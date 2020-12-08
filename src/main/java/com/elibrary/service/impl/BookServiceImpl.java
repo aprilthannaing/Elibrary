@@ -72,7 +72,7 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public List<Book> getAll() {
-		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' order by book.id desc";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
 			return null;
@@ -136,9 +136,17 @@ public class BookServiceImpl implements BookService {
 			return new ArrayList<Book>();
 		return books;
 	}
-	
-	public List<Book> getLatestBooksBySubCategoryId(long subcategoryId) {
-		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bookId from Book_SubCategory bc where bc.subcategoryId=" + subcategoryId + ") order by book.id desc";
+
+	public List<Book> getBooksBySubCategoryId(long subcategoryId) {
+		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bookId from Book_SubCategory bc where bc.subcategoryId=" + subcategoryId + ")";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
+	public List<Book> getBooksByAuthor(long authorId) {
+		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select ba.bookId from Book_Author ba where ba.authorId=" + authorId + ")";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Book>();
@@ -146,8 +154,16 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public List<Book> getLatestBooks() {
-		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "'order by book.id desc";
+		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=1 or bc.categoryId=2 or bc.categoryId=3 or bc.categoryId=4) order by book.id desc";
 		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
+	public List<Book> getAllLatestBooks() {
+		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=1 or bc.categoryId=2 or bc.categoryId=3 or bc.categoryId=4)";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Book>();
 		return books;
@@ -167,6 +183,17 @@ public class BookServiceImpl implements BookService {
 		if (CollectionUtils.isEmpty(books))
 			return (long) 0;
 		return (long) books.get(0);
+	}
+
+	public List<Book> getAllMostReadingBooks() throws ClassNotFoundException, SQLException {
+		List<Book> books = new ArrayList<Book>();
+		List<Long> bookIds = getMostReadingBookIds(ActionStatus.READ);
+		for (Long bookId : bookIds) {
+			Book book = findById(bookId);
+			if (book != null)
+				books.add(book);
+		}
+		return books;
 	}
 
 	public List<Long> getMostReadingBookIds(ActionStatus actionStatus) throws SQLException, ClassNotFoundException {
@@ -195,8 +222,16 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public List<Book> getRecommendBook(Long userId) {
-		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "' order by book.id desc";
 		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
+	public List<Book> getAllRecommendBooks(Long userId) {
+		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Book>();
 		return books;

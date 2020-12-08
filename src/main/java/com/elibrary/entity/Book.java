@@ -67,7 +67,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JoinTable(name = "book_publisher", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
 	private List<Publisher> publishers = new ArrayList<Publisher>();
 
-	@JsonView(Views.Thin.class)
+	@JsonView(Views.Summary.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_rating", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
 	private List<Rating> ratings = new ArrayList<Rating>();

@@ -42,6 +42,14 @@ public interface BookService {
 
 	public List<Book> getRecommendBook(Long userId);
 
-	public List<Book> getLatestBooksBySubCategoryId(long subcategoryId);
+	public List<Book> getBooksBySubCategoryId(long subcategoryId);
+
+	public List<Book> getBooksByAuthor(long authorId);
+
+	public List<Book> getAllLatestBooks();
+
+	public List<Book> getAllRecommendBooks(Long userId);
+
+	public List<Book> getAllMostReadingBooks() throws ClassNotFoundException, SQLException;
 
 }
