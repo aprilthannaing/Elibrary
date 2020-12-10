@@ -152,7 +152,7 @@ public class HomeController extends AbstractController {
 	private List<Author> getAuthors(Category category, AuthorType authorType) throws ClassNotFoundException, SQLException {
 		List<Author> authors = new ArrayList<Author>();
 
-		List<Long> authorIdList = authorService.getAuthorIdByBookCount(category.getId());
+		List<Long> authorIdList = authorService.getAuthorIdByCategoryId(category.getId());
 		for (Long authorId : authorIdList) {
 			if (authorId < 0 || authors.size() > 11)
 				break;
@@ -174,41 +174,12 @@ public class HomeController extends AbstractController {
 	private List<SubCategory> getDisplaySubCategories(Category category) {
 		List<SubCategory> subCategories = new ArrayList<SubCategory>();
 		category.getSubCategories().forEach(subCategory -> {
-			if (subCategory.isDisplay())
+			if (subCategory.isDisplay()) {
+				subCategory.setBookCount(bookService.getBooksBySubCategoryId(subCategory.getId()).size());
 				subCategories.add(subCategory);
+			}
 		});
 		return subCategories;
-
-	}
-
-	private List<Author> getSortedAuthorsWritten(List<Author> authorsByCategory) {
-
-//		List<Author> authors = authorService.getAuthorListByCategory(category.getId(), AuthorType.LOCAL);
-//		List<Author> sortedLocalAuthorsWriteMaxBook = getSortedAuthorsWritten(authors);
-//		sortedLocalAuthorsWriteMaxBook.forEach(author -> {
-//			logger.info("local author: " + author.getName());
-//
-//		});
-
-		List<Long> bookCounts = new ArrayList<Long>();
-		Map<Long, Author> bookAuthorMap = new HashMap<Long, Author>();
-
-		authorsByCategory.forEach(author -> {
-			Long bookCount = bookService.getBookCountWriteByAuthor(author.getId());
-			bookCounts.add(bookCount);
-			bookAuthorMap.put(bookCount, author);
-
-		});
-
-		Collections.sort(bookCounts);
-		logger.info("booKCount:" + bookCounts);
-		List<Author> sortedLocalAuthors = new ArrayList<Author>();
-
-		for (int i = bookCounts.size() - 12; i < bookCounts.size(); i++) {
-			sortedLocalAuthors.add(bookAuthorMap.get(bookCounts.get(i)));
-
-		}
-		return sortedLocalAuthors;
 	}
 
 }

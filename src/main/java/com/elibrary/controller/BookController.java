@@ -137,14 +137,6 @@ public class BookController extends AbstractController {
 		return resultJson;
 	}
 
-	private User getUser(JSONObject json) {
-		Object userId = json.get("user_id");
-		if (userId == null || userId.toString().isEmpty())
-			return null;
-
-		return userService.findByBoId(userId.toString());
-	}
-
 	private List<Book> getBooks(JSONObject json) throws ClassNotFoundException, SQLException {
 		List<Book> books = new ArrayList<Book>();
 
@@ -167,7 +159,6 @@ public class BookController extends AbstractController {
 			if (user == null)
 				return null;
 			return historyService.getBooksFavouriteByUser(user.getId());
-
 		}
 
 		/* bookmark books by user */
@@ -204,25 +195,6 @@ public class BookController extends AbstractController {
 			return null;
 		return bookService.getBooksBySubCategoryId(subcategory.getId());
 
-	}
-
-	private List<Book> getBooksByPaganation(JSONObject json, List<Book> bookList, int pageNo) {
-		User user = getUser(json);
-		if (user == null)
-			return null;
-		List<Book> resultBookList = new ArrayList<Book>();
-		int lastIndex = (bookList.size() - 1) - (pageNo * 10 - 10);
-		int substract = lastIndex < 9 ? lastIndex : 9;
-		int startIndex = lastIndex - substract;
-
-		for (int i = lastIndex; i >= startIndex; i--) {
-
-			Book book = bookList.get(i);
-			book.setAverageRating(ratingService.getAverageRating(book.getId()));
-			book.setOwnRating(ratingService.getOwnRating(user.getId(), book.getId()));
-			resultBookList.add(book);
-		}
-		return resultBookList;
 	}
 
 }
