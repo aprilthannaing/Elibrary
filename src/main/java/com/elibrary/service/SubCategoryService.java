@@ -17,4 +17,6 @@ public interface SubCategoryService {
 
 	public long countActiveSubCategory();
 
+	public List<SubCategory> byAlphabet(String alpherbat, long categoryId);
+
 }
