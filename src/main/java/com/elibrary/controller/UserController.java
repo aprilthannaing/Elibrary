@@ -57,7 +57,7 @@ public class UserController  extends AbstractController{
 		try {
 			jsonRes = Validation(req);
 			if (jsonRes.get("code").equals("000")) {
-				String loginUserid = userservice.sessionActive(req.getSessionId());
+				String loginUserid = userservice.sessionActive(req.getSessionId().trim());
 				if(!loginUserid.equals("") || loginUserid.equals("000")) {
 				}else {
 					jsonRes.put("code", "001");
@@ -73,7 +73,7 @@ public class UserController  extends AbstractController{
 					user  = userservice.selectUserByKey(req.getBoId());
 					msg = "Update Successfully";
 				}else {
-					User user1 = userservice.selectUserbyEmail(req.getEmail());
+					User user1 = userservice.selectUserbyEmail(req.getEmail().trim());
 					if(user1 != null) {
 						msg = "Email is already exit";
 						jsonRes.put("code", "001");
@@ -91,11 +91,10 @@ public class UserController  extends AbstractController{
 				user.setDepartment(dept);
 				user.setPosition(pos);
 				user.setName(req.getName());
-				user.setEmail(req.getEmail());
-				user.setPhoneNo(req.getPhoneNo());
+				user.setEmail(req.getEmail().trim());
+				user.setPhoneNo(req.getPhoneNo().trim());
 				user.setType(req.getType());
-				String status = req.getStatus();
-				user.setStatus(status);
+				user.setRoleType(req.getRoleType());
 				//Role
 				if(req.getRoleType().equals("Admin"))
 					user.setRole(UserRole.Admin);
@@ -106,6 +105,8 @@ public class UserController  extends AbstractController{
 				if(req.getRoleType().equals("User"))
 					user.setRole(UserRole.User);
 				//Status
+				String status = req.getStatus();
+				user.setStatus(status);
 				if(status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
 				else if(status.equals("ACTIVE"))
@@ -131,7 +132,6 @@ public class UserController  extends AbstractController{
 //			History his = new History();
 //			his.setEntityStatus(EntityStatus.ACTIVE);
 //			his.setWorkStatus(WorkStatus.);
-//			his.setDateTime(dateFormat());
 //			his.setUser(user);
 //			his.setToUserId(id);
 //			historyService.save(his);
@@ -146,14 +146,11 @@ public class UserController  extends AbstractController{
 		if(user.getName().equals("") || user.getName().equals(null)) {
 			message = "Please fill correct User Name";
 		}
-		if(user.getEmail().equals("") || user.getEmail().equals(null)) {
+		if(user.getEmail().trim().equals("") || user.getEmail().trim().equals(null)) {
 			message = "Please fill correct User Email";
 		}
-		if(user.getPhoneNo().equals("") || user.getPhoneNo().equals(null)) {
+		if(user.getPhoneNo().trim().equals("") || user.getPhoneNo().trim().equals(null)) {
 			message = "Please fill correct User Phone No";
-		}
-		if(user.getType().equals("") || user.getType().equals(null)) {
-			message = "Choose User Level";
 		}
 		if(!message.equals(""))
 			jsonRes.put("code", "001");
@@ -221,6 +218,7 @@ public class UserController  extends AbstractController{
 			json1.put("position", listOfValueService.getPositionbyId(user.getPosition().getId()).getName());
 			json1.put("type", user.getType());
 			json1.put("role", user.getRole().name());
+			json1.put("initialName", initialName(user.getName()));
 			resJson.put("data", json1);
 			return resJson;
 		}

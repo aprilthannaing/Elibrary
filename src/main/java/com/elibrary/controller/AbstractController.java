@@ -62,5 +62,22 @@ public class AbstractController {
 		}
 		return hashPass;
 	}
+	
+	public String initialName(String fullname) {
+		String output = "";
+		
+		if(!fullname.equals("")) {
+			String[] names = fullname.split(" "); 
+			if(names.length > 1) {
+				String fname = names[0];
+				String lname = names[names.length-1];
+				output = fname.substring(0,1).toUpperCase() + lname.substring(0,1).toUpperCase();
+			}else {
+				output = names[0].substring(0,1).toUpperCase();
+			}
+			 
+		}
+		return output;
+	}
 
 }
