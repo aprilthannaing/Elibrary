@@ -127,8 +127,9 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	return null;
 	}
 	
-	public User selectUserbyVerCode(String loginUserid,String verificationCode) {
-		String query = "Select user from User user where id="+ loginUserid + " And verificationCode='"+ verificationCode +"'";
+	public User selectUserbyVerCode(String loginUserid,String verificationCode,String email) {
+		String query = "Select user from User user where id="+ loginUserid + " And verificationCode='"+ verificationCode +"'"
+				+ " And email='"+ email +"'";
 		List<User> userList = userDao.byQuery(query);
 		if(userList.size() > 0)
 			return userList.get(0);

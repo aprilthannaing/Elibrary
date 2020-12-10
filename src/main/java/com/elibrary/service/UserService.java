@@ -30,5 +30,5 @@ public interface UserService {
 	
 	public List<User> selectUserbyStatus(Request req);
 	
-	public User selectUserbyVerCode(String email,String verificationCode);
+	public User selectUserbyVerCode(String loginid,String verificationCode,String email);
 }
