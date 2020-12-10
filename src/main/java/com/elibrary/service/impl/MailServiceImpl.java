@@ -43,7 +43,7 @@ public class MailServiceImpl implements MailService {
 		// get Session
 		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("aprilthannaing@securelinkmm.com", "Aprilthannaing@2020");
+				return new PasswordAuthentication("khainglaelaesoe@securelinkmm.com", "Kh@!ng1851987");
 			}
 		});
 		session.setDebug(true);
@@ -52,7 +52,7 @@ public class MailServiceImpl implements MailService {
 		try {
 			MimeMessage message = new MimeMessage(session);
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-			message.setSender(new InternetAddress("aprilthannaing@securelinkmm.com"));
+			message.setSender(new InternetAddress("khainglaelaesoe@securelinkmm.com"));
 			message.setSubject(subject, "UTF-8");
 			message.setText(content, "UTF-8");
 

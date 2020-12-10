@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -238,12 +239,11 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "goChangepwd", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject goChangepwd(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
+	public JSONObject goChangepwd(@RequestBody JSONObject reqJson,@RequestHeader("token") String token) throws ServiceUnavailableException {
 		JSONObject resJson = new JSONObject();
 		String oldpwd 	= reqJson.get("old_password").toString().trim();
 		String newpwd = reqJson.get("new_password").toString().trim();
-		String sessionId = reqJson.get("token").toString();
-		String loginUserid = userservice.sessionActive(sessionId);
+		String loginUserid = userservice.sessionActive(token);
 		if(!loginUserid.equals("") || loginUserid.equals("000")) {
 		}else {
 			resJson.put("status", false);
@@ -406,10 +406,10 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "verifyEmail", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	private JSONObject verifyEmail(@RequestBody String email) throws Exception {
+	private JSONObject verifyEmail(@RequestBody JSONObject json) throws Exception {
 		JSONObject resultJson = new JSONObject();
 		try {
-			User user = userservice.selectUserbyEmail(email);
+			User user = userservice.selectUserbyEmail(json.get("email").toString());
 			if(user == null) {
 				resultJson.put("message", "Email not found!");
 				resultJson.put("status", false);
@@ -418,8 +418,8 @@ public class UserController  extends AbstractController{
 	
 			String code = getRandomNumberString();
 			
-			//mailService.sendMail(_email, "Email Address Verification", "Please verify your email address for Elibray System.\n"
-			//			+ "Your verification code is " + code);
+			mailService.sendMail(json.get("email").toString(), "Email Address Verification", "Please verify your email address for Elibray System.\n"
+						+ "Your verification code is " + code);
 			user.setVerificationCode(code);
 			userservice.save(user);
 			String sessionId = saveSession(user);
@@ -438,16 +438,16 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "verifyCode", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	private JSONObject verifyCode(@RequestBody JSONObject resJson){
+	private JSONObject verifyCode(@RequestBody JSONObject resJson,@RequestHeader("token") String token){
 		JSONObject resultJson = new JSONObject();
-			String loginUserid = userservice.sessionActive(resJson.get("token").toString());
+			String loginUserid = userservice.sessionActive(token);
 			if(!loginUserid.equals("") || loginUserid.equals("000")) {
 			}else {
 				resJson.put("status", false);
 				resJson.put("message", "Session Fail");
 				return resJson;
 			}
-			User user = userservice.selectUserbyVerCode(loginUserid,resJson.get("code").toString());
+			User user = userservice.selectUserbyVerCode(loginUserid,resJson.get("code").toString(),resJson.get("email").toString());
 			if(user == null) {
 				resultJson.put("message", "Invalid Verification Code.");
 				resultJson.put("status", false);
@@ -461,18 +461,19 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "goResetPassword", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject goResetPassword(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
+	public JSONObject goResetPassword(@RequestBody JSONObject reqJson,@RequestHeader("token") String token) throws ServiceUnavailableException {
 		JSONObject resJson = new JSONObject();
 		String newpwd = reqJson.get("password").toString();
-		String sessionId = reqJson.get("token").toString();
-		String loginUserid = userservice.sessionActive(sessionId);
+		String email = reqJson.get("email").toString();
+		String code = reqJson.get("code").toString();
+		String loginUserid = userservice.sessionActive(token);
 		if(!loginUserid.equals("") || loginUserid.equals("000")) {
 		}else {
 			resJson.put("status", false);
 			resJson.put("message", "Session Fail");
 			return resJson;
 		}
-		User user  = userservice.selectUserbyId(loginUserid);
+		User user  = userservice.selectUserbyVerCode(loginUserid,code,email);
 		if(user != null) {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
