@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.History;
+import com.elibrary.entity.Rating;
 import com.elibrary.entity.SystemConstant;
 import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
 import com.elibrary.service.BookService;
 import com.elibrary.service.HistoryService;
+import com.elibrary.service.RatingService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -39,7 +41,24 @@ public class HistoryController extends AbstractController {
 	@Autowired
 	private BookService bookService;
 
+	@Autowired
+	private RatingService ratingService;
+
 	private static Logger logger = Logger.getLogger(SubCategoryController.class);
+
+	private User getUser(@RequestBody JSONObject json) {
+		Object userId = json.get("user_id");
+		if (userId == null || userId.toString().isEmpty())
+			return null;
+		return userService.findByBoId(userId.toString());
+	}
+
+	private Book getBook(@RequestBody JSONObject json) {
+		Object bookId = json.get("book_id");
+		if (bookId == null || bookId.toString().isEmpty())
+			return null;
+		return bookService.findByBoId(bookId.toString());
+	}
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
@@ -54,35 +73,21 @@ public class HistoryController extends AbstractController {
 			return resultJson;
 		}
 
-		Object userId = json.get("user_id");
-		Object bookId = json.get("book_id");
-		Object status = json.get("action_status");
-		if (userId == null || userId.toString().isEmpty()) {
-			resultJson.put("status", false);
-			resultJson.put("err_msg", "This user is not found!");
-			return resultJson;
-		}
-
-		User user = userService.findByBoId(userId.toString());
+		User user = getUser(json);
 		if (user == null) {
 			resultJson.put("status", false);
 			resultJson.put("err_msg", "This user is not found!");
 			return resultJson;
 		}
 
-		if (bookId == null || bookId.toString().isEmpty()) {
-			resultJson.put("status", false);
-			resultJson.put("err_msg", "This book is not found!");
-			return resultJson;
-		}
-
-		Book book = bookService.findByBoId(bookId.toString());
+		Book book = getBook(json);
 		if (book == null) {
 			resultJson.put("status", false);
 			resultJson.put("err_msg", "This book is not found!");
 			return resultJson;
 		}
 
+		Object status = json.get("action_status");
 		if (status == null || status.toString().isEmpty()) {
 			resultJson.put("status", false);
 			resultJson.put("err_msg", "Action Status is not valid!");
@@ -90,6 +95,7 @@ public class HistoryController extends AbstractController {
 		}
 
 		ActionStatus actionStatus = null;
+		History history = new History();
 		try {
 			actionStatus = ActionStatus.valueOf(status.toString().toUpperCase());
 			if (!History.isValidAction(actionStatus)) {
@@ -103,7 +109,29 @@ public class HistoryController extends AbstractController {
 			return resultJson;
 		}
 
-		History history = new History();
+		if (History.isRating(actionStatus)) {
+			Object ratingObject = json.get("rating");
+			if (ratingObject == null || ratingObject.toString().isEmpty()) {
+				resultJson.put("status", false);
+				resultJson.put("err_msg", "Rating must not empty!");
+				return resultJson;
+			}
+
+			Double ratingValue = Double.parseDouble(ratingObject.toString());
+			Rating rating = ratingService.findByUserandBook(user.getId(), book.getId());
+			if (rating == null) {
+				rating = new Rating();
+				rating.setBoId(SystemConstant.BOID_REQUIRED);
+			}
+			
+			rating.setRating(ratingValue);
+			ratingService.save(rating);
+			book.getRatings().add(rating);
+			bookService.save(book);
+			history.setRatingId(rating.getId());
+			resultJson.put("total_rating", df2.format(ratingService.getAverageRating(book.getId())));
+		}
+
 		history.setBoId(SystemConstant.BOID_REQUIRED);
 		history.setUserId(user);
 		history.setBookId(book);

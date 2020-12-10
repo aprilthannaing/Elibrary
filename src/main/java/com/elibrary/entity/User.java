@@ -19,13 +19,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Table(name = "user")
 public class User extends AbstractEntity implements Serializable {
 	
-	private String fromUserId;
-	
-	@Transient
 	@JsonView(Views.Thin.class)
-	private String fromUser;
-
-	@JsonView(Views.Thin.class)
+	@Column(name = "name")
 	private String name;
 
 	@JsonView(Views.Thin.class)
@@ -33,8 +28,10 @@ public class User extends AbstractEntity implements Serializable {
 	private String email;
 
 	@JsonView(Views.Thin.class)
+	@Column(name = "phoneNo")
 	private String phoneNo;
 
+	@Column(name = "password")
 	private String password;
 
 	@JsonView(Views.Thin.class)
@@ -47,10 +44,36 @@ public class User extends AbstractEntity implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private UserType type;
 
+	@Column(name = "createdDate")
 	private String createdDate;
 
+	@Column(name = "modifiedDate")
 	@JsonView(Views.Thin.class)
 	private String modifiedDate;
+	
+	@Column(name = "expiredDate")
+	private String expiredDate;
+	
+	@Column(name = "sessionStatus")
+	private EntityStatus sessionStatus;
+	
+	@Column(name = "fromUserId")
+	private String fromUserId;
+	
+	@Column(name = "verificationCode")
+	private String verificationCode;
+	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "hluttawboId")
+	private Hluttaw hluttaw;
+
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "departmentboId")
+	private Department department;
+
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "positionboId")
+	private Position position;
 	
 	@Transient
 	@JsonView(Views.Thin.class)
@@ -88,22 +111,9 @@ public class User extends AbstractEntity implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String sessionId="";
 	
-	private EntityStatus sessionStatus;
-	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "hluttawboId")
-	private Hluttaw hluttaw;
-
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "departmentboId")
-	private Department department;
-
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "positionboId")
-	private Position position;
-	
-	@Column(name = "verificationCode")
-	private String verificationCode;
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String fromUser;
 	
 	
 	public String getVerificationCode() {
@@ -296,6 +306,14 @@ public class User extends AbstractEntity implements Serializable {
 
 	public void setFromUser(String fromUser) {
 		this.fromUser = fromUser;
+	}
+
+	public String getExpiredDate() {
+		return expiredDate;
+	}
+
+	public void setExpiredDate(String expiredDate) {
+		this.expiredDate = expiredDate;
 	}
 
 }
