@@ -24,8 +24,6 @@ public interface BookService {
 
 	public long getBookCountByLibrarian(long librarianId);
 
-	public List<Book> getBookBySearchTerms(String searchTerms);
-
 	public Long getBookCountWriteByAuthor(long authorId);
 
 	public List<Book> getLatestBooksByCategoryId(long categoryId);
@@ -51,5 +49,23 @@ public interface BookService {
 	public List<Book> getAllRecommendBooks(Long userId);
 
 	public List<Book> getAllMostReadingBooks() throws ClassNotFoundException, SQLException;
+
+	public List<Book> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBookBySearchTerms(Long categoryId, Long authorId, String searchTerms) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBookBySearchTermsAndSubCategory(Long subcategoryId, String searchTerms) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBooksByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBooksByDate(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBooksByDate(Long categoryId, Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBooksByAuthor(Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
 }

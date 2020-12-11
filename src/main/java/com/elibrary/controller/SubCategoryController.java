@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
+import com.elibrary.entity.TransientSubCategory;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
@@ -79,11 +81,21 @@ public class SubCategoryController extends AbstractController {
 			return resultJson;
 		}
 
-		Category category = categoryService.findByBoId("CATEGORY10004");
-		List<SubCategory> subCategories = category.getSubCategories();
-		subCategories.sort((s1, s2) -> s1.getMyanmarName().compareTo(s2.getMyanmarName()));
+		Category category = categoryService.findByBoId(mainCategory.toString());
+		List<TransientSubCategory> sub = new ArrayList<TransientSubCategory>();
+
+		for (char alphabet = 'a'; alphabet <= 'z'; alphabet++) {
+			TransientSubCategory subCategory = new TransientSubCategory();
+			String alpha = (alphabet + "").toUpperCase();
+			subCategory.setAlphabet(alpha);
+			subCategory.setSubcategories(subCategoryService.byAlphabet(alpha, category.getId()));
+			sub.add(subCategory);
+		}
+
+		// subCategories.sort((s1, s2) ->
+		// s1.getMyanmarName().compareTo(s2.getMyanmarName()));
+		resultJson.put("sub", sub);
 		resultJson.put("status", true);
-		resultJson.put("subcategories", subCategories);
 		return resultJson;
 	}
 

@@ -76,7 +76,7 @@ public class History extends AbstractEntity implements Serializable {
 	}
 
 	public static boolean isValidAction(ActionStatus status) {
-		return status == ActionStatus.BOOKMARK || status == ActionStatus.READ || status == ActionStatus.FAVOURITE || status == ActionStatus.RATING;
+		return status == ActionStatus.BOOKMARK || status == ActionStatus.READ || status == ActionStatus.FAVOURITE || status == ActionStatus.RATING || status == ActionStatus.DOWNLOAD;
 	}
 
 	public static boolean isRating(ActionStatus status) {

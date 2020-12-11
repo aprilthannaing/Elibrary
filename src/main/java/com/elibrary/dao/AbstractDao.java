@@ -3,7 +3,6 @@ package com.elibrary.dao;
 import java.io.Serializable;
 import java.util.List;
 
-import com.elibrary.entity.Category_Subcategory;
 import com.mchange.rmi.ServiceUnavailableException;
 
 public interface AbstractDao<E, I extends Serializable> {

@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -19,17 +20,33 @@ import com.elibrary.dao.impl.BookDaoImpl;
 import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
+import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Service("BookService")
 public class BookServiceImpl implements BookService {
 
+	@Value("${spring.datasource.url}")
+	private String url;
+
+	@Value("${spring.datasource.username}")
+	private String userName;
+
+	@Value("${spring.datasource.password}")
+	private String password;
+
+	@Value("${spring.datasource.driver-class-name}")
+	private String driver;
+
 	@Autowired
 	private BookDao bookDao;
 
 	@Autowired
 	private BookAuthorDao bookAuthorDao;
+
+	@Autowired
+	private AuthorService authorService;
 
 	public static Logger logger = Logger.getLogger(BookDaoImpl.class);
 
@@ -113,14 +130,6 @@ public class BookServiceImpl implements BookService {
 		return books.size();
 	}
 
-	public List<Book> getBookBySearchTerms(String searchTerms) {
-		String query = "From Book book where searchTerms LIKE '%" + searchTerms + "%'";
-		List<Book> books = bookDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
-		return books;
-	}
-
 	public Long getBookCountWriteByAuthor(long authorId) {
 		String query = "select count(*) from Book_Author where authorId=" + authorId;
 		List<Long> books = bookAuthorDao.findLongByQueryString(query);
@@ -196,15 +205,25 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	public List<Book> getRecommendBook(Long userId) {
+		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "' order by book.id desc";
+		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
+	public List<Book> getAllRecommendBooks(Long userId) {
+		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
 	public List<Long> getMostReadingBookIds(ActionStatus actionStatus) throws SQLException, ClassNotFoundException {
 		List<Long> bookIds = new ArrayList<Long>();
-		String name, pass, url;
-		Connection con = null;
-		Class.forName("com.mysql.jdbc.Driver");
-		url = "jdbc:mysql://localhost:3306/elibrary";
-		name = "root";
-		pass = "root";
-		con = DriverManager.getConnection(url, name, pass);
+		Connection con = getConnection();
 		String seeachStoredProc = "{call GetBookCountByActionStatus()}";
 		CallableStatement myCs = con.prepareCall(seeachStoredProc);
 
@@ -221,16 +240,119 @@ public class BookServiceImpl implements BookService {
 		return bookIds;
 	}
 
-	public List<Book> getRecommendBook(Long userId) {
-		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "' order by book.id desc";
-		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
+	public Connection getConnection() throws SQLException, ClassNotFoundException {
+		Class.forName(driver);
+		return DriverManager.getConnection(url, userName, password);
+	}
+
+	public List<Book> getBookBySearchTermsAndSubCategory(Long subcategoryId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Book> bookList = new ArrayList<Book>();
+		String storedProc = "{call GET_BookId_BySubCat(?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, searchTerms);
+		myCs.setString(2, subcategoryId + "");
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				bookList.add(findByBoId(rs.getString("boId")));
+			}
+			con.close();
+		}
+		return bookList;
+	}
+
+	public List<Book> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Book> bookList = new ArrayList<Book>();
+		String storedProc = "{call GET_BookId_ByST(?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, searchTerms);
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				bookList.add(findByBoId(rs.getString("boId")));
+			}
+			con.close();
+		}
+		return bookList;
+	}
+
+	public List<Book> getBookBySearchTerms(Long categoryId, Long authorId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Book> bookList = new ArrayList<Book>();
+		String storedProc = "{call GET_BookId_ByAuthor(?,?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, searchTerms);
+		myCs.setString(2, authorId + "");
+		myCs.setString(3, categoryId + "");
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				bookList.add(findByBoId(rs.getString("boId")));
+			}
+			con.close();
+		}
+		return bookList;
+	}
+
+	public List<Book> getBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Book> bookList = new ArrayList<Book>();
+		String storedProc = "{call GET_BookId_ByCat(?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, searchTerms);
+		myCs.setString(2, categoryId + "");
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				bookList.add(findByBoId(rs.getString("boId")));
+			}
+			con.close();
+		}
+		return bookList;
+	}
+
+	public List<Book> getBooksByAuthor(Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book from Book book where publishedDate between " + startDate + " and " + endDate + " and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select ba.bookId from Book_Author ba where ba.authorId=" + authorId + ") ";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Book>();
 		return books;
 	}
 
-	public List<Book> getAllRecommendBooks(Long userId) {
-		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "'";
+	public List<Book> getBooksByDate(Long categoryId, Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		List<Book> books = getBooksByAuthor(authorId, startDate, endDate);
+		List<Book> bookList = new ArrayList<Book>();
+		books.forEach(book -> {
+			if (book != null && book.getCategory() != null && book.getCategory().getId() == categoryId)
+				bookList.add(book);
+		});
+		return books;
+	}
+
+	public List<Book> getBooksByDate(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=" + categoryId + ") ";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
+	public List<Book> getBooksByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bs.bookId from Book_SubCategory bs where bs.subcategoryId=" + subcategoryId + ") ";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Book>();
+		return books;
+	}
+
+	public List<Book> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Book>();

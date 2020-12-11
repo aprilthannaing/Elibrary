@@ -36,19 +36,19 @@ import com.mchange.rmi.ServiceUnavailableException;
 
 @RestController
 @RequestMapping("user")
-public class UserController  extends AbstractController{
+public class UserController extends AbstractController {
 	@Autowired
 	private ListOfValueService listOfValueService;
-	
+
 	@Autowired
 	private UserService userservice;
-	
+
 	@Autowired
 	private HistoryService historyService;
-	
+
 	@Autowired
 	private MailServiceImpl mailService;
-	
+
 	private static Logger logger = Logger.getLogger(UserController.class);
 	
 	@CrossOrigin(origins = "*")
@@ -63,8 +63,8 @@ public class UserController  extends AbstractController{
 			jsonRes = Validation(req);
 			if (jsonRes.get("code").equals("000")) {
 				String loginUserid = userservice.sessionActive(req.getSessionId().trim());
-				if(!loginUserid.equals("") || loginUserid.equals("000")) {
-				}else {
+				if (!loginUserid.equals("") || loginUserid.equals("000")) {
+				} else {
 					jsonRes.put("code", "001");
 					jsonRes.put("desc", "Session Fail");
 					return jsonRes;
@@ -74,12 +74,12 @@ public class UserController  extends AbstractController{
 				Position pos = new Position();
 				dept = listOfValueService.checkDepartmentbyId(req.getDeptType());
 				pos = listOfValueService.getPositionbyId(req.getPositionType());
-				if(!req.getBoId().equals("")) {
-					user  = userservice.selectUserByKey(req.getBoId());
+				if (!req.getBoId().equals("")) {
+					user = userservice.selectUserByKey(req.getBoId());
 					msg = "Update Successfully";
-				}else {
+				} else {
 					User user1 = userservice.selectUserbyEmail(req.getEmail().trim());
-					if(user1 != null) {
+					if (user1 != null) {
 						msg = "Email is already exit";
 						jsonRes.put("code", "001");
 						jsonRes.put("desc", msg);
@@ -102,26 +102,26 @@ public class UserController  extends AbstractController{
 				user.setPhoneNo(req.getPhoneNo().trim());
 				user.setType(req.getType());
 				user.setRoleType(req.getRoleType());
-				//Role
-				if(req.getRoleType().equals("Admin"))
+				// Role
+				if (req.getRoleType().equals("Admin"))
 					user.setRole(UserRole.Admin);
-				if(req.getRoleType().equals("Librarian"))
+				if (req.getRoleType().equals("Librarian"))
 					user.setRole(UserRole.Librarian);
-				if(req.getRoleType().equals("SuperLibrarian"))
+				if (req.getRoleType().equals("SuperLibrarian"))
 					user.setRole(UserRole.SuperLibrarian);
-				if(req.getRoleType().equals("User"))
+				if (req.getRoleType().equals("User"))
 					user.setRole(UserRole.User);
-				//Status
+				// Status
 				String status = req.getStatus();
 				user.setStatus(status);
-				if(status.equals("NEW"))
+				if (status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
-				else if(status.equals("ACTIVE"))
+				else if (status.equals("ACTIVE"))
 					user.setEntityStatus(EntityStatus.ACTIVE);
-				else if(status.equals("EXPIRED"))
+				else if (status.equals("EXPIRED"))
 					user.setEntityStatus(EntityStatus.EXPIRED);
 				userservice.save(user);
-				//saveHistory(user.getBoId(),loginUserid);
+				// saveHistory(user.getBoId(),loginUserid);
 				jsonRes.put("code", "000");
 				jsonRes.put("desc", msg);
 				jsonRes.put("userList", user);
@@ -146,45 +146,46 @@ public class UserController  extends AbstractController{
 //			e.printStackTrace();
 //		}
 //	}
-	
+
 	public JSONObject Validation(User user) {
 		JSONObject jsonRes = new JSONObject();
 		String message = "";
-		if(user.getName().equals("") || user.getName().equals(null)) {
+		if (user.getName().equals("") || user.getName().equals(null)) {
 			message = "Please fill correct User Name";
 		}
-		if(user.getEmail().trim().equals("") || user.getEmail().trim().equals(null)) {
+		if (user.getEmail().trim().equals("") || user.getEmail().trim().equals(null)) {
 			message = "Please fill correct User Email";
 		}
-		if(user.getPhoneNo().trim().equals("") || user.getPhoneNo().trim().equals(null)) {
+		if (user.getPhoneNo().trim().equals("") || user.getPhoneNo().trim().equals(null)) {
 			message = "Please fill correct User Phone No";
 		}
-		if(!message.equals(""))
+		if (!message.equals(""))
 			jsonRes.put("code", "001");
 		else
 			jsonRes.put("code", "000");
 		return jsonRes;
 	}
+
 	@RequestMapping(value = "selectUserInfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public List<User> selectUserInfo(@RequestBody Request req){
+	public List<User> selectUserInfo(@RequestBody Request req) {
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUser(req);
 //		if(resList.size() > 0) {
 //			User user = resList.get(0);
 //		}
-		return  resList;
+		return resList;
 	}
-	
+
 	@RequestMapping(value = "selectUserbykey", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public User selectUserbykey(@RequestBody String key){
+	public User selectUserbykey(@RequestBody String key) {
 		User user = userservice.selectUserByKey(key);
-		return  user;
+		return user;
 	}
-	
+
 	@RequestMapping(value = "goLogin", method = RequestMethod.POST)
 	@ResponseBody
 	@CrossOrigin(origins = "*")
@@ -210,18 +211,18 @@ public class UserController  extends AbstractController{
 		if(user != null) {
 			//session
 			String sessionId = saveSession(user);
-			if(user.getSessionStatus().equals(EntityStatus.NEW)) {
+			if (user.getSessionStatus().equals(EntityStatus.NEW)) {
 				resJson.put("message", "first time login");
 				resJson.put("status", true);
 				resJson.put("changePwd", true);
 				resJson.put("token", sessionId);
 				return resJson;
 			}
-			//String sessionid = userservice.checkSession(user);
+			// String sessionid = userservice.checkSession(user);
 			resJson.put("message", message);
 			resJson.put("status", true);
 			resJson.put("token", sessionId);
-			JSONObject json1= new JSONObject();
+			JSONObject json1 = new JSONObject();
 			json1.put("id", user.getBoId());
 			json1.put("name", user.getName());
 			json1.put("email", user.getEmail());
@@ -237,10 +238,9 @@ public class UserController  extends AbstractController{
 		}
 		resJson.put("message", "Your email or passord is incorrect.");
 		resJson.put("status", false);
-		
-			
 	return resJson;
 	}
+
 	public String saveSession(User user) {
 		Session session = new Session();
 		session.setEntityStatus(EntityStatus.ACTIVE);
@@ -249,6 +249,7 @@ public class UserController  extends AbstractController{
 		session.setUser(user);
 		return userservice.save(session);
 	}
+
 	@RequestMapping(value = "goChangepwd", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -262,8 +263,8 @@ public class UserController  extends AbstractController{
 	    String newpwd = AES.decrypt(base64DecryptedNewPassword, secretKey);
 	    
 		String loginUserid = userservice.sessionActive(token);
-		if(!loginUserid.equals("") || loginUserid.equals("000")) {
-		}else {
+		if (!loginUserid.equals("") || loginUserid.equals("000")) {
+		} else {
 			resJson.put("status", false);
 			resJson.put("message", "Session Fail");
 			return resJson;
@@ -290,50 +291,50 @@ public class UserController  extends AbstractController{
 		}
 		return resJson;
 	}
-	
-	public String goValidation(String email,String password) {
-		if(email.equals("") && password.equals(""))
-		    return "Please enter your email address and password";
-		if(email.equals(""))
+
+	public String goValidation(String email, String password) {
+		if (email.equals("") && password.equals(""))
+			return "Please enter your email address and password";
+		if (email.equals(""))
 			return "Please enter your email address";
-		if(!email.contains("@"))
+		if (!email.contains("@"))
 			return "Your email address is incorrect";
-		if(password.equals(""))
+		if (password.equals(""))
 			return "Please enter your password";
 		return "";
 	}
-	
+
 	@RequestMapping(value = "deleteUserinfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject deleteUserinfo(@RequestBody User req){
+	public JSONObject deleteUserinfo(@RequestBody User req) {
 		JSONObject jsonRes = new JSONObject();
 		String msg = "";
 		User user = new User();
 		try {
-				String loginUserid = userservice.sessionActive(req.getSessionId());
-				if(loginUserid.equals("")) {
-					jsonRes.put("code", "001");
-					jsonRes.put("desc", "Session Fail");
-					return jsonRes;
-				}
-				if(req.getBoId().equals("")) {
-					jsonRes.put("code", "001");
-					jsonRes.put("desc", "user not found");
-				}
-				user  = userservice.selectUserByKey(req.getBoId());
-				user.setModifiedDate(dateFormat());
-				user.setEntityStatus(EntityStatus.DELETED);
-				userservice.save(user);
-				jsonRes.put("code", "000");
-				jsonRes.put("desc", "Delete Successfully");
+			String loginUserid = userservice.sessionActive(req.getSessionId());
+			if (loginUserid.equals("")) {
+				jsonRes.put("code", "001");
+				jsonRes.put("desc", "Session Fail");
 				return jsonRes;
+			}
+			if (req.getBoId().equals("")) {
+				jsonRes.put("code", "001");
+				jsonRes.put("desc", "user not found");
+			}
+			user = userservice.selectUserByKey(req.getBoId());
+			user.setModifiedDate(dateFormat());
+			user.setEntityStatus(EntityStatus.DELETED);
+			userservice.save(user);
+			jsonRes.put("code", "000");
+			jsonRes.put("desc", "Delete Successfully");
+			return jsonRes;
 		} catch (ServiceUnavailableException e) {
 			e.printStackTrace();
 		}
 		return jsonRes;
 	}
-	
+
 	@RequestMapping(value = "setusers", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -392,11 +393,12 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "selectUserInfobyStatus", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public List<User> selectUserInfobyStatus(@RequestBody Request req){
+	public List<User> selectUserInfobyStatus(@RequestBody Request req) {
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUserbyStatus(req);
-		return  resList;
+		return resList;
 	}
+
 	@RequestMapping(value = "changeStatus", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -412,7 +414,7 @@ public class UserController  extends AbstractController{
 				return jsonRes;
 			}
 			for (int i = 0; i < arrayList.size(); i++) {
-				User user  = userservice.selectUserByKey(arrayList.get(i));
+				User user = userservice.selectUserByKey(arrayList.get(i));
 				// Status
 				user.setModifiedDate(dateFormat());
 				user.setEntityStatus(EntityStatus.ACTIVE);
@@ -429,6 +431,7 @@ public class UserController  extends AbstractController{
 
 		return jsonRes;
 	}
+
 	@RequestMapping(value = "verifyEmail", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -438,16 +441,17 @@ public class UserController  extends AbstractController{
 		JSONObject resultJson = new JSONObject();
 		try {
 			User user = userservice.selectUserbyEmail(json.get("email").toString());
-			if(user == null) {
+			if (user == null) {
 				resultJson.put("message", "Email not found!");
 				resultJson.put("status", false);
 				return resultJson;
 			}
-	
+
 			String code = getRandomNumberString();
-			
-			mailService.sendMail(json.get("email").toString(), "Email Address Verification", "Please verify your email address for Elibray System.\n"
-						+ "Your verification code is " + code);
+
+			// mailService.sendMail(json.get("email").toString(), "Email Address
+			// Verification", "Please verify your email address for Elibray System.\n"
+			// + "Your verification code is " + code);
 			user.setVerificationCode(code);
 			userservice.save(user);
 			String sessionId = saveSession(user);
@@ -467,26 +471,27 @@ public class UserController  extends AbstractController{
 	@RequestMapping(value = "verifyCode", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	private JSONObject verifyCode(@RequestBody JSONObject resJson,@RequestHeader("token") String token){
+	private JSONObject verifyCode(@RequestBody JSONObject resJson, @RequestHeader("token") String token) {
 		JSONObject resultJson = new JSONObject();
-			String loginUserid = userservice.sessionActive(token);
-			if(!loginUserid.equals("") || loginUserid.equals("000")) {
-			}else {
-				resJson.put("status", false);
-				resJson.put("message", "Session Fail");
-				return resJson;
-			}
-			User user = userservice.selectUserbyVerCode(loginUserid,resJson.get("code").toString(),resJson.get("email").toString());
-			if(user == null) {
-				resultJson.put("message", "Invalid Verification Code.");
-				resultJson.put("status", false);
-				return resultJson;
-			}
-			
+		String loginUserid = userservice.sessionActive(token);
+		if (!loginUserid.equals("") || loginUserid.equals("000")) {
+		} else {
+			resJson.put("status", false);
+			resJson.put("message", "Session Fail");
+			return resJson;
+		}
+		User user = userservice.selectUserbyVerCode(loginUserid, resJson.get("code").toString(), resJson.get("email").toString());
+		if (user == null) {
+			resultJson.put("message", "Invalid Verification Code.");
+			resultJson.put("status", false);
+			return resultJson;
+		}
+
 		resultJson.put("status", true);
 		resultJson.put("message", "success");
 		return resultJson;
 	}
+
 	@RequestMapping(value = "goResetPassword", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -497,8 +502,8 @@ public class UserController  extends AbstractController{
 		String email = reqJson.get("email").toString();
 		String code = reqJson.get("code").toString();
 		String loginUserid = userservice.sessionActive(token);
-		if(!loginUserid.equals("") || loginUserid.equals("000")) {
-		}else {
+		if (!loginUserid.equals("") || loginUserid.equals("000")) {
+		} else {
 			resJson.put("status", false);
 			resJson.put("message", "Session Fail");
 			return resJson;

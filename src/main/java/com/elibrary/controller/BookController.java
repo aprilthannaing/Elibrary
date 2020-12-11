@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
+import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
+import com.elibrary.service.CategoryService;
 import com.elibrary.service.HistoryService;
 import com.elibrary.service.RatingService;
 import com.elibrary.service.SubCategoryService;
@@ -50,6 +52,9 @@ public class BookController extends AbstractController {
 
 	@Autowired
 	private RatingService ratingService;
+
+	@Autowired
+	private CategoryService categoryService;
 
 	private static Logger logger = Logger.getLogger(SubCategoryController.class);
 
@@ -137,14 +142,6 @@ public class BookController extends AbstractController {
 		return resultJson;
 	}
 
-	private User getUser(JSONObject json) {
-		Object userId = json.get("user_id");
-		if (userId == null || userId.toString().isEmpty())
-			return null;
-
-		return userService.findByBoId(userId.toString());
-	}
-
 	private List<Book> getBooks(JSONObject json) throws ClassNotFoundException, SQLException {
 		List<Book> books = new ArrayList<Book>();
 
@@ -167,7 +164,6 @@ public class BookController extends AbstractController {
 			if (user == null)
 				return null;
 			return historyService.getBooksFavouriteByUser(user.getId());
-
 		}
 
 		/* bookmark books by user */
@@ -186,10 +182,22 @@ public class BookController extends AbstractController {
 		if (title.equals("all"))
 			return bookService.getAll();
 
-		/* books by author */
+		/* books by category and author */
+		Object categoryObject = json.get("category_id");
 		Object authorObject = json.get("author_id");
-		String authorBoId = authorObject.toString();
-		if (!authorBoId.isEmpty()) {
+		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null && !authorObject.toString().isEmpty()) {
+			Author author = authorService.findByBoId(authorObject.toString());
+			List<Book> bookList = bookService.getBooksByAuthor(author.getId());
+			bookList.forEach(book -> {
+				if (book != null && book.getCategory() != null && book.getCategory().getBoId().equals(categoryObject.toString()))
+					books.add(book);
+			});
+			return books;
+		}
+
+		/* books by author */
+		if (authorObject != null && !authorObject.toString().isEmpty()) {
+			String authorBoId = authorObject.toString();
 			Author author = authorService.findByBoId(authorBoId);
 			if (author == null)
 				return null;
@@ -204,25 +212,6 @@ public class BookController extends AbstractController {
 			return null;
 		return bookService.getBooksBySubCategoryId(subcategory.getId());
 
-	}
-
-	private List<Book> getBooksByPaganation(JSONObject json, List<Book> bookList, int pageNo) {
-		User user = getUser(json);
-		if (user == null)
-			return null;
-		List<Book> resultBookList = new ArrayList<Book>();
-		int lastIndex = (bookList.size() - 1) - (pageNo * 10 - 10);
-		int substract = lastIndex < 9 ? lastIndex : 9;
-		int startIndex = lastIndex - substract;
-
-		for (int i = lastIndex; i >= startIndex; i--) {
-
-			Book book = bookList.get(i);
-			book.setAverageRating(ratingService.getAverageRating(book.getId()));
-			book.setOwnRating(ratingService.getOwnRating(user.getId(), book.getId()));
-			resultBookList.add(book);
-		}
-		return resultBookList;
 	}
 
 }

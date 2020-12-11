@@ -1,5 +1,6 @@
 package com.elibrary.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -54,8 +55,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	public List<SubCategory> getAll() {
-		String query = "select sub from SubCategory sub where entityStatus='" + EntityStatus.ACTIVE
-				+ "' order by priority";
+		String query = "select sub from SubCategory sub where entityStatus='" + EntityStatus.ACTIVE + "' order by priority";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;
@@ -63,8 +63,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	public SubCategory findByBoId(String boId) {
-		String query = "select sub from SubCategory sub where boId='" + boId + "' and entityStatus='"
-				+ EntityStatus.ACTIVE + "'";
+		String query = "select sub from SubCategory sub where boId='" + boId + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
 			return null;
@@ -72,5 +71,13 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 	
 	
+
+	public List<SubCategory> byAlphabet(String alpherbat, long categoryId) {
+		String query = "select sub from SubCategory sub where sub.myanmarName like '" + alpherbat + "%' and sub.id in (select cs.subCategoryId from Category_SubCategory cs where cs.categoryId=" + categoryId + ") and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(subCategories))
+			return new ArrayList<SubCategory>();
+		return subCategories;
+	}
 
 }

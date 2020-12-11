@@ -44,9 +44,9 @@ public class HistoryController extends AbstractController {
 	@Autowired
 	private RatingService ratingService;
 
-	private static Logger logger = Logger.getLogger(SubCategoryController.class);
+	private static Logger logger = Logger.getLogger(HistoryController.class);
 
-	private User getUser(@RequestBody JSONObject json) {
+	public User getUser(@RequestBody JSONObject json) {
 		Object userId = json.get("user_id");
 		if (userId == null || userId.toString().isEmpty())
 			return null;
@@ -95,7 +95,6 @@ public class HistoryController extends AbstractController {
 		}
 
 		ActionStatus actionStatus = null;
-		History history = new History();
 		try {
 			actionStatus = ActionStatus.valueOf(status.toString().toUpperCase());
 			if (!History.isValidAction(actionStatus)) {
@@ -109,6 +108,7 @@ public class HistoryController extends AbstractController {
 			return resultJson;
 		}
 
+		History history = new History();
 		if (History.isRating(actionStatus)) {
 			Object ratingObject = json.get("rating");
 			if (ratingObject == null || ratingObject.toString().isEmpty()) {
@@ -123,7 +123,7 @@ public class HistoryController extends AbstractController {
 				rating = new Rating();
 				rating.setBoId(SystemConstant.BOID_REQUIRED);
 			}
-			
+
 			rating.setRating(ratingValue);
 			ratingService.save(rating);
 			book.getRatings().add(rating);

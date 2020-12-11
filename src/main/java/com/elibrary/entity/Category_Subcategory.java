@@ -9,24 +9,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 @Entity
-@Table(name = "category_subcategory")
-public class Category_Subcategory{
-	
+@Table(name = "Category_SubCategory")
+public class Category_SubCategory implements Serializable {
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true, nullable = false)
 	private long Id;
-	
-	@Column(name = "categoryId")
-	@JsonView(Views.Thin.class)
+
+	@Column(name = "categoryId", unique = true, nullable = false)
 	private long categoryId;
-	
-	@Column(name = "subcategoryId")
-	@JsonView(Views.Thin.class)
-	private long subcategoryId;
+
+	@Column(name = "subCategoryId", unique = true, nullable = false)
+	private long subCategoryId;
 
 	public long getId() {
 		return Id;
@@ -36,23 +32,20 @@ public class Category_Subcategory{
 		Id = id;
 	}
 
-	public Long getCategoryId() {
+	public long getCategoryId() {
 		return categoryId;
 	}
 
-	public void setCategoryId(Long categoryId) {
+	public void setCategoryId(long categoryId) {
 		this.categoryId = categoryId;
 	}
 
-	public Long getSubcategoryId() {
-		return subcategoryId;
+	public long getSubCategoryId() {
+		return subCategoryId;
 	}
 
-	public void setSubcategoryId(Long subcategoryId) {
-		this.subcategoryId = subcategoryId;
+	public void setSubCategoryId(long subCategoryId) {
+		this.subCategoryId = subCategoryId;
 	}
 
-	
-	
-	
 }

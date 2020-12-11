@@ -91,7 +91,7 @@ public class AuthorServiceImpl implements AuthorService {
 		return authors.get(0);
 	}
 
-	public List<Long> getAuthorIdByBookCount(long categoryId) throws SQLException, ClassNotFoundException {
+	public List<Long> getAuthorIdByCategoryId(long categoryId) throws SQLException, ClassNotFoundException {
 		List<Long> authorIds = new ArrayList<Long>();
 		String name, pass, url;
 		Connection con = null;
