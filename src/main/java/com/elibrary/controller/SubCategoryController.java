@@ -86,8 +86,9 @@ public class SubCategoryController extends AbstractController {
 
 		for (char alphabet = 'a'; alphabet <= 'z'; alphabet++) {
 			TransientSubCategory subCategory = new TransientSubCategory();
-			subCategory.setAlphabet(alphabet + "");
-			subCategory.setSubcategories(subCategoryService.byAlphabet(alphabet + "", category.getId()));
+			String alpha = (alphabet + "").toUpperCase();
+			subCategory.setAlphabet(alpha);
+			subCategory.setSubcategories(subCategoryService.byAlphabet(alpha, category.getId()));
 			sub.add(subCategory);
 		}
 

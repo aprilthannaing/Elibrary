@@ -95,7 +95,6 @@ public class HistoryController extends AbstractController {
 		}
 
 		ActionStatus actionStatus = null;
-		History history = new History();
 		try {
 			actionStatus = ActionStatus.valueOf(status.toString().toUpperCase());
 			if (!History.isValidAction(actionStatus)) {
@@ -109,6 +108,7 @@ public class HistoryController extends AbstractController {
 			return resultJson;
 		}
 
+		History history = new History();
 		if (History.isRating(actionStatus)) {
 			Object ratingObject = json.get("rating");
 			if (ratingObject == null || ratingObject.toString().isEmpty()) {

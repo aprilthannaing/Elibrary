@@ -1,5 +1,6 @@
 package com.elibrary.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -70,10 +71,10 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	}
 
 	public List<SubCategory> byAlphabet(String alpherbat, long categoryId) {
-		String query = "select sub from SubCategory sub where sub.myanmarName like '" + alpherbat.toUpperCase() + "%' and sub.id in (select cs.subCategoryId from Category_SubCategory cs where cs.categoryId=" + categoryId + ") and entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select sub from SubCategory sub where sub.myanmarName like '" + alpherbat + "%' and sub.id in (select cs.subCategoryId from Category_SubCategory cs where cs.categoryId=" + categoryId + ") and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<SubCategory> subCategories = subCategoryDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(subCategories))
-			return null;
+			return new ArrayList<SubCategory>();
 		return subCategories;
 	}
 
