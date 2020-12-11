@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
+import com.elibrary.entity.Request;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.service.AuthorService;
@@ -156,6 +157,23 @@ public class AbstractController {
 			resultBookList.add(book);
 		}
 		return resultBookList;
+	}
+	
+	public List<User> getUsersByPagination(Request json, List<User> userList, int pageNo){
+		List<User> resultUserList = new ArrayList<User>();
+		
+		int lastIndex = (userList.size() - 1) - (pageNo * 10 - 10);
+		int substract = lastIndex < 9 ? lastIndex : 9;
+		int startIndex = lastIndex - substract;
+		for (int i = lastIndex; i >= startIndex; i--) {
+
+			User user = userList.get(i);
+			
+			resultUserList.add(user);
+		}
+
+		return resultUserList;
+		
 	}
 
 }

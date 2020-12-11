@@ -263,11 +263,17 @@ update author set profilePicture="AuthorProfile/author1.png";
 ALTER TABLE subcategory CHANGE name myanmarName VARCHAR(255) DEFAULT NULL;
 ALTER TABLE subcategory ADD engName VARCHAR(150) DEFAULT NULL;
 
+
+alter table book drop column searchterms;
 ALTER table Book ADD column searchTerms varchar(1000);
-UPDATE Book book SET searchTerms = CONCAT_WS ( " ", boId, ISBN, publisher, edition, title, coverPhoto, publishedDate, volume, state, modifiedDate, createdDate, sort, path, seriesIndex, size, callNo, accessionNo, (select name from User user where user.id = book.uploader));
+UPDATE Book book SET searchTerms = CONCAT_WS ( " ", boId, ISBN, publisher, edition, title, publishedDate, volume, createdDate, callNo, 
+accessionNo,(select user.name from User user where user.id = book.uploader));
+
+
+
+
 
 update subcategory set display="true" where id=7;
-
 update category set icon="CategoryIcon/englishbook.png" where id=4;
 update category set icon="CategoryIcon/infonote.png" where id=6;
 update category set icon="CategoryIcon/ministrybook.png" where id=2;
@@ -321,3 +327,94 @@ END
 //DELIMITER ;
 
 call GetBookCountByActionStatus()
+
+
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_BookId_ByST;
+CREATE PROCEDURE GET_BookId_ByST(IN ST nvarchar(1000))
+BEGIN
+ SELECT b.id
+  , b.boId
+  FROM book b
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category bc ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
+  ,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+  , (SELECT a.name FROM author a WHERE a.id=ba.authorId) , (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
+  , (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId),  (SELECT S.engName FROM subcategory s WHERE S.id=BS.subcategoryId),(SELECT C.myanmarName FROM category c WHERE C.id=BC.categoryId)
+  ) LIKE CONCAT('%',ST,'%');
+END
+//DELIMITER ;
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_BookId_BySubCat;
+CREATE PROCEDURE GET_BookId_BySubCat(IN ST nvarchar(1000), SubcatID varchar(30))
+BEGIN
+ SELECT b.id
+  , b.boId
+  FROM book b
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category bc ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
+  ,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+  , (SELECT a.name FROM author a WHERE a.id=ba.authorId) , (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
+  , (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId), (SELECT S.engName FROM subcategory s WHERE S.id=BS.subcategoryId),(SELECT C.myanmarName FROM category c WHERE C.id=BC.categoryId)
+  ) LIKE CONCAT('%',ST,'%')
+AND bs.subcategoryId=SubcatID;
+END
+//DELIMITER ;
+
+call elibrary.GET_BookId_ByCat('နှစ်(၂၀)ပြည့်','2');
+
+
+
+USE elibrary;
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_BookId_ByCat;
+CREATE PROCEDURE GET_BookId_ByCat(IN ST nvarchar(1000), CatID varchar(30))
+BEGIN
+ SELECT b.id
+  , b.boId
+  FROM book b
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category bc ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
+  ,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+  , (SELECT a.name FROM author a WHERE a.id=ba.authorId) , (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
+  , (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId),(SELECT C.myanmarName FROM category c WHERE C.id=BC.categoryId)
+  ) LIKE CONCAT('%',ST,'%')
+  AND bc.categoryId=CatID;
+END
+//DELIMITER ;
+
+call GET_BookId_ByCat('နှစ်(၂၀)ပြည့်','2')
+
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_BookId_ByAuthor`(IN ST NVARCHAR(1000), IN AuID NVARCHAR(30), IN CatID nvarchar(30))
+BEGIN
+ SELECT b.id
+  , b.boId
+  FROM book b
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category bc ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
+  ,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+  , (SELECT a.name FROM author a WHERE a.id=ba.authorId) , (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
+  , (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId), (SELECT S.engName FROM subcategory s WHERE S.id=BS.subcategoryId),(SELECT C.myanmarName FROM category c WHERE C.id=BC.categoryId)
+  ) LIKE CONCAT('%',ST,'%')
+AND ba.authorId=AuID
+AND bc.categoryId=CatID;
+END
+call GET_BookId_ByAuthor('a',1,1);
+

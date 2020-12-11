@@ -7,6 +7,7 @@ public class Request {
 	String text3;
 	String fromDate;
 	String toDate;
+	String page;
 	public String getSearchText() {
 		return searchText;
 	}
@@ -42,5 +43,11 @@ public class Request {
 	}
 	public void setText3(String text3) {
 		this.text3 = text3;
+	}
+	public String getPage() {
+		return page;
+	}
+	public void setPage(String page) {
+		this.page = page;
 	}
 }

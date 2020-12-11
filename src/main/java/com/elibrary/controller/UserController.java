@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.AES;
+import com.elibrary.entity.Book;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
@@ -169,13 +170,26 @@ public class UserController extends AbstractController {
 	@RequestMapping(value = "selectUserInfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public List<User> selectUserInfo(@RequestBody Request req) {
+	public JSONObject selectUserInfo(@RequestBody Request req) {
+		JSONObject resJson = new JSONObject();
+		String page = req.getPage();
+		
+		int pageNo;
+		pageNo = Integer.parseInt(page);
+		
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUser(req);
+		
+		int lastPageNo = resList.size() % 10 == 0 ? resList.size() / 10 : resList.size() / 10 + 1;
+		List<User> users = getUsersByPagination(req, resList, pageNo);
 //		if(resList.size() > 0) {
 //			User user = resList.get(0);
 //		}
-		return resList;
+		resJson.put("users", users);
+		resJson.put("currentPage", page);
+		resJson.put("lastPage", lastPageNo);
+		resJson.put("totalCount", resList.size());
+		return resJson;
 	}
 
 	@RequestMapping(value = "selectUserbykey", method = RequestMethod.POST)
@@ -396,6 +410,7 @@ public class UserController extends AbstractController {
 	public List<User> selectUserInfobyStatus(@RequestBody Request req) {
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUserbyStatus(req);
+		
 		return resList;
 	}
 
