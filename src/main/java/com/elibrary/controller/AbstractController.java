@@ -21,6 +21,8 @@ public class AbstractController {
 
 	@Autowired
 	private SessionService sessionService;
+	
+	public static final String secretKey = "mykey@91mykey@91";
 
 	public final String authorization = "7M8N3SLQ8QIKDJOSEPXJKJDFOZIN1NBO";
 
