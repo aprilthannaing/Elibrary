@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.TransientSubCategory;
@@ -57,6 +56,7 @@ public class SubCategoryController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject getAll() throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
+		
 		result.put("subcategories", subCategoryService.getAll());
 		return result;
 	}
@@ -132,8 +132,16 @@ public class SubCategoryController extends AbstractController {
 	public JSONObject findByBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = subCategoryService.findByBoId(json.get("boId").toString().trim());
-		if (subCategory != null)
+		String subCategoryId = String.valueOf(subCategory.getId());
+
+		if (subCategory != null) {
 			result.put("subCategory", subCategory);
+			result.put("subCategoryId",subCategoryId);
+			//subc.fin(boid
+			//categoryId from category_subcat where subId= "sub.id
+//			result.put("category", cat);
+
+		}
 		return result;
 	}
 

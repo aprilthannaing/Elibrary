@@ -69,6 +69,8 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 			return null;
 		return subCategories.get(0);
 	}
+	
+	
 
 	public List<SubCategory> byAlphabet(String alpherbat, long categoryId) {
 		String query = "select sub from SubCategory sub where sub.myanmarName like '" + alpherbat + "%' and sub.id in (select cs.subCategoryId from Category_SubCategory cs where cs.categoryId=" + categoryId + ") and entityStatus='" + EntityStatus.ACTIVE + "'";

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
+import com.elibrary.entity.Request;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.service.AuthorService;
@@ -36,6 +37,8 @@ public class AbstractController {
 
 	@Autowired
 	private SessionService sessionService;
+	
+	public static final String secretKey = "mykey@91mykey@91";
 
 	@Autowired
 	private AuthorService authorService;
@@ -68,6 +71,12 @@ public class AbstractController {
 
 	public String dateFormat() {
 		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDateTime now = LocalDateTime.now();
+		return dateFormat.format(now);
+	}
+	
+	public String dateTimeFormat() {
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
 		return dateFormat.format(now);
 	}
@@ -206,6 +215,23 @@ public class AbstractController {
 			resultBookList.add(book);
 		}
 		return resultBookList;
+	}
+	
+	public List<User> getUsersByPagination(Request json, List<User> userList, int pageNo){
+		List<User> resultUserList = new ArrayList<User>();
+		
+		int lastIndex = (userList.size() - 1) - (pageNo * 10 - 10);
+		int substract = lastIndex < 9 ? lastIndex : 9;
+		int startIndex = lastIndex - substract;
+		for (int i = lastIndex; i >= startIndex; i--) {
+
+			User user = userList.get(i);
+			
+			resultUserList.add(user);
+		}
+
+		return resultUserList;
+		
 	}
 
 	public List<Author> getAuthorByPaganation(List<Author> authorList, int pageNo) {
