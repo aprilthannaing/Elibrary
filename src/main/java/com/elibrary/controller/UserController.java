@@ -82,9 +82,7 @@ public class UserController extends AbstractController {
 					}
 					user.setSessionStatus(EntityStatus.NEW);
 					user.setCreatedDate(dateFormat());
-					byte[] encryptedMsg = AES.encrypt(getRandomNumberString(), secretKey);
-					String base64Encrypted = Base64.getEncoder().encodeToString(encryptedMsg);
-					user.setPassword(base64Encrypted);
+					user.setPassword(getRandomNumberString());
 					user.setFromUserId(loginUserid);
 					msg = "Insert Successfully";
 				}
@@ -206,9 +204,9 @@ public class UserController extends AbstractController {
 		JSONObject resJson = new JSONObject();
 		String message = "";
 		String email = reqJson.get("email").toString();
-		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("password").toString());
-		String password = AES.decrypt(base64DecryptedPassword, secretKey);
-
+		
+		String password = AES.decryptWithMobile(reqJson.get("password").toString(), secretKeyByMobile);
+		//To use AES/ECB(decrypt)
 		message = this.goValidation(email, password);
 		if (!message.equals("")) {
 			resJson.put("message", message);
@@ -216,10 +214,8 @@ public class UserController extends AbstractController {
 			return resJson;
 		}
 
-		byte[] encryptedMsg = AES.encrypt(password, secretKey);
-		String base64Encrypted = Base64.getEncoder().encodeToString(encryptedMsg);
 
-		User user = userservice.getLogin(email, base64Encrypted);
+		User user = userservice.getLogin(email, password);
 		if (user != null) {
 			// session
 			String sessionId = saveSession(user);// diff
@@ -258,11 +254,13 @@ public class UserController extends AbstractController {
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
-	public JSONObject goLoginByAdmin(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
+	public JSONObject goLoginByAdmin(@RequestBody JSONObject reqJson) throws Exception {
 		JSONObject resJson = new JSONObject();
 		String message = "";
 		String email = reqJson.get("email").toString();
-		String password = reqJson.get("password").toString();
+		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("password").toString());
+		String password = AES.decrypt(base64DecryptedPassword, secretKey);
+		
 		message = this.goValidation(email, password);
 		if (!message.equals("")) {
 			resJson.put("message", message);
@@ -300,6 +298,7 @@ public class UserController extends AbstractController {
 		}
 		resJson.put("message", "Your email or passord is incorrect.");
 		resJson.put("status", false);
+		resJson.put("password", password);
 		return resJson;
 	}
 
@@ -331,21 +330,16 @@ public class UserController extends AbstractController {
 			resJson.put("message", "Session Fail");
 			return resJson;
 		}
-		byte[] encryptedMsg = AES.encrypt(newpwd, secretKey);
-		String encryptedNewPassword = Base64.getEncoder().encodeToString(encryptedMsg);
-
-		byte[] encryptedMsg1 = AES.encrypt(oldpwd, secretKey);
-		String encryptedOldPassword = Base64.getEncoder().encodeToString(encryptedMsg1);
 
 		User user = userservice.selectUserbyId(loginUserid);
 		if (user != null) {
-			if (user.getPassword().equals(encryptedNewPassword) || !user.getPassword().equals(encryptedOldPassword)) {
+			if (user.getPassword().equals(newpwd) || !user.getPassword().equals(oldpwd)) {
 				resJson.put("message", "Your new password cannot be the same as your old password. Please enter a different password");
 				resJson.put("status", false);
 				return resJson;
 			}
 
-			user.setPassword(encryptedNewPassword);
+			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
 			resJson.put("message", "Password changed Successfully");
@@ -575,10 +569,8 @@ public class UserController extends AbstractController {
 		}
 		User user = userservice.selectUserbyVerCode(loginUserid, code, email);
 		if (user != null) {
-			byte[] encryptedMsg = AES.encrypt(newpwd, secretKey);
-			String base64EncryptedNewPassword = Base64.getEncoder().encodeToString(encryptedMsg);
 
-			user.setPassword(base64EncryptedNewPassword);
+			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
 			resJson.put("message", "success");

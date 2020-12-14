@@ -63,6 +63,8 @@ public class AbstractController {
 	private HistoryService historyService;
 
 	public final String authorization = "7M8N3SLQ8QIKDJOSEPXJKJDFOZIN1NBO";
+	
+	public final String secretKeyByMobile = "7M8N3SLQ8QIKDJOSEPXJKJDFOZIN1NBO";
 
 	public static DecimalFormat df2 = new DecimalFormat("#.##");
 
