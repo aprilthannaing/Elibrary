@@ -317,6 +317,43 @@ public class UserController extends AbstractController {
 	public JSONObject goChangepwd(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
 
+		
+		String oldPassword = AES.decryptWithMobile(reqJson.get("old_password").toString(), secretKeyByMobile);
+		
+		String newPassword = AES.decryptWithMobile(reqJson.get("new_password").toString(), secretKeyByMobile);
+		
+
+		String loginUserid = userservice.sessionActive(token);
+		if (!loginUserid.equals("") || loginUserid.equals("000")) {
+		} else {
+			resJson.put("status", false);
+			resJson.put("message", "Session Fail");
+			return resJson;
+		}
+
+		User user = userservice.selectUserbyId(loginUserid);
+		if (user != null) {
+			if (user.getPassword().equals(newPassword) || !user.getPassword().equals(oldPassword)) {
+				resJson.put("message", "Your new password cannot be the same as your old password. Please enter a different password");
+				resJson.put("status", false);
+				return resJson;
+			}
+
+			user.setPassword(newPassword);
+			user.setSessionStatus(EntityStatus.ACTIVE);
+			userservice.save(user);
+			resJson.put("message", "Password changed Successfully");
+			resJson.put("status", true);
+		}
+		return resJson;
+	}
+	
+	@RequestMapping(value = "goChangepwdByAdmin", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject goChangepwdByAdmin(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
+		JSONObject resJson = new JSONObject();
+
 		byte[] base64DecryptedOldPassword = Base64.getDecoder().decode(reqJson.get("old_password").toString());
 		String oldpwd = AES.decrypt(base64DecryptedOldPassword, secretKey);
 
@@ -556,6 +593,36 @@ public class UserController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	public JSONObject goResetPassword(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
+		String newPassword = AES.decryptWithMobile(reqJson.get("password").toString(), secretKeyByMobile);
+		
+		String email = reqJson.get("email").toString();
+		String code = reqJson.get("code").toString();
+		String loginUserid = userservice.sessionActive(token);
+		if (!loginUserid.equals("") || loginUserid.equals("000")) {
+		} else {
+			resJson.put("status", false);
+			resJson.put("message", "Session Fail");
+			return resJson;
+		}
+		User user = userservice.selectUserbyVerCode(loginUserid, code, email);
+		if (user != null) {
+
+			user.setPassword(newPassword);
+			user.setSessionStatus(EntityStatus.ACTIVE);
+			userservice.save(user);
+			resJson.put("message", "success");
+			resJson.put("status", true);
+		}
+		return resJson;
+	}
+	
+	
+	@RequestMapping(value = "goResetPasswordByAdmin", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	@CrossOrigin(origins = "*")
+	public JSONObject goResetPasswordByAdmin(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
+		JSONObject resJson = new JSONObject();
 		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("password").toString());
 		String newpwd = AES.decrypt(base64DecryptedPassword, secretKey);
 		String email = reqJson.get("email").toString();
@@ -578,6 +645,8 @@ public class UserController extends AbstractController {
 		}
 		return resJson;
 	}
+	
+	
 
 	@RequestMapping(value = "signout", method = RequestMethod.POST)
 	@ResponseBody

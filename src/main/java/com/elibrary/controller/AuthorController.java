@@ -42,7 +42,7 @@ public class AuthorController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
+	@RequestMapping(value = "getall", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public JSONObject getAllByPaganation(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -62,13 +62,12 @@ public class AuthorController extends AbstractController {
 
 		Category category = getCategory(json);
 		if (category != null) {
-			// by category
+			// all
 
-			Long categoryId = category.getId();
-			List<Author> localAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.LOCAL);
+			List<Author> localAuthorList = authorService.getAuthorList(AuthorType.LOCAL);
 			int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
 
-			List<Author> interAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.INTERNATIONAL);
+			List<Author> interAuthorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
 			int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
 
 			resultJson.put("status", true);
@@ -77,23 +76,13 @@ public class AuthorController extends AbstractController {
 			resultJson.put("inter_last_page", interLastPageNo);
 			resultJson.put("local_author", getAuthorByPaganation(localAuthorList, page));
 			resultJson.put("international_author", getAuthorByPaganation(interAuthorList, page));
+		
 			return resultJson;
 		}
 
-		// all
+		// by category
 
-		List<Author> localAuthorList = authorService.getAuthorList(AuthorType.LOCAL);
-		int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
-
-		List<Author> interAuthorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
-		int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
-
-		resultJson.put("status", true);
-		resultJson.put("current_page", page);
-		resultJson.put("local_last_page", localLastPageNo);
-		resultJson.put("inter_last_page", interLastPageNo);
-		resultJson.put("local_author", getAuthorByPaganation(localAuthorList, page));
-		resultJson.put("international_author", getAuthorByPaganation(interAuthorList, page));
+		resultJson.put("authors", authorService.getAll());
 		return resultJson;
 	}
 
