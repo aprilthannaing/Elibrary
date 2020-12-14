@@ -30,6 +30,7 @@ import com.elibrary.entity.UserRole;
 import com.elibrary.entity.Views;
 import com.elibrary.service.HistoryService;
 import com.elibrary.service.ListOfValueService;
+import com.elibrary.service.SessionService;
 import com.elibrary.service.UserService;
 import com.elibrary.service.impl.MailServiceImpl;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -43,9 +44,6 @@ public class UserController extends AbstractController {
 
 	@Autowired
 	private UserService userservice;
-
-	@Autowired
-	private HistoryService historyService;
 
 	@Autowired
 	private MailServiceImpl mailService;
@@ -96,8 +94,11 @@ public class UserController extends AbstractController {
 				}
 				user.setModifiedDate(dateFormat());
 				user.setHluttaw(htaw);
+				user.setHlutawType(req.getHlutawType());//response
 				user.setDepartment(dept);
+				user.setDeptType(req.getDeptType());//response
 				user.setPosition(pos);
+				user.setPositionType(req.getPositionType());//response
 				user.setName(req.getName());
 				user.setEmail(req.getEmail().trim());
 				user.setPhoneNo(req.getPhoneNo().trim());
@@ -112,10 +113,11 @@ public class UserController extends AbstractController {
 					user.setRole(UserRole.SuperLibrarian);
 				if (req.getRoleType().equals("User"))
 					user.setRole(UserRole.User);
-				// Status
+				user.setRoleType(req.getRoleType());//response
+				//Status
 				String status = req.getStatus();
-				user.setStatus(status);
-				if (status.equals("NEW"))
+				user.setStatus(status);//response
+				if(status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
 				else if (status.equals("ACTIVE"))
 					user.setEntityStatus(EntityStatus.ACTIVE);
@@ -224,6 +226,55 @@ public class UserController extends AbstractController {
 		User user = userservice.getLogin(email, base64Encrypted);
 		if(user != null) {
 			//session
+			String sessionId = saveSession(user);//diff
+			if(user.getSessionStatus().equals(EntityStatus.NEW)) {
+				resJson.put("message", "first time login");
+				resJson.put("status", true);
+				resJson.put("changePwd", true);
+				resJson.put("token", sessionId);
+				return resJson;
+			}
+			//String sessionid = userservice.checkSession(user);
+			resJson.put("message", message);
+			resJson.put("status", true);
+			resJson.put("token", sessionId);
+			JSONObject json1= new JSONObject();
+			json1.put("id", user.getBoId());
+			json1.put("name", user.getName());
+			json1.put("email", user.getEmail());
+			json1.put("phoneNo", user.getPhoneNo());
+			json1.put("hluttaw", listOfValueService.checkHluttawById(user.getHluttaw().getId()).getName());
+			json1.put("department", listOfValueService.checkDepartmentbyId(user.getDepartment().getId()).getName());
+			json1.put("position", listOfValueService.getPositionbyId(user.getPosition().getId()).getName());
+			json1.put("type", user.getType());
+			json1.put("role", user.getRole().name());
+			json1.put("initialName", initialName(user.getName()));
+			resJson.put("data", json1);
+			return resJson;
+		}
+		resJson.put("message", "Your email or passord is incorrect.");
+		resJson.put("status", false);
+			
+	return resJson;
+	}
+	@RequestMapping(value = "goLoginByAdmin", method = RequestMethod.POST)
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@JsonView(Views.Summary.class)
+	public JSONObject goLoginByAdmin(@RequestBody JSONObject reqJson) throws ServiceUnavailableException{
+		JSONObject resJson = new JSONObject();
+		String message = "";
+		String email 	= reqJson.get("email").toString();
+		String password = reqJson.get("password").toString();
+		message = this.goValidation(email, password); 
+		if(!message.equals("")) {
+			resJson.put("message", message);
+			resJson.put("status", false);
+			return resJson;
+		}
+		User user = userservice.getLoginByAdmin(email, password);//diff
+		if(user != null) {
+			//session
 			String sessionId = saveSession(user);
 			if (user.getSessionStatus().equals(EntityStatus.NEW)) {
 				resJson.put("message", "first time login");
@@ -258,8 +309,8 @@ public class UserController extends AbstractController {
 	public String saveSession(User user) {
 		Session session = new Session();
 		session.setEntityStatus(EntityStatus.ACTIVE);
-		session.setStartDate(dateFormat());
-		session.setEndDate(dateFormat());
+		session.setStartDate(dateTimeFormat());
+		session.setEndDate(dateTimeFormat());
 		session.setUser(user);
 		return userservice.save(session);
 	}
@@ -535,5 +586,17 @@ public class UserController extends AbstractController {
 			resJson.put("status", true);
 		}
 		return resJson;
+	}
+	
+	@RequestMapping(value = "signout", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public void signout(@RequestBody String userid,@RequestHeader("token") String token) throws ServiceUnavailableException {
+		Session session = userservice.sessionActiveById(token,userid);
+		if(session != null) {
+			session.setEntityStatus(EntityStatus.INACTIVE);
+			session.setEndDate(dateTimeFormat());
+			userservice.save(session);
+		}
 	}
 }

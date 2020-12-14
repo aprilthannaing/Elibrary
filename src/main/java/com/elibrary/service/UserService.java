@@ -31,4 +31,8 @@ public interface UserService {
 	public List<User> selectUserbyStatus(Request req);
 	
 	public User selectUserbyVerCode(String loginid,String verificationCode,String email);
+	
+	public User getLoginByAdmin(String email, String password);
+	
+	public Session sessionActiveById(String sessionId,String userid);
 }

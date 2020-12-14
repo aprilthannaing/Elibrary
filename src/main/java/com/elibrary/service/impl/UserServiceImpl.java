@@ -120,7 +120,7 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	}
 	
 	public User selectUserbyEmail(String email) {
-		String query = "Select user from User user where email='"+ email + "'";
+		String query = "Select user from User user where email='"+ email + "' and entityStatus<>'" + EntityStatus.DELETED + "'";
 		List<User> userList = userDao.byQuery(query);
 		if(userList.size() > 0)
 			return userList.get(0);
@@ -137,7 +137,7 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	}
 
 	public User findByBoId(String boId) {
-		String query = "select user from User user where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE
+		String query = "select user from User user where boId='" + boId + "' and entityStatus='" + EntityStatus.ACTIVE
 				+ "'";
 		List<User> users = userDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(users))
@@ -145,9 +145,18 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		return users.get(0);
 	}
 
-	public User getLogin(String email, String password) {
+	public User getLoginByAdmin(String email, String password) {
 		String query = "from User where email='" + email + "' And password='" + password + "' And entityStatus='"
 				+ EntityStatus.ACTIVE + "' And role <>'"+ UserRole.User +"'";
+		List<User> users = userDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(users))
+			return null;
+		return users.get(0);
+	}
+	
+	public User getLogin(String email, String password) {
+		String query = "from User where email='" + email + "' And password='" + password + "' And entityStatus='"
+				+ EntityStatus.ACTIVE + "'";
 		List<User> users = userDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(users))
 			return null;
@@ -228,6 +237,22 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		if (CollectionUtils.isEmpty(userList))
 			return "";
 	return userList.get(0).getName();
+	}
+	
+	public long checkSession() {
+		String query = "select max(id) from Session";
+		List<Long> idList = userDao.findLongByQueryString(query);
+		if (idList.get(0) == null)
+			return 1;
+		return idList.get(0) + 1;
+	}
+	
+	public Session sessionActiveById(String sessionId,String userid){
+		String query = "from Session where boId='" + sessionId + "' And entityStatus='" + EntityStatus.ACTIVE +"'";// And userid=" + userid;
+		List<Session> sessionList = sessionDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(sessionList))
+			return null;
+		return sessionList.get(0);
 	}
 
 }

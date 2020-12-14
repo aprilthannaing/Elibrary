@@ -66,6 +66,12 @@ public class AbstractController {
 		LocalDateTime now = LocalDateTime.now();
 		return dateFormat.format(now);
 	}
+	
+	public String dateTimeFormat() {
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+		return dateFormat.format(now);
+	}
 
 	public static String getRandomNumberString() {
 		Random rnd = new Random();
