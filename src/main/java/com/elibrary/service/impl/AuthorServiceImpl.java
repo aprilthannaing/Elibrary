@@ -17,6 +17,7 @@ import com.elibrary.dao.AuthorDao;
 import com.elibrary.dao.impl.AuthorDaoImpl;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
+import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.AuthorService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -157,5 +158,16 @@ public class AuthorServiceImpl implements AuthorService {
 		}
 		return authorIds;
 	}
+	
+	@Override
+	public Author findById(Long Id) {
+		String query = "select author from author author where Id='" + Id + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Author> authors = authorDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(authors))
+			return null;
+		return authors.get(0);
+	}
+
+
 
 }

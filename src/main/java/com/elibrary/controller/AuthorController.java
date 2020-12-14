@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
+import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
+import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -32,11 +35,45 @@ public class AuthorController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "all", method = RequestMethod.GET)
+	@RequestMapping(value = "all", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject getAll() throws ServiceUnavailableException {
+	public JSONObject get(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
-		result.put("authors", authorService.getAll());
+		
+		String checkToShow = reqJson.get("selected").toString();
+		
+		Object page = reqJson.get("page");
+		if (page == null || page.toString().isEmpty()) {
+			result.put("status", false);
+			result.put("message", "This page is not found!");
+			return result;
+		}
+		int pageNo;
+		try {
+			pageNo = Integer.parseInt(page.toString());
+		} catch (Exception e) {
+			result.put("status", false);
+			result.put("message", "This page is not found!");
+			return result;
+		}
+		
+		
+		List<Author> authorList = new ArrayList<Author>();
+		if(checkToShow.equals("1")) 
+			
+			authorList = authorService.getAuthorList(AuthorType.LOCAL);
+			
+		else authorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
+		
+		int lastPageNo = authorList.size() % 10 == 0 ? authorList.size() / 10 : authorList.size() / 10 + 1;
+		
+		List<Author> authors = getAuthorsByPagination(authorList, pageNo);
+				
+		result.put("status", true);
+		result.put("current_page", pageNo);
+		result.put("last_page", lastPageNo);
+		result.put("total_count", authorList.size());
+		result.put("authors", authorList);
 		return result;
 	}
 

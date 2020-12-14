@@ -183,6 +183,21 @@ public class AbstractController {
 		}
 		return resultBookList;
 	}
+	
+	public List<Author> getAuthorsByPagination(List<Author> authorList, int pageNo){
+		List<Author> resultAuthorList = new ArrayList<Author>();
+		int lastIndex = (authorList.size() - 1) - (pageNo * 10 - 10);
+		int substract = lastIndex < 9 ? lastIndex : 9;
+		int startIndex = lastIndex - substract;
+		
+		for (int i = lastIndex; i >= startIndex; i--) {
+			Author author = authorService.findById(authorList.get(i));
+		
+			resultAuthorList.add(author);
+		}
+		return resultAuthorList;
+		
+	}
 
 	public List<Book> setBookInfo(List<Book> bookList, User user) {
 		bookList.forEach(book -> {
