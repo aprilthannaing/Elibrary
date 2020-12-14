@@ -41,7 +41,7 @@ public class AuthorController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "getall", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public JSONObject getAllByPaganation(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
