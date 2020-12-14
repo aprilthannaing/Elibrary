@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
-import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
@@ -118,6 +117,28 @@ public class BookController extends AbstractController {
 			return resultJson;
 		}
 
+		/* latest books */
+		Object titleObject = json.get("title");
+		String title = titleObject.toString();
+		if (title.equals("latest")) {
+			List<Long> bookIdList = bookService.getAllLatestBooks();
+			int lastPageNo = bookIdList.size() % 10 == 0 ? bookIdList.size() / 10 : bookIdList.size() / 10 + 1;
+
+			List<Book> books = getBooksByPaganationWithBookIds(json, bookIdList, pageNo);
+			if (books == null) {
+				resultJson.put("status", false);
+				resultJson.put("message", "This User or Author or Sub-Category is not found!");
+				return resultJson;
+			}
+
+			resultJson.put("status", true);
+			resultJson.put("current_page", pageNo);
+			resultJson.put("last_page", lastPageNo);
+			resultJson.put("total_count", bookIdList.size());
+			resultJson.put("books", books);
+			return resultJson;
+		}
+
 		List<Book> bookList = getBooks(json); // by subcategory, by author id, latest, popular, all, favourite, bookmark
 		if (bookList == null) {
 			resultJson.put("status", false);
@@ -144,13 +165,8 @@ public class BookController extends AbstractController {
 
 	private List<Book> getBooks(JSONObject json) throws ClassNotFoundException, SQLException {
 		List<Book> books = new ArrayList<Book>();
-
-		/* latest books */
 		Object titleObject = json.get("title");
 		String title = titleObject.toString();
-		if (title.equals("latest")) {
-			return bookService.getAllLatestBooks();
-		}
 
 		/* recommend books */
 		if (title.equals("recommend")) {

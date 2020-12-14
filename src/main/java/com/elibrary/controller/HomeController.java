@@ -2,10 +2,7 @@ package com.elibrary.controller;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -85,7 +82,7 @@ public class HomeController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST) // home
 	@JsonView(Views.Thin.class)
 	public JSONObject getHomePage(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
@@ -111,9 +108,9 @@ public class HomeController extends AbstractController {
 		}
 
 		resultJson.put("status", true);
-		resultJson.put("latest_book", bookService.getLatestBooks()); // 15
-		resultJson.put("popular_book", getMostReadingBooks()); // 6
-		resultJson.put("recommend_book", bookService.getRecommendBook(user.getId())); // 12
+		resultJson.put("latest_book", setBookInfo(bookService.getLatestBooks(), user)); // 15
+		resultJson.put("popular_book", setBookInfo(getMostReadingBooks(), user)); // 6
+		resultJson.put("recommend_book", setBookInfo(bookService.getRecommendBook(user.getId()), user)); // 12
 		resultJson.put("local_author", getAuthors(AuthorType.LOCAL)); // 12
 		resultJson.put("international_author", getAuthors(AuthorType.INTERNATIONAL));
 		resultJson.put("main_category", categoryService.getAll()); // 6
@@ -122,7 +119,7 @@ public class HomeController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "book", method = RequestMethod.POST)
+	@RequestMapping(value = "book", method = RequestMethod.POST) // page by category
 	@JsonView(Views.Summary.class)
 	public JSONObject getHomePageByCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
@@ -140,11 +137,25 @@ public class HomeController extends AbstractController {
 			return resultJson;
 		}
 
+		Object userId = json.get("user_id");
+		if (userId == null || userId.toString().isEmpty()) {
+			resultJson.put("status", false);
+			resultJson.put("err_msg", "This user is not found!");
+			return resultJson;
+		}
+
+		User user = userService.findByBoId(userId.toString());
+		if (user == null) {
+			resultJson.put("status", false);
+			resultJson.put("err_msg", "This user is not found!");
+			return resultJson;
+		}
+
 		Category category = categoryService.findByBoId(categoryId.toString());
 		resultJson.put("local_author", getAuthors(category, AuthorType.LOCAL));
 		resultJson.put("international_author", getAuthors(category, AuthorType.INTERNATIONAL));
 		resultJson.put("sub_category", getDisplaySubCategories(category));
-		resultJson.put("latest_book", getLatestBooks(category));
+		resultJson.put("latest_book", setBookInfo(getLatestBooks(category), user));
 		resultJson.put("status", true);
 		return resultJson;
 	}

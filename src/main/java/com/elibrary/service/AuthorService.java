@@ -27,4 +27,6 @@ public interface AuthorService {
 
 	public List<Long> getAuthorIdByBookCount() throws SQLException, ClassNotFoundException;
 
+	public List<Author> getAuthorList(AuthorType authorType);
+
 }

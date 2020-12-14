@@ -32,6 +32,7 @@ public class HistoryServiceImpl implements HistoryService {
 
 	public static Logger logger = Logger.getLogger(CategoryDaoImpl.class);
 
+	@Override
 	public void save(History history) throws ServiceUnavailableException {
 		try {
 
@@ -57,6 +58,7 @@ public class HistoryServiceImpl implements HistoryService {
 		return "HISTORY" + plus();
 	}
 
+	@Override
 	public List<History> getBookIdReadByUser(Long userId) {
 		String query = "from History history where history.userId=" + userId + " order by history.Id desc";
 		List<History> historyList = historyDao.getEntitiesByQuery(query, 20);
@@ -66,6 +68,7 @@ public class HistoryServiceImpl implements HistoryService {
 
 	}
 
+	@Override
 	public List<Book> getBooksFavouriteByUser(Long userId) {
 		String query = "select history from History history where history.userId=" + userId + " and history.actionStatus='" + ActionStatus.FAVOURITE + "' order by history.Id desc";
 		List<History> historyList = historyDao.getEntitiesByQuery(query);
@@ -82,12 +85,57 @@ public class HistoryServiceImpl implements HistoryService {
 
 	}
 
+	@Override
 	public List<Book> getBooksBookMarkByUser(Long userId) {
 		String query = "select distinct history.bookId from History history where history.userId=" + userId + " and history.actionStatus='" + ActionStatus.BOOKMARK + "' order by history.Id desc";
 		List<Book> bookList = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(bookList))
 			return new ArrayList<Book>();
 		return bookList;
+	}
+
+	@Override
+	public boolean isFavourite(long userId, long bookId) {
+		String query = "from History where userId=" + userId + " and bookId=" + bookId + " and actionStatus='" + ActionStatus.FAVOURITE + "'";
+		return !CollectionUtils.isEmpty(historyDao.getEntitiesByQuery(query));
+	}
+
+	@Override
+	public boolean isBookMark(long userId, long bookId) {
+		String query = "from History where userId=" + userId + " and bookId=" + bookId + " and actionStatus='" + ActionStatus.BOOKMARK + "'";
+		return !CollectionUtils.isEmpty(historyDao.getEntitiesByQuery(query));
+	}
+
+	@Override
+	public boolean isRead(long userId, long bookId) {
+		String query = "from History where userId=" + userId + " and bookId=" + bookId + " and actionStatus='" + ActionStatus.READ + "'";
+		return !CollectionUtils.isEmpty(historyDao.getEntitiesByQuery(query));
+	}
+
+	public void unFavourite(long userId, long bookId) {
+		String query = "from History where userId=" + userId + " and bookId=" + bookId + " and actionStatus='" + ActionStatus.FAVOURITE + "'";
+		List<History> historyList = historyDao.getEntitiesByQuery(query);
+		historyList.forEach(history -> {
+			history.setActionStatus(ActionStatus.UNFAVOURITE);
+			try {
+				save(history);
+			} catch (ServiceUnavailableException e) {
+				logger.error("Error: " + e);
+			}
+		});
+	}
+
+	public void unBookMark(long userId, long bookId) {
+		String query = "from History where userId=" + userId + " and bookId=" + bookId + " and actionStatus='" + ActionStatus.BOOKMARK + "'";
+		List<History> historyList = historyDao.getEntitiesByQuery(query);
+		historyList.forEach(history -> {
+			history.setActionStatus(ActionStatus.UNBOOKMARK);
+			try {
+				save(history);
+			} catch (ServiceUnavailableException e) {
+				logger.error("Error: " + e);
+			}
+		});
 	}
 
 }

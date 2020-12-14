@@ -44,7 +44,7 @@ public interface BookService {
 
 	public List<Book> getBooksByAuthor(long authorId);
 
-	public List<Book> getAllLatestBooks();
+	public List<Long> getAllLatestBooks();
 
 	public List<Book> getAllRecommendBooks(Long userId);
 

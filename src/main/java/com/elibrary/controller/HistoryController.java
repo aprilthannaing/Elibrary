@@ -46,6 +46,7 @@ public class HistoryController extends AbstractController {
 
 	private static Logger logger = Logger.getLogger(HistoryController.class);
 
+	@Override
 	public User getUser(@RequestBody JSONObject json) {
 		Object userId = json.get("user_id");
 		if (userId == null || userId.toString().isEmpty())
@@ -105,6 +106,20 @@ public class HistoryController extends AbstractController {
 		} catch (Exception e) {
 			resultJson.put("status", false);
 			resultJson.put("err_msg", "Action Status is not valid!");
+			return resultJson;
+		}
+
+		if (History.isUnFavourite(actionStatus)) {
+			historyService.unFavourite(user.getId(), book.getId());
+			resultJson.put("status", true);
+			resultJson.put("message", "Success");
+			return resultJson;
+		}
+
+		if (History.isUnBookMark(actionStatus)) {
+			historyService.unBookMark(user.getId(), book.getId());
+			resultJson.put("status", true);
+			resultJson.put("message", "Success");
 			return resultJson;
 		}
 

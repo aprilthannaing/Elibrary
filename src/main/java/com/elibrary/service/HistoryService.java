@@ -16,4 +16,14 @@ public interface HistoryService {
 
 	public List<Book> getBooksFavouriteByUser(Long userId);
 
+	public boolean isFavourite(long userId, long bookId);
+
+	public boolean isBookMark(long userId, long bookId);
+
+	public boolean isRead(long userId, long bookId);
+
+	public void unFavourite(long userId, long bookId);
+
+	public void unBookMark(long userId, long bookId);
+
 }

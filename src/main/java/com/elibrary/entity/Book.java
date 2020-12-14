@@ -13,6 +13,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -81,11 +82,17 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JoinColumn(name = "uploader")
 	private User uploader;
 
+	@Transient
 	@JsonView(Views.Thin.class)
-	private String favouriteStatus;
+	private boolean favouriteStatus;
 
+	@Transient
 	@JsonView(Views.Thin.class)
-	private String bookMarkStatus;
+	private boolean bookMarkStatus;
+
+	@Transient
+	@JsonView(Views.Thin.class)
+	private boolean readStatus;
 
 	@JsonView(Views.Thin.class)
 	private double ownRating;
@@ -93,20 +100,28 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JsonView(Views.Thin.class)
 	private double averageRating;
 
-	public String getFavouriteStatus() {
+	public boolean isFavouriteStatus() {
 		return favouriteStatus;
 	}
 
-	public void setFavouriteStatus(String favouriteStatus) {
+	public void setFavouriteStatus(boolean favouriteStatus) {
 		this.favouriteStatus = favouriteStatus;
 	}
 
-	public String getBookMarkStatus() {
+	public boolean isBookMarkStatus() {
 		return bookMarkStatus;
 	}
 
-	public void setBookMarkStatus(String bookMarkStatus) {
+	public void setBookMarkStatus(boolean bookMarkStatus) {
 		this.bookMarkStatus = bookMarkStatus;
+	}
+
+	public boolean isReadStatus() {
+		return readStatus;
+	}
+
+	public void setReadStatus(boolean readStatus) {
+		this.readStatus = readStatus;
 	}
 
 	public double getOwnRating() {

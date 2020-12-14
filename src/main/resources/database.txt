@@ -246,8 +246,9 @@ alter table user add column fromUserId varchar(50);
 alter table category add column icon varchar(255);
 alter table subcategory add column display varchar(255);
 
-alter table book add column favouriteStatus varchar(255);
-alter table book add column bookMarkStatus varchar(255);
+alter table book drop column readStatus;
+alter table book drop column favouriteStatus;
+alter table book drop column bookMarkStatus;
 alter table book add column ownRating varchar(255);
 alter table book add column averageRating varchar(255);
 alter table user add column verificationCode varchar(6);
@@ -397,6 +398,27 @@ END
 //DELIMITER ;
 
 call GET_BookId_ByCat('နှစ်(၂၀)ပြည့်','2')
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_BookId_ByCat;
+CREATE PROCEDURE `GET_BookId_ByAuthor`(IN ST NVARCHAR(1000), IN AuID NVARCHAR(30), IN CatID nvarchar(30))
+BEGIN
+ SELECT b.id
+  , b.boId
+  FROM book b
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category bc ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
+  ,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+  , (SELECT a.name FROM author a WHERE a.id=ba.authorId) , (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
+  , (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId), (SELECT S.engName FROM subcategory s WHERE S.id=BS.subcategoryId),(SELECT C.myanmarName FROM category c WHERE C.id=BC.categoryId)
+  ) LIKE CONCAT('%',ST,'%')
+AND ba.authorId=AuID
+AND bc.categoryId=CatID;
+END
+//DELIMITER ;
 
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_BookId_ByAuthor`(IN ST NVARCHAR(1000), IN AuID NVARCHAR(30), IN CatID nvarchar(30))

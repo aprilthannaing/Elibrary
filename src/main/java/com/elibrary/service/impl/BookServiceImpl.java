@@ -50,6 +50,7 @@ public class BookServiceImpl implements BookService {
 
 	public static Logger logger = Logger.getLogger(BookDaoImpl.class);
 
+	@Override
 	public void save(Book book) throws ServiceUnavailableException {
 		try {
 
@@ -67,6 +68,7 @@ public class BookServiceImpl implements BookService {
 		return countBook() + 10000;
 	}
 
+	@Override
 	public long countBook() {
 		String query = "select count(*) from Book";
 		return bookDao.findLongByQueryString(query).get(0);
@@ -76,18 +78,21 @@ public class BookServiceImpl implements BookService {
 		return "BOOK" + plus();
 	}
 
+	@Override
 	public boolean isDuplicateProfile(String fullProfile) {
 		String query = "select book from Book book where coverPhoto='" + fullProfile.trim() + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		return !CollectionUtils.isEmpty(books);
 	}
 
+	@Override
 	public boolean isDuplicatePDF(String fullProfile) {
 		String query = "select book from Book book where path='" + fullProfile.trim() + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
 		return !CollectionUtils.isEmpty(books);
 	}
 
+	@Override
 	public List<Book> getAll() {
 		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' order by book.id desc";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -114,6 +119,7 @@ public class BookServiceImpl implements BookService {
 		return books.get(0);
 	}
 
+	@Override
 	public List<Book> getBookListByLibrarian(long librarianId) {
 		String query = "From Book book where uploader=" + librarianId;
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -122,6 +128,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public long getBookCountByLibrarian(long librarianId) {
 		String query = "from Book book where uploader=" + librarianId;
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -130,6 +137,7 @@ public class BookServiceImpl implements BookService {
 		return books.size();
 	}
 
+	@Override
 	public Long getBookCountWriteByAuthor(long authorId) {
 		String query = "select count(*) from Book_Author where authorId=" + authorId;
 		List<Long> books = bookAuthorDao.findLongByQueryString(query);
@@ -138,6 +146,7 @@ public class BookServiceImpl implements BookService {
 		return (long) books.get(0);
 	}
 
+	@Override
 	public List<Book> getLatestBooksByCategoryId(long categoryId) {
 		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bookId from Book_Category bc where bc.categoryId=" + categoryId + ") order by book.id desc";
 		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
@@ -146,6 +155,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getBooksBySubCategoryId(long subcategoryId) {
 		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bookId from Book_SubCategory bc where bc.subcategoryId=" + subcategoryId + ")";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -154,6 +164,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getBooksByAuthor(long authorId) {
 		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select ba.bookId from Book_Author ba where ba.authorId=" + authorId + ")";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -162,22 +173,27 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getLatestBooks() {
-		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=1 or bc.categoryId=2 or bc.categoryId=3 or bc.categoryId=4) order by book.id desc";
-		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
-		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
+		List<Book> books = new ArrayList<Book>();
+		String query = "select distinct id from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=1 or bc.categoryId=2 or bc.categoryId=3 or bc.categoryId=4) order by book.id desc";
+		List<Long> idList = bookDao.findLongByQueryString(query, 15);
+		idList.forEach(id -> {
+			books.add(findById(id));
+		});
 		return books;
 	}
 
-	public List<Book> getAllLatestBooks() {
-		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=1 or bc.categoryId=2 or bc.categoryId=3 or bc.categoryId=4)";
-		List<Book> books = bookDao.getEntitiesByQuery(query);
+	@Override
+	public List<Long> getAllLatestBooks() {
+		String query = "select distinct book.id from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where (bc.categoryId!=6 AND bc.categoryId!=5))";
+		List<Long> books = bookDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
+			return new ArrayList<Long>();
 		return books;
 	}
 
+	@Override
 	public Long getAverageRating(long bookId) {
 		String query = "select ratingId from Book_Rating where bookId=" + bookId;
 		List<Long> ratings = bookDao.findLongByQueryString(query);
@@ -186,6 +202,7 @@ public class BookServiceImpl implements BookService {
 		return ratings.get(0);
 	}
 
+	@Override
 	public Long getBookCountByCategory(long categoryId) {
 		String query = "select count(*) from Book_Category where categoryId=" + categoryId;
 		List<Long> books = bookAuthorDao.findLongByQueryString(query);
@@ -194,6 +211,7 @@ public class BookServiceImpl implements BookService {
 		return (long) books.get(0);
 	}
 
+	@Override
 	public List<Book> getAllMostReadingBooks() throws ClassNotFoundException, SQLException {
 		List<Book> books = new ArrayList<Book>();
 		List<Long> bookIds = getMostReadingBookIds(ActionStatus.READ);
@@ -205,6 +223,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getRecommendBook(Long userId) {
 		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "' order by book.id desc";
 		List<Book> books = bookDao.getEntitiesByQuery(query, 15);
@@ -213,6 +232,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getAllRecommendBooks(Long userId) {
 		String query = "select distinct book from Book book where book.Id in (select bs.bookId from Book_SubCategory bs where bs.subcategoryId in (select bsub.subcategoryId from Book_SubCategory bsub where bsub.bookId in (Select h.bookId from History h where h.userId=" + userId + "))) and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -221,6 +241,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Long> getMostReadingBookIds(ActionStatus actionStatus) throws SQLException, ClassNotFoundException {
 		List<Long> bookIds = new ArrayList<Long>();
 		Connection con = getConnection();
@@ -245,6 +266,7 @@ public class BookServiceImpl implements BookService {
 		return DriverManager.getConnection(url, userName, password);
 	}
 
+	@Override
 	public List<Book> getBookBySearchTermsAndSubCategory(Long subcategoryId, String searchTerms) throws SQLException, ClassNotFoundException {
 		List<Book> bookList = new ArrayList<Book>();
 		String storedProc = "{call GET_BookId_BySubCat(?,?)}";
@@ -263,6 +285,7 @@ public class BookServiceImpl implements BookService {
 		return bookList;
 	}
 
+	@Override
 	public List<Book> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException {
 		List<Book> bookList = new ArrayList<Book>();
 		String storedProc = "{call GET_BookId_ByST(?)}";
@@ -280,6 +303,7 @@ public class BookServiceImpl implements BookService {
 		return bookList;
 	}
 
+	@Override
 	public List<Book> getBookBySearchTerms(Long categoryId, Long authorId, String searchTerms) throws SQLException, ClassNotFoundException {
 		List<Book> bookList = new ArrayList<Book>();
 		String storedProc = "{call GET_BookId_ByAuthor(?,?,?)}";
@@ -299,6 +323,7 @@ public class BookServiceImpl implements BookService {
 		return bookList;
 	}
 
+	@Override
 	public List<Book> getBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException {
 		List<Book> bookList = new ArrayList<Book>();
 		String storedProc = "{call GET_BookId_ByCat(?,?)}";
@@ -317,6 +342,7 @@ public class BookServiceImpl implements BookService {
 		return bookList;
 	}
 
+	@Override
 	public List<Book> getBooksByAuthor(Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
 		String query = "select book from Book book where publishedDate between " + startDate + " and " + endDate + " and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select ba.bookId from Book_Author ba where ba.authorId=" + authorId + ") ";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -325,6 +351,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getBooksByDate(Long categoryId, Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
 		List<Book> books = getBooksByAuthor(authorId, startDate, endDate);
 		List<Book> bookList = new ArrayList<Book>();
@@ -335,6 +362,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getBooksByDate(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
 		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=" + categoryId + ") ";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -343,6 +371,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getBooksByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
 		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bs.bookId from Book_SubCategory bs where bs.subcategoryId=" + subcategoryId + ") ";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -351,6 +380,7 @@ public class BookServiceImpl implements BookService {
 		return books;
 	}
 
+	@Override
 	public List<Book> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException {
 		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);

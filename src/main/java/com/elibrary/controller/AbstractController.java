@@ -23,7 +23,9 @@ import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.service.AuthorService;
+import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
+import com.elibrary.service.HistoryService;
 import com.elibrary.service.RatingService;
 import com.elibrary.service.SessionService;
 import com.elibrary.service.SubCategoryService;
@@ -46,9 +48,15 @@ public class AbstractController {
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private RatingService ratingService;
+
+	@Autowired
+	private BookService bookService;
+
+	@Autowired
+	private HistoryService historyService;
 
 	public final String authorization = "7M8N3SLQ8QIKDJOSEPXJKJDFOZIN1NBO";
 
@@ -90,20 +98,20 @@ public class AbstractController {
 		}
 		return hashPass;
 	}
-	
+
 	public String initialName(String fullname) {
 		String output = "";
-		
-		if(!fullname.equals("")) {
-			String[] names = fullname.split(" "); 
-			if(names.length > 1) {
+
+		if (!fullname.equals("")) {
+			String[] names = fullname.split(" ");
+			if (names.length > 1) {
 				String fname = names[0];
-				String lname = names[names.length-1];
-				output = fname.substring(0,1).toUpperCase() + lname.substring(0,1).toUpperCase();
-			}else {
-				output = names[0].substring(0,1).toUpperCase();
+				String lname = names[names.length - 1];
+				output = fname.substring(0, 1).toUpperCase() + lname.substring(0, 1).toUpperCase();
+			} else {
+				output = names[0].substring(0, 1).toUpperCase();
 			}
-			 
+
 		}
 		return output;
 	}
@@ -130,11 +138,56 @@ public class AbstractController {
 		return categoryService.findByBoId(categoryObject.toString());
 	}
 
+	public int getPage(JSONObject json) {
+		Object page = json.get("page");
+		if (page == null || page.toString().isEmpty())
+			return 0;
+		return Integer.parseInt(page.toString());
+	}
+
 	public SubCategory getSubCategory(JSONObject json) {
 		Object subCategoryObject = json.get("sub_category_id");
 		if (subCategoryObject == null || subCategoryObject.toString().isEmpty())
 			return null;
 		return subCategoryService.findByBoId(subCategoryObject.toString());
+	}
+
+	public List<Book> getBooksByPaganationWithBookIds(JSONObject json, List<Long> bookList, int pageNo) {
+		User user = getUser(json);
+		if (user == null)
+			return null;
+		List<Book> resultBookList = new ArrayList<Book>();
+		int lastIndex = (bookList.size() - 1) - (pageNo * 10 - 10);
+		int substract = lastIndex < 9 ? lastIndex : 9;
+		int startIndex = lastIndex - substract;
+
+		for (int i = lastIndex; i >= startIndex; i--) {
+			Book book = bookService.findById(bookList.get(i));
+			setBookInfo(book, user);
+			resultBookList.add(book);
+		}
+		return resultBookList;
+	}
+
+	public List<Book> setBookInfo(List<Book> bookList, User user) {
+		bookList.forEach(book -> {
+			setBookInfo(book, user);
+		});
+		return bookList;
+
+	}
+
+	public void setBookInfo(Book book, User user) {
+		Long userId = user.getId();
+		Long bookId = book.getId();
+		book.setAverageRating(ratingService.getAverageRating(bookId));
+		book.setOwnRating(ratingService.getOwnRating(userId, bookId));
+		if (historyService.isFavourite(userId, bookId))
+			book.setFavouriteStatus(true);
+		if (historyService.isBookMark(userId, bookId))
+			book.setBookMarkStatus(true);
+		if (historyService.isRead(userId, bookId))
+			book.setReadStatus(true);
 	}
 
 	public List<Book> getBooksByPaganation(JSONObject json, List<Book> bookList, int pageNo) {
@@ -149,11 +202,23 @@ public class AbstractController {
 		for (int i = lastIndex; i >= startIndex; i--) {
 
 			Book book = bookList.get(i);
-			book.setAverageRating(ratingService.getAverageRating(book.getId()));
-			book.setOwnRating(ratingService.getOwnRating(user.getId(), book.getId()));
+			setBookInfo(book, user);
 			resultBookList.add(book);
 		}
 		return resultBookList;
+	}
+
+	public List<Author> getAuthorByPaganation(List<Author> authorList, int pageNo) {
+		List<Author> resultAuthorList = new ArrayList<Author>();
+		int lastIndex = (authorList.size() - 1) - (pageNo * 10 - 10);
+		int substract = lastIndex < 9 ? lastIndex : 9;
+		int startIndex = lastIndex - substract;
+
+		for (int i = lastIndex; i >= startIndex; i--) {
+			Author author = authorList.get(i);
+			resultAuthorList.add(author);
+		}
+		return resultAuthorList;
 	}
 
 }
