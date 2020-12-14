@@ -3,6 +3,7 @@ package com.elibrary.controller;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.SubCategory;
@@ -200,7 +202,21 @@ public class BookController extends AbstractController {
 			User user = getUser(json);
 			if (user == null)
 				return null;
-			return historyService.getBooksFavouriteByUser(user.getId());
+
+			Stack<Book> stackBooks = new Stack<Book>();
+			List<Book> bookList = new ArrayList<Book>();
+			historyService.getBooksByUser(user.getId(), ActionStatus.FAVOURITE).forEach(book -> {
+				if (!stackBooks.contains(book)) {
+					logger.info("push!!!!!!!!!!!!!!!!!!" + book.getBoId());
+
+					stackBooks.push(book);
+				}
+			});
+
+			for (int i = 0; i < stackBooks.size(); i++) {
+				bookList.add(stackBooks.pop());
+			}
+			return bookList;
 		}
 
 		/* bookmark books by user */
@@ -208,7 +224,26 @@ public class BookController extends AbstractController {
 			User user = getUser(json);
 			if (user == null)
 				return null;
-			return historyService.getBooksBookMarkByUser(user.getId());
+
+			// return historyService.getBooksByUser(user.getId(), ActionStatus.BOOKMARK);
+
+			Stack<Book> stackBooks = new Stack<Book>();
+			List<Book> bookList = new ArrayList<Book>();
+			historyService.getBooksByUser(user.getId(), ActionStatus.BOOKMARK).forEach(book -> {
+				if (!stackBooks.contains(book)) {
+					logger.info("push!!!!!!!!!!!!!!!!!!" + book.getBoId());
+					stackBooks.push(book);
+				}
+			});
+
+			for (int i = 0; i < stackBooks.size(); i++) {
+
+				Book book = stackBooks.pop();
+				logger.info("pop!!!!!!!!!!!!!!!!!!" + book.getBoId());
+
+				bookList.add(book);
+			}
+			return bookList;
 		}
 
 		/* popular books */

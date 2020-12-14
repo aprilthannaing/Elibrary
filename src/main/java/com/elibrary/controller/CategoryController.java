@@ -46,9 +46,10 @@ public class CategoryController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "all", method = RequestMethod.GET)
+	@RequestMapping(value = "all", method = RequestMethod.GET) // mobile
 	@JsonView(Views.Summary.class)
 	public JSONObject getAll(@RequestHeader("token") String token) throws ServiceUnavailableException {
+
 		JSONObject result = new JSONObject();
 		if (!isTokenRight(token)) {
 			result.put("status", false);
@@ -98,7 +99,7 @@ public class CategoryController extends AbstractController {
 	public String getCount() throws ServiceUnavailableException {
 		return categoryService.countActiveCategory() + "";
 	}
-	
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "bySubcategoryId", method = RequestMethod.POST)
@@ -110,10 +111,10 @@ public class CategoryController extends AbstractController {
 		String categoryId = String.valueOf(category);
 		if (category != null) {
 			result.put("categoryId", categoryId);
-		}	
+		}
 		return result;
 	}
-	
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "byId", method = RequestMethod.POST)
@@ -125,7 +126,7 @@ public class CategoryController extends AbstractController {
 		if (category != null) {
 			result.put("category", category);
 		}
-			
+
 		return result;
 	}
 }

@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,10 +42,17 @@ public class AuthorController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
 	@JsonView(Views.Summary.class)
-	public JSONObject getAllByPaganation(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject getAllByPaganation(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
 		int page = getPage(json);
 		if (page <= 0) {
 			resultJson.put("status", false);
@@ -53,7 +61,6 @@ public class AuthorController extends AbstractController {
 		}
 
 		Category category = getCategory(json);
-		logger.info("categoryObject wereofodifidfcategory !!!!!!!!!!!!!!!!!!" + category);
 		if (category != null) {
 			// by category
 

@@ -2,6 +2,7 @@ package com.elibrary.service;
 
 import java.util.List;
 
+import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.History;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -12,9 +13,7 @@ public interface HistoryService {
 
 	public List<History> getBookIdReadByUser(Long userId);
 
-	public List<Book> getBooksBookMarkByUser(Long userId);
-
-	public List<Book> getBooksFavouriteByUser(Long userId);
+	public List<Book> getBooksByUser(Long userId, ActionStatus actionStatus);
 
 	public boolean isFavourite(long userId, long bookId);
 

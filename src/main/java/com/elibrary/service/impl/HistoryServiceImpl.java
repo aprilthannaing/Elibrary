@@ -69,8 +69,8 @@ public class HistoryServiceImpl implements HistoryService {
 	}
 
 	@Override
-	public List<Book> getBooksFavouriteByUser(Long userId) {
-		String query = "select history from History history where history.userId=" + userId + " and history.actionStatus='" + ActionStatus.FAVOURITE + "' order by history.Id desc";
+	public List<Book> getBooksByUser(Long userId, ActionStatus actionStatus) {
+		String query = "select history from History history where history.userId=" + userId + " and history.actionStatus='" + actionStatus + "' order by history.Id desc";
 		List<History> historyList = historyDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(historyList))
 			return new ArrayList<Book>();
@@ -78,20 +78,12 @@ public class HistoryServiceImpl implements HistoryService {
 		List<Book> bookList = new ArrayList<Book>();
 		historyList.forEach(history -> {
 			Book book = history.getBookId();
-			if (!bookList.contains(book))
+			if (!bookList.contains(book)) {
 				bookList.add(book);
+			}
 		});
 		return bookList;
 
-	}
-
-	@Override
-	public List<Book> getBooksBookMarkByUser(Long userId) {
-		String query = "select distinct history.bookId from History history where history.userId=" + userId + " and history.actionStatus='" + ActionStatus.BOOKMARK + "' order by history.Id desc";
-		List<Book> bookList = bookDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(bookList))
-			return new ArrayList<Book>();
-		return bookList;
 	}
 
 	@Override
@@ -112,6 +104,7 @@ public class HistoryServiceImpl implements HistoryService {
 		return !CollectionUtils.isEmpty(historyDao.getEntitiesByQuery(query));
 	}
 
+	@Override
 	public void unFavourite(long userId, long bookId) {
 		String query = "from History where userId=" + userId + " and bookId=" + bookId + " and actionStatus='" + ActionStatus.FAVOURITE + "'";
 		List<History> historyList = historyDao.getEntitiesByQuery(query);
@@ -125,6 +118,7 @@ public class HistoryServiceImpl implements HistoryService {
 		});
 	}
 
+	@Override
 	public void unBookMark(long userId, long bookId) {
 		String query = "from History where userId=" + userId + " and bookId=" + bookId + " and actionStatus='" + ActionStatus.BOOKMARK + "'";
 		List<History> historyList = historyDao.getEntitiesByQuery(query);
