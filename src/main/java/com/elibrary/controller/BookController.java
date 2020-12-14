@@ -204,19 +204,18 @@ public class BookController extends AbstractController {
 				return null;
 
 			Stack<Book> stackBooks = new Stack<Book>();
-			List<Book> bookList = new ArrayList<Book>();
-			historyService.getBooksByUser(user.getId(), ActionStatus.FAVOURITE).forEach(book -> {
-				if (!stackBooks.contains(book)) {
-					logger.info("push!!!!!!!!!!!!!!!!!!" + book.getBoId());
+			List<Book> newBookList = new ArrayList<Book>();
+			List<Book> bookList = historyService.getBooksByUser(user.getId(), ActionStatus.FAVOURITE);
 
+			bookList.forEach(book -> {
+				if (!stackBooks.contains(book))
 					stackBooks.push(book);
-				}
 			});
 
-			for (int i = 0; i < stackBooks.size(); i++) {
-				bookList.add(stackBooks.pop());
-			}
-			return bookList;
+			for (int i = 0; i < bookList.size(); i++)
+				newBookList.add(stackBooks.pop());
+
+			return newBookList;
 		}
 
 		/* bookmark books by user */
@@ -228,22 +227,18 @@ public class BookController extends AbstractController {
 			// return historyService.getBooksByUser(user.getId(), ActionStatus.BOOKMARK);
 
 			Stack<Book> stackBooks = new Stack<Book>();
-			List<Book> bookList = new ArrayList<Book>();
-			historyService.getBooksByUser(user.getId(), ActionStatus.BOOKMARK).forEach(book -> {
-				if (!stackBooks.contains(book)) {
-					logger.info("push!!!!!!!!!!!!!!!!!!" + book.getBoId());
+			List<Book> newBookList = new ArrayList<Book>();
+			List<Book> bookList = historyService.getBooksByUser(user.getId(), ActionStatus.BOOKMARK);
+
+			bookList.forEach(book -> {
+				if (!stackBooks.contains(book))
 					stackBooks.push(book);
-				}
 			});
 
-			for (int i = 0; i < stackBooks.size(); i++) {
+			for (int i = 0; i < bookList.size(); i++)
+				newBookList.add(stackBooks.pop());
 
-				Book book = stackBooks.pop();
-				logger.info("pop!!!!!!!!!!!!!!!!!!" + book.getBoId());
-
-				bookList.add(book);
-			}
-			return bookList;
+			return newBookList;
 		}
 
 		/* popular books */

@@ -46,6 +46,16 @@ public class UserController extends AbstractController {
 
 	private static Logger logger = Logger.getLogger(UserController.class);
 
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "mail", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public JSONObject getAll() throws ServiceUnavailableException {
+		JSONObject result = new JSONObject();
+		mailService.sendMail("htethtetsan57@gmail.com", "hihihihi", "helllo hello hello hello");
+		return result;
+	}
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "setuserinfo", method = RequestMethod.POST)
 	@ResponseBody
@@ -204,16 +214,15 @@ public class UserController extends AbstractController {
 		JSONObject resJson = new JSONObject();
 		String message = "";
 		String email = reqJson.get("email").toString();
-		
+
 		String password = AES.decryptWithMobile(reqJson.get("password").toString(), secretKeyByMobile);
-		//To use AES/ECB(decrypt)
+		// To use AES/ECB(decrypt)
 		message = this.goValidation(email, password);
 		if (!message.equals("")) {
 			resJson.put("message", message);
 			resJson.put("status", false);
 			return resJson;
 		}
-
 
 		User user = userservice.getLogin(email, password);
 		if (user != null) {
@@ -260,7 +269,7 @@ public class UserController extends AbstractController {
 		String email = reqJson.get("email").toString();
 		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("password").toString());
 		String password = AES.decrypt(base64DecryptedPassword, secretKey);
-		
+
 		message = this.goValidation(email, password);
 		if (!message.equals("")) {
 			resJson.put("message", message);
@@ -317,11 +326,9 @@ public class UserController extends AbstractController {
 	public JSONObject goChangepwd(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
 
-		
 		String oldPassword = AES.decryptWithMobile(reqJson.get("old_password").toString(), secretKeyByMobile);
-		
+
 		String newPassword = AES.decryptWithMobile(reqJson.get("new_password").toString(), secretKeyByMobile);
-		
 
 		String loginUserid = userservice.sessionActive(token);
 		if (!loginUserid.equals("") || loginUserid.equals("000")) {
@@ -347,7 +354,7 @@ public class UserController extends AbstractController {
 		}
 		return resJson;
 	}
-	
+
 	@RequestMapping(value = "goChangepwdByAdmin", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -594,7 +601,7 @@ public class UserController extends AbstractController {
 	public JSONObject goResetPassword(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
 		String newPassword = AES.decryptWithMobile(reqJson.get("password").toString(), secretKeyByMobile);
-		
+
 		String email = reqJson.get("email").toString();
 		String code = reqJson.get("code").toString();
 		String loginUserid = userservice.sessionActive(token);
@@ -615,8 +622,7 @@ public class UserController extends AbstractController {
 		}
 		return resJson;
 	}
-	
-	
+
 	@RequestMapping(value = "goResetPasswordByAdmin", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -645,8 +651,6 @@ public class UserController extends AbstractController {
 		}
 		return resJson;
 	}
-	
-	
 
 	@RequestMapping(value = "signout", method = RequestMethod.POST)
 	@ResponseBody
@@ -659,35 +663,34 @@ public class UserController extends AbstractController {
 			userservice.save(session);
 		}
 	}
-	
+
 	@RequestMapping(value = "encrypt", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject encrypt(@RequestBody JSONObject reqJson) throws Exception{
+	public JSONObject encrypt(@RequestBody JSONObject reqJson) throws Exception {
 		JSONObject resultJson = new JSONObject();
 		String stringToEncrypt = reqJson.get("toEncrypt").toString();
 		byte[] encryptedMsg = AES.encrypt(stringToEncrypt, secretKey);
-	    String base64EncryptedPassword = Base64.getEncoder().encodeToString(encryptedMsg);
-	   
-	    resultJson.put("Status", "1");
-	    resultJson.put("Encrypted string", base64EncryptedPassword);
+		String base64EncryptedPassword = Base64.getEncoder().encodeToString(encryptedMsg);
+
+		resultJson.put("Status", "1");
+		resultJson.put("Encrypted string", base64EncryptedPassword);
 		return resultJson;
-		
+
 	}
-	
+
 	@RequestMapping(value = "decrypt", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject decrypt(@RequestBody JSONObject reqJson) throws Exception{
+	public JSONObject decrypt(@RequestBody JSONObject reqJson) throws Exception {
 		JSONObject resultJson = new JSONObject();
 		String stringToDecrypt = reqJson.get("toDecrypt").toString();
 		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("toDecrypt").toString());
-	    String decryptedPassword = AES.decrypt(base64DecryptedPassword, secretKey);	   
-	    resultJson.put("Status", "1");
-	    resultJson.put("Decrypted string", decryptedPassword);
+		String decryptedPassword = AES.decrypt(base64DecryptedPassword, secretKey);
+		resultJson.put("Status", "1");
+		resultJson.put("Decrypted string", decryptedPassword);
 		return resultJson;
-		
+
 	}
-	
-	
+
 }
