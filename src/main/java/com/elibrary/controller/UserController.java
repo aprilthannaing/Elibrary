@@ -599,4 +599,35 @@ public class UserController extends AbstractController {
 			userservice.save(session);
 		}
 	}
+	
+	@RequestMapping(value = "encrypt", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject encrypt(@RequestBody JSONObject reqJson) throws Exception{
+		JSONObject resultJson = new JSONObject();
+		String stringToEncrypt = reqJson.get("toEncrypt").toString();
+		byte[] encryptedMsg = AES.encrypt(stringToEncrypt, secretKey);
+	    String base64EncryptedPassword = Base64.getEncoder().encodeToString(encryptedMsg);
+	   
+	    resultJson.put("Status", "1");
+	    resultJson.put("Encrypted string", base64EncryptedPassword);
+		return resultJson;
+		
+	}
+	
+	@RequestMapping(value = "decrypt", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject decrypt(@RequestBody JSONObject reqJson) throws Exception{
+		JSONObject resultJson = new JSONObject();
+		String stringToDecrypt = reqJson.get("toDecrypt").toString();
+		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("toDecrypt").toString());
+	    String decryptedPassword = AES.decrypt(base64DecryptedPassword, secretKey);	   
+	    resultJson.put("Status", "1");
+	    resultJson.put("Decrypted string", decryptedPassword);
+		return resultJson;
+		
+	}
+	
+	
 }
