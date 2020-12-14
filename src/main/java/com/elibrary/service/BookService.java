@@ -8,6 +8,9 @@ import com.elibrary.entity.Book;
 import com.mchange.rmi.ServiceUnavailableException;
 
 public interface BookService {
+
+	public List<Long> getAllIds();
+
 	public void save(Book book) throws ServiceUnavailableException;
 
 	public boolean isDuplicateProfile(String fullProfile);

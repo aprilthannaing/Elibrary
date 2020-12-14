@@ -120,6 +120,27 @@ public class BookController extends AbstractController {
 		/* latest books */
 		Object titleObject = json.get("title");
 		String title = titleObject.toString();
+
+		/* all books */
+		if (title.equals("all")) {
+			List<Long> bookIdList = bookService.getAllIds();
+			int lastPageNo = bookIdList.size() % 10 == 0 ? bookIdList.size() / 10 : bookIdList.size() / 10 + 1;
+
+			List<Book> books = getBooksByPaganationWithBookIds(json, bookIdList, pageNo);
+			if (books == null) {
+				resultJson.put("status", false);
+				resultJson.put("message", "This User or Author or Sub-Category is not found!");
+				return resultJson;
+			}
+
+			resultJson.put("status", true);
+			resultJson.put("current_page", pageNo);
+			resultJson.put("last_page", lastPageNo);
+			resultJson.put("total_count", bookIdList.size());
+			resultJson.put("books", books);
+			return resultJson;
+		}
+
 		if (title.equals("latest")) {
 			List<Long> bookIdList = bookService.getAllLatestBooks();
 			int lastPageNo = bookIdList.size() % 10 == 0 ? bookIdList.size() / 10 : bookIdList.size() / 10 + 1;
@@ -193,10 +214,6 @@ public class BookController extends AbstractController {
 		/* popular books */
 		if (title.equals("popular"))
 			return bookService.getAllMostReadingBooks();
-
-		/* all books */
-		if (title.equals("all"))
-			return bookService.getAll();
 
 		/* books by category and author */
 		Object categoryObject = json.get("category_id");

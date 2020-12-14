@@ -1,9 +1,8 @@
 package com.elibrary.controller;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import java.util.Base64;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.AES;
-import com.elibrary.entity.Book;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
@@ -28,9 +26,7 @@ import com.elibrary.entity.Session;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.Views;
-import com.elibrary.service.HistoryService;
 import com.elibrary.service.ListOfValueService;
-import com.elibrary.service.SessionService;
 import com.elibrary.service.UserService;
 import com.elibrary.service.impl.MailServiceImpl;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -49,12 +45,12 @@ public class UserController extends AbstractController {
 	private MailServiceImpl mailService;
 
 	private static Logger logger = Logger.getLogger(UserController.class);
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "setuserinfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject setuserinfo(@RequestBody User req) throws Exception{
+	public JSONObject setuserinfo(@RequestBody User req) throws Exception {
 		JSONObject jsonRes = new JSONObject();
 		String msg = "";
 		User user = new User();
@@ -87,18 +83,18 @@ public class UserController extends AbstractController {
 					user.setSessionStatus(EntityStatus.NEW);
 					user.setCreatedDate(dateFormat());
 					byte[] encryptedMsg = AES.encrypt(getRandomNumberString(), secretKey);
-				    String base64Encrypted = Base64.getEncoder().encodeToString(encryptedMsg);
+					String base64Encrypted = Base64.getEncoder().encodeToString(encryptedMsg);
 					user.setPassword(base64Encrypted);
 					user.setFromUserId(loginUserid);
 					msg = "Insert Successfully";
 				}
 				user.setModifiedDate(dateFormat());
 				user.setHluttaw(htaw);
-				user.setHlutawType(req.getHlutawType());//response
+				user.setHlutawType(req.getHlutawType());// response
 				user.setDepartment(dept);
-				user.setDeptType(req.getDeptType());//response
+				user.setDeptType(req.getDeptType());// response
 				user.setPosition(pos);
-				user.setPositionType(req.getPositionType());//response
+				user.setPositionType(req.getPositionType());// response
 				user.setName(req.getName());
 				user.setEmail(req.getEmail().trim());
 				user.setPhoneNo(req.getPhoneNo().trim());
@@ -113,11 +109,11 @@ public class UserController extends AbstractController {
 					user.setRole(UserRole.SuperLibrarian);
 				if (req.getRoleType().equals("User"))
 					user.setRole(UserRole.User);
-				user.setRoleType(req.getRoleType());//response
-				//Status
+				user.setRoleType(req.getRoleType());// response
+				// Status
 				String status = req.getStatus();
-				user.setStatus(status);//response
-				if(status.equals("NEW"))
+				user.setStatus(status);// response
+				if (status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
 				else if (status.equals("ACTIVE"))
 					user.setEntityStatus(EntityStatus.ACTIVE);
@@ -175,13 +171,13 @@ public class UserController extends AbstractController {
 	public JSONObject selectUserInfo(@RequestBody Request req) {
 		JSONObject resJson = new JSONObject();
 		String page = req.getPage();
-		
+
 		int pageNo;
 		pageNo = Integer.parseInt(page);
-		
+
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUser(req);
-		
+
 		int lastPageNo = resList.size() % 10 == 0 ? resList.size() / 10 : resList.size() / 10 + 1;
 		List<User> users = getUsersByPagination(req, resList, pageNo);
 //		if(resList.size() > 0) {
@@ -206,39 +202,39 @@ public class UserController extends AbstractController {
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
-	public JSONObject getLogin(@RequestBody JSONObject reqJson) throws Exception{
+	public JSONObject getLogin(@RequestBody JSONObject reqJson) throws Exception {
 		JSONObject resJson = new JSONObject();
 		String message = "";
-		String email 	= reqJson.get("email").toString();
+		String email = reqJson.get("email").toString();
 		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("password").toString());
-	    String password = AES.decrypt(base64DecryptedPassword, secretKey);
-	    
-		message = this.goValidation(email, password); 
-		if(!message.equals("")) {
+		String password = AES.decrypt(base64DecryptedPassword, secretKey);
+
+		message = this.goValidation(email, password);
+		if (!message.equals("")) {
 			resJson.put("message", message);
 			resJson.put("status", false);
 			return resJson;
 		}
-		
+
 		byte[] encryptedMsg = AES.encrypt(password, secretKey);
-	    String base64Encrypted = Base64.getEncoder().encodeToString(encryptedMsg);
+		String base64Encrypted = Base64.getEncoder().encodeToString(encryptedMsg);
 
 		User user = userservice.getLogin(email, base64Encrypted);
-		if(user != null) {
-			//session
-			String sessionId = saveSession(user);//diff
-			if(user.getSessionStatus().equals(EntityStatus.NEW)) {
+		if (user != null) {
+			// session
+			String sessionId = saveSession(user);// diff
+			if (user.getSessionStatus().equals(EntityStatus.NEW)) {
 				resJson.put("message", "first time login");
 				resJson.put("status", true);
 				resJson.put("changePwd", true);
 				resJson.put("token", sessionId);
 				return resJson;
 			}
-			//String sessionid = userservice.checkSession(user);
+			// String sessionid = userservice.checkSession(user);
 			resJson.put("message", message);
 			resJson.put("status", true);
 			resJson.put("token", sessionId);
-			JSONObject json1= new JSONObject();
+			JSONObject json1 = new JSONObject();
 			json1.put("id", user.getBoId());
 			json1.put("name", user.getName());
 			json1.put("email", user.getEmail());
@@ -254,27 +250,28 @@ public class UserController extends AbstractController {
 		}
 		resJson.put("message", "Your email or passord is incorrect.");
 		resJson.put("status", false);
-			
-	return resJson;
+
+		return resJson;
 	}
+
 	@RequestMapping(value = "goLoginByAdmin", method = RequestMethod.POST)
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
-	public JSONObject goLoginByAdmin(@RequestBody JSONObject reqJson) throws ServiceUnavailableException{
+	public JSONObject goLoginByAdmin(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
 		JSONObject resJson = new JSONObject();
 		String message = "";
-		String email 	= reqJson.get("email").toString();
+		String email = reqJson.get("email").toString();
 		String password = reqJson.get("password").toString();
-		message = this.goValidation(email, password); 
-		if(!message.equals("")) {
+		message = this.goValidation(email, password);
+		if (!message.equals("")) {
 			resJson.put("message", message);
 			resJson.put("status", false);
 			return resJson;
 		}
-		User user = userservice.getLoginByAdmin(email, password);//diff
-		if(user != null) {
-			//session
+		User user = userservice.getLoginByAdmin(email, password);// diff
+		if (user != null) {
+			// session
 			String sessionId = saveSession(user);
 			if (user.getSessionStatus().equals(EntityStatus.NEW)) {
 				resJson.put("message", "first time login");
@@ -303,7 +300,7 @@ public class UserController extends AbstractController {
 		}
 		resJson.put("message", "Your email or passord is incorrect.");
 		resJson.put("status", false);
-	return resJson;
+		return resJson;
 	}
 
 	public String saveSession(User user) {
@@ -318,15 +315,15 @@ public class UserController extends AbstractController {
 	@RequestMapping(value = "goChangepwd", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject goChangepwd(@RequestBody JSONObject reqJson,@RequestHeader("token") String token) throws Exception {
+	public JSONObject goChangepwd(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
 
 		byte[] base64DecryptedOldPassword = Base64.getDecoder().decode(reqJson.get("old_password").toString());
-	    String oldpwd = AES.decrypt(base64DecryptedOldPassword, secretKey);
-		
-	    byte[] base64DecryptedNewPassword = Base64.getDecoder().decode(reqJson.get("new_password").toString());
-	    String newpwd = AES.decrypt(base64DecryptedNewPassword, secretKey);
-	    
+		String oldpwd = AES.decrypt(base64DecryptedOldPassword, secretKey);
+
+		byte[] base64DecryptedNewPassword = Base64.getDecoder().decode(reqJson.get("new_password").toString());
+		String newpwd = AES.decrypt(base64DecryptedNewPassword, secretKey);
+
 		String loginUserid = userservice.sessionActive(token);
 		if (!loginUserid.equals("") || loginUserid.equals("000")) {
 		} else {
@@ -335,19 +332,19 @@ public class UserController extends AbstractController {
 			return resJson;
 		}
 		byte[] encryptedMsg = AES.encrypt(newpwd, secretKey);
-	    String encryptedNewPassword = Base64.getEncoder().encodeToString(encryptedMsg);
-	    
+		String encryptedNewPassword = Base64.getEncoder().encodeToString(encryptedMsg);
+
 		byte[] encryptedMsg1 = AES.encrypt(oldpwd, secretKey);
-	    String encryptedOldPassword = Base64.getEncoder().encodeToString(encryptedMsg1);
-	    
-		User user  = userservice.selectUserbyId(loginUserid);
-		if(user != null) {
-			if(user.getPassword().equals(encryptedNewPassword) || !user.getPassword().equals(encryptedOldPassword)) {
+		String encryptedOldPassword = Base64.getEncoder().encodeToString(encryptedMsg1);
+
+		User user = userservice.selectUserbyId(loginUserid);
+		if (user != null) {
+			if (user.getPassword().equals(encryptedNewPassword) || !user.getPassword().equals(encryptedOldPassword)) {
 				resJson.put("message", "Your new password cannot be the same as your old password. Please enter a different password");
 				resJson.put("status", false);
 				return resJson;
 			}
-			
+
 			user.setPassword(encryptedNewPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
@@ -454,6 +451,7 @@ public class UserController extends AbstractController {
 
 		return jsonRes;
 	}
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "selectUserInfobyStatus", method = RequestMethod.POST)
 	@ResponseBody
@@ -461,7 +459,7 @@ public class UserController extends AbstractController {
 	public List<User> selectUserInfobyStatus(@RequestBody Request req) {
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUserbyStatus(req);
-		
+
 		return resList;
 	}
 
@@ -503,7 +501,7 @@ public class UserController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	@CrossOrigin(origins = "*")
 	private JSONObject verifyEmail(@RequestBody JSONObject json) throws Exception {
-	
+
 		JSONObject resultJson = new JSONObject();
 		try {
 			User user = userservice.selectUserbyEmail(json.get("email").toString());
@@ -532,7 +530,7 @@ public class UserController extends AbstractController {
 		}
 		return resultJson;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "verifyCode", method = RequestMethod.POST)
 	@ResponseBody
@@ -561,10 +559,11 @@ public class UserController extends AbstractController {
 	@RequestMapping(value = "goResetPassword", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject goResetPassword(@RequestBody JSONObject reqJson,@RequestHeader("token") String token) throws Exception {
+	@CrossOrigin(origins = "*")
+	public JSONObject goResetPassword(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
 		byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("password").toString());
-	    String newpwd = AES.decrypt(base64DecryptedPassword, secretKey);
+		String newpwd = AES.decrypt(base64DecryptedPassword, secretKey);
 		String email = reqJson.get("email").toString();
 		String code = reqJson.get("code").toString();
 		String loginUserid = userservice.sessionActive(token);
@@ -574,10 +573,10 @@ public class UserController extends AbstractController {
 			resJson.put("message", "Session Fail");
 			return resJson;
 		}
-		User user  = userservice.selectUserbyVerCode(loginUserid,code,email);
-		if(user != null) {
+		User user = userservice.selectUserbyVerCode(loginUserid, code, email);
+		if (user != null) {
 			byte[] encryptedMsg = AES.encrypt(newpwd, secretKey);
-		    String base64EncryptedNewPassword = Base64.getEncoder().encodeToString(encryptedMsg);
+			String base64EncryptedNewPassword = Base64.getEncoder().encodeToString(encryptedMsg);
 
 			user.setPassword(base64EncryptedNewPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
@@ -587,13 +586,13 @@ public class UserController extends AbstractController {
 		}
 		return resJson;
 	}
-	
+
 	@RequestMapping(value = "signout", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public void signout(@RequestBody String userid,@RequestHeader("token") String token) throws ServiceUnavailableException {
-		Session session = userservice.sessionActiveById(token,userid);
-		if(session != null) {
+	public void signout(@RequestBody String userid, @RequestHeader("token") String token) throws ServiceUnavailableException {
+		Session session = userservice.sessionActiveById(token, userid);
+		if (session != null) {
 			session.setEntityStatus(EntityStatus.INACTIVE);
 			session.setEndDate(dateTimeFormat());
 			userservice.save(session);

@@ -13,6 +13,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class AbstractController {
 
 	@Autowired
 	private SessionService sessionService;
-	
+
 	public static final String secretKey = "mykey@91mykey@91";
 
 	@Autowired
@@ -65,6 +66,8 @@ public class AbstractController {
 
 	public static DecimalFormat df2 = new DecimalFormat("#.##");
 
+	public static Logger logger = Logger.getLogger(AbstractController.class);
+
 	public boolean isTokenRight(String token) {
 		return sessionService.findByBoId(token) != null;
 	}
@@ -74,7 +77,7 @@ public class AbstractController {
 		LocalDateTime now = LocalDateTime.now();
 		return dateFormat.format(now);
 	}
-	
+
 	public String dateTimeFormat() {
 		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
@@ -141,9 +144,10 @@ public class AbstractController {
 	}
 
 	public Category getCategory(JSONObject json) {
-		Object categoryObject = json.get("category_id");
+		Object categoryObject = json.get("category_Id");
 		if (categoryObject == null || categoryObject.toString().isEmpty())
 			return null;
+
 		return categoryService.findByBoId(categoryObject.toString());
 	}
 
@@ -216,22 +220,22 @@ public class AbstractController {
 		}
 		return resultBookList;
 	}
-	
-	public List<User> getUsersByPagination(Request json, List<User> userList, int pageNo){
+
+	public List<User> getUsersByPagination(Request json, List<User> userList, int pageNo) {
 		List<User> resultUserList = new ArrayList<User>();
-		
+
 		int lastIndex = (userList.size() - 1) - (pageNo * 10 - 10);
 		int substract = lastIndex < 9 ? lastIndex : 9;
 		int startIndex = lastIndex - substract;
 		for (int i = lastIndex; i >= startIndex; i--) {
 
 			User user = userList.get(i);
-			
+
 			resultUserList.add(user);
 		}
 
 		return resultUserList;
-		
+
 	}
 
 	public List<Author> getAuthorByPaganation(List<Author> authorList, int pageNo) {

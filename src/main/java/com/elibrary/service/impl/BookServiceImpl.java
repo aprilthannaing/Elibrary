@@ -102,6 +102,15 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	public List<Long> getAllIds() {
+		String query = "select book.id from Book book where entityStatus='" + EntityStatus.ACTIVE + "' order by book.id desc";
+		List<Long> bookIds = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(bookIds))
+			return null;
+		return bookIds;
+	}
+
+	@Override
 	public Book findByBoId(String boId) {
 		String query = "select book from Book book where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);

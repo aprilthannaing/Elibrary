@@ -440,3 +440,5 @@ AND bc.categoryId=CatID;
 END
 call GET_BookId_ByAuthor('a',1,1);
 
+ update history set ratingId=0;
+

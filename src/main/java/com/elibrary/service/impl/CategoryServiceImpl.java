@@ -13,7 +13,6 @@ import com.elibrary.dao.impl.CategoryDaoImpl;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.CategoryService;
-import com.mchange.lang.ArrayUtils;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Service("categoryService")
@@ -24,6 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	public static Logger logger = Logger.getLogger(CategoryDaoImpl.class);
 
+	@Override
 	public void save(Category category) throws ServiceUnavailableException {
 		try {
 
@@ -40,11 +40,13 @@ public class CategoryServiceImpl implements CategoryService {
 		return countCategory() + 10000;
 	}
 
+	@Override
 	public long countCategory() {
 		String query = "select count(*) from Category";
 		return categoryDao.findLongByQueryString(query).get(0);
 	}
 
+	@Override
 	public long countActiveCategory() {
 		String query = "select count(*) from Category where entityStatus='" + EntityStatus.ACTIVE + "'";
 		return categoryDao.findLongByQueryString(query).get(0);
@@ -54,6 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
 		return "CATEGORY" + plus();
 	}
 
+	@Override
 	public List<Category> getAll() {
 		String query = "select category from Category category where entityStatus='" + EntityStatus.ACTIVE + "' order by priority";
 		List<Category> categories = categoryDao.getEntitiesByQuery(query);
@@ -62,20 +65,21 @@ public class CategoryServiceImpl implements CategoryService {
 		return categories;
 	}
 
+	@Override
 	public Category findByBoId(String boId) {
 		String query = "select category from Category category where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Category> categories = categoryDao.getEntitiesByQuery(query);
-		if (!CollectionUtils.isEmpty(categories))
-			return categories.get(0);
-		return null;
+		if (CollectionUtils.isEmpty(categories))
+			return null;
+		return categories.get(0);
 	}
-	
+
 	@Override
 	public Long findBySubCategoryId(String id) {
 		String query = "select categorySub.categoryId from Category_Subcategory categorySub where categorySub.subcategoryId='" + id + "'";
 		List<Long> categoryList = categoryDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(categoryList))
-			return (long)0;
+			return (long) 0;
 		return categoryList.get(0);
 	}
 

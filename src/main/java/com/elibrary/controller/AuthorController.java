@@ -41,7 +41,7 @@ public class AuthorController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "getall", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public JSONObject getAllByPaganation(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -53,13 +53,15 @@ public class AuthorController extends AbstractController {
 		}
 
 		Category category = getCategory(json);
+		logger.info("categoryObject wereofodifidfcategory !!!!!!!!!!!!!!!!!!" + category);
 		if (category != null) {
-			// all
+			// by category
 
-			List<Author> localAuthorList = authorService.getAuthorList(AuthorType.LOCAL);
+			Long categoryId = category.getId();
+			List<Author> localAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.LOCAL);
 			int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
 
-			List<Author> interAuthorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
+			List<Author> interAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.INTERNATIONAL);
 			int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
 
 			resultJson.put("status", true);
@@ -71,9 +73,20 @@ public class AuthorController extends AbstractController {
 			return resultJson;
 		}
 
-		// by category
+		// all
 
-		resultJson.put("authors", authorService.getAll());
+		List<Author> localAuthorList = authorService.getAuthorList(AuthorType.LOCAL);
+		int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
+
+		List<Author> interAuthorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
+		int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
+
+		resultJson.put("status", true);
+		resultJson.put("current_page", page);
+		resultJson.put("local_last_page", localLastPageNo);
+		resultJson.put("inter_last_page", interLastPageNo);
+		resultJson.put("local_author", getAuthorByPaganation(localAuthorList, page));
+		resultJson.put("international_author", getAuthorByPaganation(interAuthorList, page));
 		return resultJson;
 	}
 
