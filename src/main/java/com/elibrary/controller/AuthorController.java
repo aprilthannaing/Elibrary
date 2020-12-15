@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
-import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
-import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -39,9 +37,9 @@ public class AuthorController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject get(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
-		
+
 		String checkToShow = reqJson.get("selected").toString();
-		
+
 		Object page = reqJson.get("page");
 		if (page == null || page.toString().isEmpty()) {
 			result.put("status", false);
@@ -56,19 +54,19 @@ public class AuthorController extends AbstractController {
 			result.put("message", "This page is not found!");
 			return result;
 		}
-		
-		
+
 		List<Author> authorList = new ArrayList<Author>();
-		if(checkToShow.equals("1")) 
-			
+		if (checkToShow.equals("1"))
+
 			authorList = authorService.getAuthorList(AuthorType.LOCAL);
-			
-		else authorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
-		
+
+		else
+			authorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
+
 		int lastPageNo = authorList.size() % 10 == 0 ? authorList.size() / 10 : authorList.size() / 10 + 1;
-		
+
 		List<Author> authors = getAuthorsByPagination(authorList, pageNo);
-				
+
 		result.put("status", true);
 		result.put("current_page", pageNo);
 		result.put("last_page", lastPageNo);
@@ -79,7 +77,7 @@ public class AuthorController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "getall", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public JSONObject getAllByPaganation(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -99,12 +97,13 @@ public class AuthorController extends AbstractController {
 
 		Category category = getCategory(json);
 		if (category != null) {
-			// all
+			// by category
 
-			List<Author> localAuthorList = authorService.getAuthorList(AuthorType.LOCAL);
+			Long categoryId = category.getId();
+			List<Author> localAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.LOCAL);
 			int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
 
-			List<Author> interAuthorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
+			List<Author> interAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.INTERNATIONAL);
 			int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
 
 			resultJson.put("status", true);
@@ -113,13 +112,22 @@ public class AuthorController extends AbstractController {
 			resultJson.put("inter_last_page", interLastPageNo);
 			resultJson.put("local_author", getAuthorByPaganation(localAuthorList, page));
 			resultJson.put("international_author", getAuthorByPaganation(interAuthorList, page));
-		
 			return resultJson;
 		}
 
-		// by category
+		// all
+		List<Author> localAuthorList = authorService.getAuthorList(AuthorType.LOCAL);
+		int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
 
-		resultJson.put("authors", authorService.getAll());
+		List<Author> interAuthorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
+		int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
+
+		resultJson.put("status", true);
+		resultJson.put("current_page", page);
+		resultJson.put("local_last_page", localLastPageNo);
+		resultJson.put("inter_last_page", interLastPageNo);
+		resultJson.put("local_author", getAuthorByPaganation(localAuthorList, page));
+		resultJson.put("international_author", getAuthorByPaganation(interAuthorList, page));
 		return resultJson;
 	}
 

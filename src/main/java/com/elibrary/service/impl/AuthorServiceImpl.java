@@ -2,7 +2,6 @@ package com.elibrary.service.impl;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import com.elibrary.service.AuthorService;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Service("authorService")
-public class AuthorServiceImpl implements AuthorService {
+public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorService {
 
 	@Autowired
 	private AuthorDao authorDao;
@@ -81,6 +80,7 @@ public class AuthorServiceImpl implements AuthorService {
 		return authors.get(0);
 	}
 
+	@Override
 	public List<Author> getAuthorList(AuthorType authorType) {
 		String query = "select author from Author author where authorType='" + authorType + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
@@ -110,13 +110,7 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public List<Long> getAuthorIdByCategoryId(long categoryId) throws SQLException, ClassNotFoundException {
 		List<Long> authorIds = new ArrayList<Long>();
-		String name, pass, url;
-		Connection con = null;
-		Class.forName("com.mysql.jdbc.Driver");
-		url = "jdbc:mysql://localhost:3306/elibrary";
-		name = "root";
-		pass = "root";
-		con = DriverManager.getConnection(url, name, pass);
+		Connection con = getConnection();
 		String seeachStoredProc = "{call GET_BookCountByAuthor()}";
 		CallableStatement myCs = con.prepareCall(seeachStoredProc);
 
@@ -137,13 +131,7 @@ public class AuthorServiceImpl implements AuthorService {
 	@Override
 	public List<Long> getAuthorIdByBookCount() throws SQLException, ClassNotFoundException {
 		List<Long> authorIds = new ArrayList<Long>();
-		String name, pass, url;
-		Connection con = null;
-		Class.forName("com.mysql.jdbc.Driver");
-		url = "jdbc:mysql://localhost:3306/elibrary";
-		name = "root";
-		pass = "root";
-		con = DriverManager.getConnection(url, name, pass);
+		Connection con = getConnection();
 		String seeachStoredProc = "{call GET_BookCountByAuthor()}";
 		CallableStatement myCs = con.prepareCall(seeachStoredProc);
 

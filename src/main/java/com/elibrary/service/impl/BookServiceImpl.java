@@ -2,7 +2,6 @@ package com.elibrary.service.impl;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -25,19 +23,7 @@ import com.elibrary.service.BookService;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Service("BookService")
-public class BookServiceImpl implements BookService {
-
-	@Value("${spring.datasource.url}")
-	private String url;
-
-	@Value("${spring.datasource.username}")
-	private String userName;
-
-	@Value("${spring.datasource.password}")
-	private String password;
-
-	@Value("${spring.datasource.driver-class-name}")
-	private String driver;
+public class BookServiceImpl extends AbstractServiceImpl implements BookService {
 
 	@Autowired
 	private BookDao bookDao;
@@ -268,11 +254,6 @@ public class BookServiceImpl implements BookService {
 			con.close();
 		}
 		return bookIds;
-	}
-
-	public Connection getConnection() throws SQLException, ClassNotFoundException {
-		Class.forName(driver);
-		return DriverManager.getConnection(url, userName, password);
 	}
 
 	@Override

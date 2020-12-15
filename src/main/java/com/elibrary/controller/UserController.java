@@ -393,13 +393,14 @@ public class UserController extends AbstractController {
 	}
 
 	public String goValidation(String email, String password) {
-		if (email.equals("") && password.equals(""))
+		if (email.isEmpty() && password.isEmpty())
 			return "Please enter your email address and password";
-		if (email.equals(""))
+		if (email.isEmpty())
 			return "Please enter your email address";
 		if (!email.contains("@"))
 			return "Your email address is incorrect";
-		if (password.equals(""))
+
+		if (password != null && password.isEmpty())
 			return "Please enter your password";
 		return "";
 	}
