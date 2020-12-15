@@ -206,10 +206,10 @@ public class UserController extends AbstractController {
 		return user;
 	}
 
-	@RequestMapping(value = "goLogin", method = RequestMethod.POST)
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
+	@RequestMapping(value = "goLogin", method = RequestMethod.POST)
 	public JSONObject getLogin(@RequestBody JSONObject reqJson) throws Exception {
 		JSONObject resJson = new JSONObject();
 		String message = "";
@@ -259,10 +259,10 @@ public class UserController extends AbstractController {
 		return resJson;
 	}
 
-	@RequestMapping(value = "goLoginByAdmin", method = RequestMethod.POST)
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
+	@RequestMapping(value = "goLoginByAdmin", method = RequestMethod.POST)
 	public JSONObject goLoginByAdmin(@RequestBody JSONObject reqJson) throws Exception {
 		JSONObject resJson = new JSONObject();
 		String message = "";
@@ -321,6 +321,7 @@ public class UserController extends AbstractController {
 	}
 
 	@RequestMapping(value = "goChangepwd", method = RequestMethod.POST)
+	@CrossOrigin(origins = "*")
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject goChangepwd(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
@@ -355,6 +356,7 @@ public class UserController extends AbstractController {
 		return resJson;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "goChangepwdByAdmin", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -405,6 +407,7 @@ public class UserController extends AbstractController {
 		return "";
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "deleteUserinfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -436,6 +439,7 @@ public class UserController extends AbstractController {
 		return jsonRes;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "setusers", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -502,6 +506,7 @@ public class UserController extends AbstractController {
 		return resList;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "changeStatus", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
