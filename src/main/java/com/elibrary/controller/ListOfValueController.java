@@ -28,6 +28,7 @@ public class ListOfValueController {
 	private ListOfValueService listOfValueService;
 	
 ////////Department////////////////////
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "departmentSetup", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -118,10 +119,9 @@ public class ListOfValueController {
 		
 	}
 	
-	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "getHluttaw", method = RequestMethod.POST)
 	@ResponseBody
-	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
 	public JSONObject getHluttaw(@RequestBody String req){
 		JSONObject jsonResponse = new JSONObject();

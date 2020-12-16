@@ -44,8 +44,7 @@ public class MailServiceImpl implements MailService {
 		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("myanmarportal2@gmail.com", "portal12345#"); // "apriltn19@gmail.com", "April123!@#" //"",
-																								// "myanmarportal2@gmail.com" , "portal12345#"
+				return new PasswordAuthentication("myanmarportal2@gmail.com", "portal12345#");// "myanmarportal2@gmail.com" , "portal12345#"
 
 			}
 		});
