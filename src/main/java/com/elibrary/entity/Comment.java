@@ -15,6 +15,8 @@ public class Comment extends AbstractEntity implements Serializable {
 	private String description;
 
 	public String getDescription() {
+		if (description == null)
+			return "";
 		return description;
 	}
 

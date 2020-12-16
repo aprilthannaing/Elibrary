@@ -36,6 +36,8 @@ public class AbstractEntity {
 	}
 
 	public String getBoId() {
+		if (boId == null)
+			return "";
 		return boId;
 	}
 

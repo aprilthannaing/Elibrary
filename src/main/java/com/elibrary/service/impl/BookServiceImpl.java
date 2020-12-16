@@ -160,6 +160,15 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
+	public Long getBookCount(long subcategoryId) {
+		String query = "select count(*) from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bookId from Book_SubCategory bc where bc.subcategoryId=" + subcategoryId + ")";
+		List<Long> books = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(books))
+			return (long) 0;
+		return books.get(0);
+	}
+
+	@Override
 	public List<Book> getBooksByAuthor(long authorId) {
 		String query = "select book from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select ba.bookId from Book_Author ba where ba.authorId=" + authorId + ")";
 		List<Book> books = bookDao.getEntitiesByQuery(query);
@@ -257,8 +266,8 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
-	public List<Book> getBookBySearchTermsAndSubCategory(Long subcategoryId, String searchTerms) throws SQLException, ClassNotFoundException {
-		List<Book> bookList = new ArrayList<Book>();
+	public List<Long> getBookBySearchTermsAndSubCategory(Long subcategoryId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Long> idList = new ArrayList<Long>();
 		String storedProc = "{call GET_BookId_BySubCat(?,?)}";
 		Connection con = getConnection();
 		CallableStatement myCs = con.prepareCall(storedProc);
@@ -268,16 +277,16 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (hasResults) {
 			ResultSet rs = myCs.getResultSet();
 			while (rs.next()) {
-				bookList.add(findByBoId(rs.getString("boId")));
+				idList.add(Long.parseLong(rs.getString("id")));
 			}
 			con.close();
 		}
-		return bookList;
+		return idList;
 	}
 
 	@Override
-	public List<Book> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException {
-		List<Book> bookList = new ArrayList<Book>();
+	public List<Long> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Long> idList = new ArrayList<Long>();
 		String storedProc = "{call GET_BookId_ByST(?)}";
 		Connection con = getConnection();
 		CallableStatement myCs = con.prepareCall(storedProc);
@@ -286,16 +295,16 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (hasResults) {
 			ResultSet rs = myCs.getResultSet();
 			while (rs.next()) {
-				bookList.add(findByBoId(rs.getString("boId")));
+				idList.add(Long.parseLong(rs.getString("id")));
 			}
 			con.close();
 		}
-		return bookList;
+		return idList;
 	}
 
 	@Override
-	public List<Book> getBookBySearchTerms(Long categoryId, Long authorId, String searchTerms) throws SQLException, ClassNotFoundException {
-		List<Book> bookList = new ArrayList<Book>();
+	public List<Long> getBookBySearchTerms(Long categoryId, Long authorId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Long> idList = new ArrayList<Long>();
 		String storedProc = "{call GET_BookId_ByAuthor(?,?,?)}";
 		Connection con = getConnection();
 		CallableStatement myCs = con.prepareCall(storedProc);
@@ -306,16 +315,16 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (hasResults) {
 			ResultSet rs = myCs.getResultSet();
 			while (rs.next()) {
-				bookList.add(findByBoId(rs.getString("boId")));
+				idList.add(Long.parseLong(rs.getString("id")));
 			}
 			con.close();
 		}
-		return bookList;
+		return idList;
 	}
 
 	@Override
-	public List<Book> getBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException {
-		List<Book> bookList = new ArrayList<Book>();
+	public List<Long> getBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Long> IdList = new ArrayList<Long>();
 		String storedProc = "{call GET_BookId_ByCat(?,?)}";
 		Connection con = getConnection();
 		CallableStatement myCs = con.prepareCall(storedProc);
@@ -325,58 +334,59 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (hasResults) {
 			ResultSet rs = myCs.getResultSet();
 			while (rs.next()) {
-				bookList.add(findByBoId(rs.getString("boId")));
+				IdList.add(Long.parseLong(rs.getString("id")));
 			}
 			con.close();
 		}
-		return bookList;
+		return IdList;
 	}
 
 	@Override
-	public List<Book> getBooksByAuthor(Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
-		String query = "select book from Book book where publishedDate between " + startDate + " and " + endDate + " and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select ba.bookId from Book_Author ba where ba.authorId=" + authorId + ") ";
-		List<Book> books = bookDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
-		return books;
+	public List<Long> getBooksByAuthor(Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book.id from Book book where publishedDate between " + startDate + " and " + endDate + " and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select ba.bookId from Book_Author ba where ba.authorId=" + authorId + ") ";
+		List<Long> bookIds = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(bookIds))
+			return new ArrayList<Long>();
+		return bookIds;
 	}
 
 	@Override
-	public List<Book> getBooksByDate(Long categoryId, Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
-		List<Book> books = getBooksByAuthor(authorId, startDate, endDate);
-		List<Book> bookList = new ArrayList<Book>();
-		books.forEach(book -> {
-			if (book != null && book.getCategory() != null && book.getCategory().getId() == categoryId)
-				bookList.add(book);
+	public List<Long> getBooksByDate(Long categoryId, Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		List<Long> bookIds = getBooksByAuthor(authorId, startDate, endDate);
+		List<Long> bookIdList = new ArrayList<Long>();
+		bookIds.forEach(id -> {
+			Book book = findById(id);
+			if (id != null && book.getCategory() != null && book.getCategory().getId() == categoryId)
+				bookIdList.add(id);
 		});
+		return bookIds;
+	}
+
+	@Override
+	public List<Long> getBooksByDate(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book.id from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=" + categoryId + ") ";
+		List<Long> IdList = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(IdList))
+			return new ArrayList<Long>();
+		return IdList;
+	}
+
+	@Override
+	public List<Long> getBooksByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book.id from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bs.bookId from Book_SubCategory bs where bs.subcategoryId=" + subcategoryId + ") ";
+		List<Long> books = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Long>();
 		return books;
 	}
 
 	@Override
-	public List<Book> getBooksByDate(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
-		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where bc.categoryId=" + categoryId + ") ";
-		List<Book> books = bookDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
-		return books;
-	}
-
-	@Override
-	public List<Book> getBooksByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
-		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bs.bookId from Book_SubCategory bs where bs.subcategoryId=" + subcategoryId + ") ";
-		List<Book> books = bookDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
-		return books;
-	}
-
-	@Override
-	public List<Book> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException {
-		String query = "select book from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
-		List<Book> books = bookDao.getEntitiesByQuery(query);
-		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
-		return books;
+	public List<Long> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		String query = "select book.id from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Long> idList = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(idList))
+			return new ArrayList<Long>();
+		return idList;
 	}
 
 }

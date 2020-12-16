@@ -27,7 +27,7 @@ public class Category extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Summary.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "category_subcategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
+	@JoinTable(name = "category_subCategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
 	private List<SubCategory> subCategories;
 
 	@JsonView(Views.Thin.class)
@@ -75,6 +75,8 @@ public class Category extends AbstractEntity implements Serializable {
 	}
 
 	public String getMyanmarName() {
+		if (myanmarName == null)
+			return "";
 		return myanmarName;
 	}
 
@@ -83,6 +85,8 @@ public class Category extends AbstractEntity implements Serializable {
 	}
 
 	public String getEngName() {
+		if (engName == null)
+			return "";
 		return engName;
 	}
 

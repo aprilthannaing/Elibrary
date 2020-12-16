@@ -156,10 +156,10 @@ public class OperationController {
 		String pdfFilePath = IMAGEUPLOADURL.trim() + "BookFile//";
 
 		File file = new File(pdfFilePath + pdfName);
-		book.setSize((long) file.length() / 1024 + "KB");
+		book.setSize(file.length() / 1024 + "KB");
 		FileOutputStream fop = new FileOutputStream(file);
 		fop.write(decodedBytes);
-		
+
 		book.setPath("/BookFile/" + pdfName.trim());
 		return true;
 	}
@@ -380,17 +380,24 @@ public class OperationController {
 	private boolean setSubCategoryInfo(SubCategory subCategory, JSONObject json) {
 		Object myanmarName = json.get("myanmarName");
 		Object engName = json.get("engName");
-		if (myanmarName == null || myanmarName.toString().isEmpty() || engName ==null || engName.toString().isEmpty())
+		if ((myanmarName == null && engName == null) || (myanmarName.toString().isEmpty() && engName.toString().isEmpty()))
 			return false;
-		
+
 		Object priority = json.get("priority");
 		if (priority == null || priority.toString().isEmpty())
 			return false;
+
+		Object categoryId = json.get("category");
+		if (categoryId == null || categoryId.toString().isEmpty())
+			return false;
+
+		Category category = categoryService.findByBoId(categoryId.toString());
 
 		subCategory.setMyanmarName(myanmarName.toString());
 		subCategory.setEngName(engName.toString());
 		subCategory.setPriority(Double.parseDouble(json.get("priority").toString()));
 		subCategory.setEntityStatus(EntityStatus.ACTIVE);
+		subCategory.setCategory(category);
 		return true;
 	}
 

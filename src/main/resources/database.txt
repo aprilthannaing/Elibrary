@@ -148,7 +148,7 @@ CREATE TABLE `rating` (
 CREATE TABLE `comment` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
- `description` longText DEFAULT NULL,
+ `description` longText DEFAULT NOT NULL,
  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -253,6 +253,12 @@ alter table book add column ownRating varchar(255);
 alter table book add column averageRating varchar(255);
 alter table user add column verificationCode varchar(6);
 alter table history add column ratingId varchar(50);
+
+alter table category_subcategory rename column subcategoryId to subCategoryId;
+
+ALTER TABLE category_subcategory RENAME COLUMN subcategoryId TO subCategoryId;
+
+ALTER TABLE category_subcategory CHANGE COLUMN subcategoryId subCategoryId varchar(50);
 
 update book set ownRating=0;
 update book set averageRating=0;
@@ -441,4 +447,7 @@ END
 call GET_BookId_ByAuthor('a',1,1);
 
  update history set ratingId=0;
+ 
+ alter table subcategory add column categoryId varchar(50);
+ 
 

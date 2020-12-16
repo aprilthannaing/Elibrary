@@ -53,22 +53,24 @@ public interface BookService {
 
 	public List<Book> getAllMostReadingBooks() throws ClassNotFoundException, SQLException;
 
-	public List<Book> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException;
+	public List<Long> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBookBySearchTerms(Long categoryId, Long authorId, String searchTerms) throws SQLException, ClassNotFoundException;
+	public List<Long> getBookBySearchTerms(Long categoryId, Long authorId, String searchTerms) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException;
+	public List<Long> getBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBookBySearchTermsAndSubCategory(Long subcategoryId, String searchTerms) throws SQLException, ClassNotFoundException;
+	public List<Long> getBookBySearchTermsAndSubCategory(Long subcategoryId, String searchTerms) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException;
+	public List<Long> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBooksByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+	public List<Long> getBooksByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBooksByDate(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+	public List<Long> getBooksByDate(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBooksByDate(Long categoryId, Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+	public List<Long> getBooksByDate(Long categoryId, Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
-	public List<Book> getBooksByAuthor(Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+	public List<Long> getBooksByAuthor(Long authorId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
+	public Long getBookCount(long subcategoryId);
 
 }

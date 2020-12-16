@@ -221,6 +221,8 @@ public class Book extends AbstractReadingObject implements Serializable {
 	}
 
 	public SubCategory getSubCategory() {
+		if (subCategory == null)
+			subCategory = new SubCategory();
 		return subCategory;
 	}
 
@@ -229,6 +231,8 @@ public class Book extends AbstractReadingObject implements Serializable {
 	}
 
 	public Category getCategory() {
+		if (category == null)
+			category = new Category();
 		return category;
 	}
 
@@ -237,9 +241,8 @@ public class Book extends AbstractReadingObject implements Serializable {
 	}
 
 	public List<Author> getAuthors() {
-		if (authors == null) {
+		if (authors == null)
 			authors = new ArrayList<Author>();
-		}
 		return authors;
 	}
 
@@ -248,9 +251,9 @@ public class Book extends AbstractReadingObject implements Serializable {
 	}
 
 	public List<Publisher> getPublishers() {
-		if (publishers == null) {
+		if (publishers == null)
 			publishers = new ArrayList<Publisher>();
-		}
+
 		return publishers;
 	}
 
@@ -267,6 +270,8 @@ public class Book extends AbstractReadingObject implements Serializable {
 	}
 
 	public Comment getComment() {
+		if (comment == null)
+			comment = new Comment();
 		return comment;
 	}
 

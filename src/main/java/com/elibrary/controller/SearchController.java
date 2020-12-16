@@ -1,7 +1,6 @@
 package com.elibrary.controller;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -73,10 +72,10 @@ public class SearchController extends AbstractController {
 			}
 		}
 
-		List<Book> bookList = getBookList(json);
+		List<Long> bookList = getBookList(json);
 		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
 		int pageNo = Integer.parseInt(pageObject.toString());
-		List<Book> books = getBooksByPaganation(json, bookList, pageNo);
+		List<Book> books = getBooksByPaganationWithBookIds(json, bookList, pageNo);
 		if (books == null) {
 			resultJson.put("status", false);
 			resultJson.put("message", "This User is not found!");
@@ -91,7 +90,7 @@ public class SearchController extends AbstractController {
 		return resultJson;
 	}
 
-	private List<Book> getBookList(JSONObject json) throws ClassNotFoundException, SQLException {
+	private List<Long> getBookList(JSONObject json) throws ClassNotFoundException, SQLException {
 		Category category = getCategory(json);
 		Author author = getAuthor(json);
 		SubCategory subCategory = getSubCategory(json);

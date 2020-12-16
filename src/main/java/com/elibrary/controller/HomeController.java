@@ -106,14 +106,17 @@ public class HomeController extends AbstractController {
 			resultJson.put("err_msg", "Unauthorized Request");
 			return resultJson;
 		}
-
+		List<Category> categoryList = categoryService.getAll();
+		categoryList.forEach(category -> {
+			category.setBookCount(bookService.getBookCountByCategory(category.getId()));
+		});
 		resultJson.put("status", true);
 		resultJson.put("latest_book", setBookInfo(bookService.getLatestBooks(), user)); // 15
 		resultJson.put("popular_book", setBookInfo(getMostReadingBooks(), user)); // 6
 		resultJson.put("recommend_book", setBookInfo(bookService.getRecommendBook(user.getId()), user)); // 12
 		resultJson.put("local_author", getAuthors(AuthorType.LOCAL)); // 12
 		resultJson.put("international_author", getAuthors(AuthorType.INTERNATIONAL));
-		resultJson.put("main_category", categoryService.getAll()); // 6
+		resultJson.put("main_category", categoryList); // 6
 		return resultJson;
 	}
 
@@ -155,7 +158,7 @@ public class HomeController extends AbstractController {
 		resultJson.put("local_author", getAuthors(category, AuthorType.LOCAL));
 		resultJson.put("international_author", getAuthors(category, AuthorType.INTERNATIONAL));
 		resultJson.put("sub_category", getDisplaySubCategories(category));
-		resultJson.put("latest_book", setBookInfo(getLatestBooks(category), user));
+		resultJson.put("latest_book", setBookInfo(bookService.getLatestBooksByCategoryId(category.getId()), user));
 		resultJson.put("status", true);
 		return resultJson;
 	}
@@ -174,19 +177,11 @@ public class HomeController extends AbstractController {
 		return authors;
 	}
 
-	private List<Book> getLatestBooks(Category category) {
-		List<Book> bookList = bookService.getLatestBooksByCategoryId(category.getId());
-		bookList.forEach(book -> {
-			book.setAverageRating(bookService.getAverageRating(book.getId()));
-		});
-		return bookList;
-	}
-
 	private List<SubCategory> getDisplaySubCategories(Category category) {
 		List<SubCategory> subCategories = new ArrayList<SubCategory>();
 		category.getSubCategories().forEach(subCategory -> {
 			if (subCategory.isDisplay()) {
-				subCategory.setBookCount(bookService.getBooksBySubCategoryId(subCategory.getId()).size());
+				subCategory.setBookCount(bookService.getBookCount(subCategory.getId()));
 				subCategories.add(subCategory);
 			}
 		});

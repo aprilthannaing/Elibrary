@@ -76,7 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public Long findBySubCategoryId(String id) {
-		String query = "select categorySub.categoryId from Category_Subcategory categorySub where categorySub.subcategoryId='" + id + "'";
+		String query = "select categorySub.categoryId from Category_SubCategory categorySub where categorySub.subCategoryId='" + id + "'";
 		List<Long> categoryList = categoryDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(categoryList))
 			return (long) 0;

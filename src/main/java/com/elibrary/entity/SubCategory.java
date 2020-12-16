@@ -1,15 +1,12 @@
 package com.elibrary.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -34,6 +31,19 @@ public class SubCategory extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	private String display;
+
+	@JsonView(Views.Thin.class)
+	@JoinColumn(name = "categoryId")
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Category category;
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
 
 	public long getBookCount() {
 		return bookCount;
@@ -60,6 +70,8 @@ public class SubCategory extends AbstractEntity implements Serializable {
 	}
 
 	public String getMyanmarName() {
+		if (myanmarName == null)
+			return "";
 		return myanmarName;
 	}
 
@@ -68,6 +80,8 @@ public class SubCategory extends AbstractEntity implements Serializable {
 	}
 
 	public String getEngName() {
+		if (engName == null)
+			return "";
 		return engName;
 	}
 
