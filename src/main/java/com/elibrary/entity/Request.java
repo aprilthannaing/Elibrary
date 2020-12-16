@@ -7,7 +7,8 @@ public class Request {
 	String text3;
 	String fromDate;
 	String toDate;
-	String page;
+	int currentpage;
+	int pageSize;
 	public String getSearchText() {
 		return searchText;
 	}
@@ -44,10 +45,17 @@ public class Request {
 	public void setText3(String text3) {
 		this.text3 = text3;
 	}
-	public String getPage() {
-		return page;
+	public int getCurrentpage() {
+		return currentpage;
 	}
-	public void setPage(String page) {
-		this.page = page;
+	public void setCurrentpage(int currentpage) {
+		this.currentpage = currentpage;
 	}
+	public int getPageSize() {
+		return pageSize;
+	}
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+	
 }

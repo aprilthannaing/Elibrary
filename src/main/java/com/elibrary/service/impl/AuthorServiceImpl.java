@@ -114,6 +114,7 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 	public List<Long> getAuthorIdByCategoryId(long categoryId) throws SQLException, ClassNotFoundException {
 		List<Long> authorIds = new ArrayList<Long>();
 		Connection con = getConnection();
+
 		String seeachStoredProc = "{call GET_BookCountByAuthor()}";
 		CallableStatement myCs = con.prepareCall(seeachStoredProc);
 

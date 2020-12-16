@@ -52,6 +52,8 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	public List<User> selectUser(Request req) {
 		List<User> response = new ArrayList<User>();
 		String whereclause = "";
+		int l_startRecord = (req.getCurrentpage() - 1) * req.getPageSize();
+		int l_endRecord = l_startRecord + req.getPageSize();
 		if (!req.getSearchText().trim().equals("")) {
 			whereclause = " and (" + " name like '%" + req.getSearchText() + "%' or email like '%" + req.getSearchText()
 					+ "%' " + "or phoneNo like '%" + req.getSearchText() + "%' or role like '%" + req.getSearchText()
@@ -76,7 +78,13 @@ public class UserServiceImpl extends AbstractController implements UserService {
 		if(!req.getToDate().trim().equals("")) {
 			whereclause += " and modifiedDate <='" + req.getToDate() + "'";
 		}
-		String query = "from User where entityStatus<>'DELETED' " + whereclause + " order by id desc";
+		String query = "from User where entityStatus<>'DELETED' " + whereclause + " order by id desc" ;
+//		String query = "select RowConstrainedResult FROM ( SELECT (@row_number:=@row_number + 1) AS row_num,user" 
+//				+ " FROM user user, (SELECT @row_number:=0) AS temp where entityStatus<>'DELETED' " + whereclause 
+//				+ " ORDER BY id desc) AS RowConstrainedResult"
+//				+ " WHERE ( row_num > "+ l_startRecord +" and row_num <= "+ l_endRecord +" )";
+		//String query =  "select t from (select @rownum:=@rownum+1 rownumber, user from user user cross join (SELECT @rownum:=0) r order by id desc)As  t" + 
+		//"WHERE ( rownumber > "+l_startRecord+" and rownumber <= "+l_endRecord+" )";
 		List<User> userList = userDao.byQuery(query);
 		for (User row : userList) {
 			row.setDeptType(row.getDepartment().getId());
@@ -129,7 +137,7 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	
 	public User selectUserbyVerCode(String loginUserid,String verificationCode,String email) {
 		String query = "Select user from User user where id="+ loginUserid + " And verificationCode='"+ verificationCode +"'"
-				+ " And email='"+ email +"'";
+				+ " And email='"+ email +"' And  entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<User> userList = userDao.byQuery(query);
 		if(userList.size() > 0)
 			return userList.get(0);

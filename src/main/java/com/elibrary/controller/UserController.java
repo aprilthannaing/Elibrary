@@ -123,8 +123,13 @@ public class UserController extends AbstractController {
 				user.setStatus(status);// response
 				if (status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
-				else if (status.equals("ACTIVE"))
+				else if (status.equals("ACTIVE")) {
+					if(!status.equals(user.getEntityStatus().name())) {
+						mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account", "Welcome!Please verify your email address for Elibray System.\n"
+									+ "Your password is "+ user.getPassword() + ".");
+					}
 					user.setEntityStatus(EntityStatus.ACTIVE);
+				}
 				else if (status.equals("EXPIRED"))
 					user.setEntityStatus(EntityStatus.EXPIRED);
 				userservice.save(user);
@@ -173,27 +178,23 @@ public class UserController extends AbstractController {
 		return jsonRes;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "selectUserInfo", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject selectUserInfo(@RequestBody Request req) {
 		JSONObject resJson = new JSONObject();
-		String page = req.getPage();
-
-		int pageNo;
-		pageNo = Integer.parseInt(page);
-
 		List<User> resList = new ArrayList<User>();
 		resList = userservice.selectUser(req);
 
 		int lastPageNo = resList.size() % 10 == 0 ? resList.size() / 10 : resList.size() / 10 + 1;
-		List<User> users = getUsersByPagination(req, resList, pageNo);
-//		if(resList.size() > 0) {
-//			User user = resList.get(0);
-//		}
-		resJson.put("users", users);
-		resJson.put("currentPage", page);
-		resJson.put("lastPage", lastPageNo);
+		List<User> users = getUsersByPagination(req, resList, req.getCurrentpage());
+		if(resList.size() > 0) {
+			User user = resList.get(0);
+		}
+		resJson.put("users", resList);
+		resJson.put("currentPage", req.getCurrentpage());
+		//resJson.put("lastPage", lastPageNo);
 		resJson.put("totalCount", resList.size());
 		return resJson;
 	}
@@ -350,6 +351,8 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
+			 mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+					 + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -388,6 +391,8 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
+			 mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+					 + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -557,9 +562,8 @@ public class UserController extends AbstractController {
 
 			String code = getRandomNumberString();
 
-			// mailService.sendMail(json.get("email").toString(), "Email Address
-			// Verification", "Please verify your email address for Elibray System.\n"
-			// + "Your verification code is " + code);
+			 mailService.sendMail(json.get("email").toString(), "Elibrary : Email Address Verification", "Please verify your email address for Elibray System.\n"
+			 + "Your verification code is " + code);
 			user.setVerificationCode(code);
 			userservice.save(user);
 			String sessionId = saveSession(user);
@@ -600,10 +604,10 @@ public class UserController extends AbstractController {
 		return resultJson;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "goResetPassword", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	@CrossOrigin(origins = "*")
 	public JSONObject goResetPassword(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
 		String newPassword = AES.decryptWithMobile(reqJson.get("password").toString(), secretKeyByMobile);
@@ -623,6 +627,8 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
+			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+					 + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
@@ -652,12 +658,15 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
+			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+					 + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
 		return resJson;
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "signout", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
