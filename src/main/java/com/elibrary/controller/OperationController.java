@@ -407,7 +407,7 @@ public class OperationController {
 		if (priority == null || priority.toString().isEmpty())
 			return false;
 
-		Object categoryId = json.get("category");
+		Object categoryId = json.get("categoryBoId");
 		if (categoryId == null || categoryId.toString().isEmpty())
 			return false;
 
