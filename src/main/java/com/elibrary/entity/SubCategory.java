@@ -2,11 +2,7 @@ package com.elibrary.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -33,16 +29,14 @@ public class SubCategory extends AbstractEntity implements Serializable {
 	private String display;
 
 	@JsonView(Views.Thin.class)
-	@JoinColumn(name = "categoryId")
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Category category;
+	private String categoryBoId;
 
-	public Category getCategory() {
-		return category;
+	public String getCategoryBoId() {
+		return categoryBoId;
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
+	public void setCategoryBoId(String categoryBoId) {
+		this.categoryBoId = categoryBoId;
 	}
 
 	public long getBookCount() {

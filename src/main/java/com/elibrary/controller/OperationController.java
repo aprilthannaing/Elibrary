@@ -92,7 +92,7 @@ public class OperationController {
 	private void setBookInfo(Book book, JSONObject json) throws ServiceUnavailableException, IOException {
 		List<Author> authors = new ArrayList<Author>();
 		List<Object> authorObjects = (List<Object>) json.get("authors");
-	
+
 		if (!CollectionUtils.isEmpty(authorObjects)) {
 			for (Object boId : authorObjects) {
 				Author author = authorService.findByBoId(boId.toString());
@@ -130,7 +130,7 @@ public class OperationController {
 
 	private boolean setImage(JSONObject json, Book book) throws IOException {
 		String imageSrc = json.get("imageSrc").toString();
-		
+
 		imageSrc = imageSrc.split("base64")[1];
 
 		String filePath = IMAGEUPLOADURL.trim() + "BookProfile//";
@@ -151,15 +151,14 @@ public class OperationController {
 		if (pdf == null || pdf.toString().isEmpty()) {
 			return false;
 		}
-			
-		
+
 		try {
 			pdf = pdf.split("base64")[1];
-		}catch (Exception e) {
+		} catch (Exception e) {
 			logger.getLogger("error:" + e.getMessage());
 			logger.info(pdf);
 		}
-		
+
 		String pdfName = json.get("pdfName").toString().split("\\\\")[2];
 		if (bookService.isDuplicatePDF("/BookFile/" + pdfName.trim())) {
 			return false;
@@ -207,8 +206,6 @@ public class OperationController {
 			resultJson.put("msg", "Please select cover photo!");
 			return resultJson;
 		}
-		
-		
 
 		Object categoryObject = json.get("category");
 		if (categoryObject == null || categoryObject.toString().isEmpty()) {
@@ -242,7 +239,7 @@ public class OperationController {
 			resultJson.put("msg", "This Profile Picture is already registered!");
 			return resultJson;
 		}
-		
+
 		Object pdf = json.get("pdfName").toString();
 		if (pdf == null || pdf.toString().isEmpty()) {
 			resultJson.put("status", "0");
@@ -307,9 +304,9 @@ public class OperationController {
 				return resultJson;
 			}
 		}
-		
+
 		Object pdf = json.get("pdf");
-		
+
 		if (pdf != null && pdf.toString().contains("base64")) {
 			if (!setPDFFile(json, book)) {
 				resultJson.put("status", "0");
@@ -400,7 +397,7 @@ public class OperationController {
 		categoryService.save(category);
 	}
 
-	private boolean setSubCategoryInfo(SubCategory subCategory, JSONObject json) {
+	private boolean setSubCategoryInfo(SubCategory subCategory, JSONObject json) throws ServiceUnavailableException {
 		Object myanmarName = json.get("myanmarName");
 		Object engName = json.get("engName");
 		if ((myanmarName == null && engName == null) || (myanmarName.toString().isEmpty() && engName.toString().isEmpty()))
@@ -420,7 +417,10 @@ public class OperationController {
 		subCategory.setEngName(engName.toString());
 		subCategory.setPriority(Double.parseDouble(json.get("priority").toString()));
 		subCategory.setEntityStatus(EntityStatus.ACTIVE);
-		subCategory.setCategory(category);
+		subCategory.setCategoryBoId(categoryId.toString());
+
+		category.getSubCategories().add(subCategory);
+		categoryService.save(category);
 		return true;
 	}
 

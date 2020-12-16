@@ -448,6 +448,7 @@ call GET_BookId_ByAuthor('a',1,1);
 
  update history set ratingId=0;
  
- alter table subcategory add column categoryId varchar(50);
+  alter table subcategory drop column categoryId varchar(50); 
+ alter table subcategory add column categoryBoId varchar(50);
  
 

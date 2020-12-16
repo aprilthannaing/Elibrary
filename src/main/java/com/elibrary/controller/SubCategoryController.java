@@ -133,7 +133,6 @@ public class SubCategoryController extends AbstractController {
 	public JSONObject findByBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = subCategoryService.findByBoId(json.get("boId").toString().trim());
-		logger.info("category!!!!!!!!!!!!!" + subCategory.getCategory());
 		result.put("subCategory", subCategory);
 		return result;
 	}
