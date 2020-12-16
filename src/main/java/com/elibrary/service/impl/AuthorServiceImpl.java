@@ -16,7 +16,6 @@ import com.elibrary.dao.AuthorDao;
 import com.elibrary.dao.impl.AuthorDaoImpl;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
-import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.AuthorService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -73,16 +72,17 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 
 	@Override
 	public Author findByBoId(String boId) {
-		String query = "select author from Author author where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select author from Author author where boId='" + boId + "'and entityStatus='"
+				+ EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;
 		return authors.get(0);
 	}
 
-	@Override
 	public List<Author> getAuthorList(AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select author from Author author where authorType='" + authorType + "' and entityStatus='"
+				+ EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return new ArrayList<Author>();
@@ -91,7 +91,9 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 
 	@Override
 	public List<Author> getAuthorListByCategory(long categoryId, AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType + "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId=" + categoryId + " ))";
+		String query = "select author from Author author where authorType='" + authorType
+				+ "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId="
+				+ categoryId + " ))";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return new ArrayList<Author>();
@@ -100,7 +102,8 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 
 	@Override
 	public Author getAuthorListById(long authorId, AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType + "' and author.id=" + authorId;
+		String query = "select author from Author author where authorType='" + authorType + "' and author.id="
+				+ authorId;
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;
@@ -146,16 +149,15 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 		}
 		return authorIds;
 	}
-	
+
 	@Override
 	public Author findById(Long Id) {
-		String query = "select author from author author where Id='" + Id + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		String query = "select author from author author where Id='" + Id + "'and entityStatus='" + EntityStatus.ACTIVE
+				+ "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;
 		return authors.get(0);
 	}
-
-
 
 }

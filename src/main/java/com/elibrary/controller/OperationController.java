@@ -92,6 +92,7 @@ public class OperationController {
 	private void setBookInfo(Book book, JSONObject json) throws ServiceUnavailableException, IOException {
 		List<Author> authors = new ArrayList<Author>();
 		List<Object> authorObjects = (List<Object>) json.get("authors");
+	
 		if (!CollectionUtils.isEmpty(authorObjects)) {
 			for (Object boId : authorObjects) {
 				Author author = authorService.findByBoId(boId.toString());
@@ -129,6 +130,7 @@ public class OperationController {
 
 	private boolean setImage(JSONObject json, Book book) throws IOException {
 		String imageSrc = json.get("imageSrc").toString();
+		
 		imageSrc = imageSrc.split("base64")[1];
 
 		String filePath = IMAGEUPLOADURL.trim() + "BookProfile//";
@@ -146,6 +148,10 @@ public class OperationController {
 
 	private boolean setPDFFile(JSONObject json, Book book) throws IOException {
 		String pdf = json.get("pdf").toString();
+		if (pdf == null || pdf.toString().isEmpty()) {
+			return false;
+		}
+			
 		pdf = pdf.split("base64")[1];
 		String pdfName = json.get("pdfName").toString().split("\\\\")[2];
 		if (bookService.isDuplicatePDF("/BookFile/" + pdfName.trim())) {
@@ -194,6 +200,8 @@ public class OperationController {
 			resultJson.put("msg", "Please select cover photo!");
 			return resultJson;
 		}
+		
+		
 
 		Object categoryObject = json.get("category");
 		if (categoryObject == null || categoryObject.toString().isEmpty()) {
@@ -285,8 +293,9 @@ public class OperationController {
 				return resultJson;
 			}
 		}
-
+		
 		Object pdf = json.get("pdf");
+		
 		if (pdf != null && pdf.toString().contains("base64")) {
 			if (!setPDFFile(json, book)) {
 				resultJson.put("status", "0");
