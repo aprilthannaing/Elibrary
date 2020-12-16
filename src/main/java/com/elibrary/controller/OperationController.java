@@ -147,12 +147,19 @@ public class OperationController {
 	}
 
 	private boolean setPDFFile(JSONObject json, Book book) throws IOException {
-		String pdf = json.get("pdf").toString();
+		String pdf = json.get("pdfName").toString();
 		if (pdf == null || pdf.toString().isEmpty()) {
 			return false;
 		}
 			
-		pdf = pdf.split("base64")[1];
+		
+		try {
+			pdf = pdf.split("base64")[1];
+		}catch (Exception e) {
+			logger.getLogger("error:" + e.getMessage());
+			logger.info(pdf);
+		}
+		
 		String pdfName = json.get("pdfName").toString().split("\\\\")[2];
 		if (bookService.isDuplicatePDF("/BookFile/" + pdfName.trim())) {
 			return false;
@@ -233,6 +240,13 @@ public class OperationController {
 		if (!setImage(json, book)) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "This Profile Picture is already registered!");
+			return resultJson;
+		}
+		
+		Object pdf = json.get("pdfName").toString();
+		if (pdf == null || pdf.toString().isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please select PDF file!");
 			return resultJson;
 		}
 
