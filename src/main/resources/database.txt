@@ -271,14 +271,13 @@ ALTER TABLE subcategory CHANGE name myanmarName VARCHAR(255) DEFAULT NULL;
 ALTER TABLE subcategory ADD engName VARCHAR(150) DEFAULT NULL;
 
 
-alter table book drop column searchterms;
 ALTER table Book ADD column searchTerms varchar(1000);
 UPDATE Book book SET searchTerms = CONCAT_WS ( " ", boId, ISBN, publisher, edition, title, publishedDate, volume, createdDate, callNo, 
 accessionNo,(select user.name from User user where user.id = book.uploader));
 
-
-
-
+ALTER table Book ADD column searchTerms varchar(1000);
+UPDATE Book book SET searchTerms = CONCAT_WS ( " ", boId, ISBN, publisher, edition, title, publishedDate, volume, createdDate, callNo, 
+accessionNo,(select user.name from User user where user.id = book.uploader));
 
 update subcategory set display="true" where id=7;
 update category set icon="CategoryIcon/englishbook.png" where id=4;

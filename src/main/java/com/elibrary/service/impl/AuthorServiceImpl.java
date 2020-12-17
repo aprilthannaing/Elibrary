@@ -72,17 +72,16 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 
 	@Override
 	public Author findByBoId(String boId) {
-		String query = "select author from Author author where boId='" + boId + "'and entityStatus='"
-				+ EntityStatus.ACTIVE + "'";
+		String query = "select author from Author author where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;
 		return authors.get(0);
 	}
 
+	@Override
 	public List<Author> getAuthorList(AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType + "' and entityStatus='"
-				+ EntityStatus.ACTIVE + "'";
+		String query = "select author from Author author where authorType='" + authorType + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return new ArrayList<Author>();
@@ -91,9 +90,7 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 
 	@Override
 	public List<Author> getAuthorListByCategory(long categoryId, AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType
-				+ "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId="
-				+ categoryId + " ))";
+		String query = "select author from Author author where authorType='" + authorType + "' and author.id in (select ba.authorId from Book_Author ba where ba.bookId in(Select bc.id from Book_Category bc where bc.categoryId=" + categoryId + " ))";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return new ArrayList<Author>();
@@ -102,8 +99,7 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 
 	@Override
 	public Author getAuthorListById(long authorId, AuthorType authorType) {
-		String query = "select author from Author author where authorType='" + authorType + "' and author.id="
-				+ authorId;
+		String query = "select author from Author author where authorType='" + authorType + "' and author.id=" + authorId;
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;
@@ -133,6 +129,27 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 	}
 
 	@Override
+	public List<Long> getAuthorIdByCategoryIdAndName(long categoryId, String name) throws SQLException, ClassNotFoundException {
+		List<Long> authorIds = new ArrayList<Long>();
+		Connection con = getConnection();
+
+		String seeachStoredProc = "{call GET_BookCountByAuthor()}";
+		CallableStatement myCs = con.prepareCall(seeachStoredProc);
+
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				if (Long.parseLong(rs.getString("CAT_ID")) == categoryId && rs.getString("AUTHOR_NAME").contains(name))
+					authorIds.add(Long.parseLong(rs.getString("AUTHOR_ID")));
+			}
+
+			con.close();
+		}
+		return authorIds;
+	}
+
+	@Override
 	public List<Long> getAuthorIdByBookCount() throws SQLException, ClassNotFoundException {
 		List<Long> authorIds = new ArrayList<Long>();
 		Connection con = getConnection();
@@ -153,8 +170,7 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 
 	@Override
 	public Author findById(Long Id) {
-		String query = "select author from author author where Id='" + Id + "'and entityStatus='" + EntityStatus.ACTIVE
-				+ "'";
+		String query = "select author from Author author where id=" + Id + " and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Author> authors = authorDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(authors))
 			return null;

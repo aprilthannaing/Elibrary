@@ -51,6 +51,10 @@ import com.elibrary.service.PublisherService;
 import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @RestController
@@ -846,6 +850,45 @@ public class OperationController {
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;
+	}
+
+	@RequestMapping(value = "watermark", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public String testWaterMark() throws ServiceUnavailableException {
+		try {
+
+			PdfReader reader = new PdfReader("C:\\Users\\DELL\\Project\\Elibrary\\80_NanDarMoeKyal_BoGyokeAungSan.pdf");
+			PdfReader.unethicalreading = true;
+			int n = reader.getNumberOfPages();
+			PdfStamper stamp = new PdfStamper(reader, new FileOutputStream("C:\\Users\\DELL\\Project\\Elibrary\\PDFWithWatermarkImage4.pdf"));
+			int i = 0;
+			PdfContentByte under;
+			Image img = Image.getInstance("C:\\Users\\DELL\\Project\\Elibrary\\images.jpg");
+			img.setAbsolutePosition(0, 0);
+
+			while (i < n) {
+				i++;
+				under = stamp.getOverContent(i);
+				under.addImage(img);
+			}
+			stamp.close();
+
+//			File file = new File("C:\\Users\\DELL\\Project\\Elibrary\\ThawDarSwe_ABrandeAndFamousShortStories.pdf");
+//			PDDocument doc = PDDocument.load(file);
+//			PDPage page = doc.getPage(0);
+//			PDImageXObject pdImage = PDImageXObject.createFromFile("C:\\Users\\DELL\\Project\\Elibrary\\images.png", doc);
+//			PDPageContentStream contents = new PDPageContentStream(doc, page);
+//			contents.drawImage(pdImage, 70, 250);
+//			contents.close();
+//			doc.save("C:\\Users\\DELL\\Project\\Elibrary\\PDFWithWatermarkImage6.pdf");
+//			doc.close();
+
+		} catch (Exception de) {
+			de.printStackTrace();
+		}
+
+		return "success";
 	}
 
 }

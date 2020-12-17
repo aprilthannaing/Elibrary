@@ -75,8 +75,8 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public Long findBySubCategoryId(String id) {
-		String query = "select categorySub.categoryId from Category_SubCategory categorySub where categorySub.subCategoryId='" + id + "'";
+	public Long findBySubCategoryId(Long id) {
+		String query = "select categorySub.categoryId from Category_SubCategory categorySub where categorySub.subCategoryId=" + id;
 		List<Long> categoryList = categoryDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(categoryList))
 			return (long) 0;
@@ -84,8 +84,8 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public Category findByCategoryId(String id) {
-		String query = "select category from Category category where id='" + id + "'";
+	public Category findByCategoryId(Long id) {
+		String query = "select category from Category category where id=" + id;
 		List<Category> category = categoryDao.getEntitiesByQuery(query);
 		if (!CollectionUtils.isEmpty(category))
 			return category.get(0);

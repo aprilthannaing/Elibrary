@@ -144,4 +144,23 @@ public class SubCategoryController extends AbstractController {
 		return subCategoryService.countActiveSubCategory() + "";
 	}
 
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "importcategory", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public String importCategory() throws ServiceUnavailableException {
+		subCategoryService.getAll().forEach(sub -> {
+			Long categoryId = categoryService.findBySubCategoryId(sub.getId());
+			Category category = categoryService.findByCategoryId(categoryId);
+			sub.setCategoryBoId(category.getBoId());
+			try {
+				subCategoryService.save(sub);
+			} catch (ServiceUnavailableException e) {
+				logger.error("Ërror: " + e);
+			}
+		});
+
+		return "success";
+	}
+
 }

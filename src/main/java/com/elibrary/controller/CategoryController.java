@@ -107,7 +107,7 @@ public class CategoryController extends AbstractController {
 	public JSONObject findBySubCategoryBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		logger.info("json: " + json);
 		JSONObject result = new JSONObject();
-		Long category = categoryService.findBySubCategoryId(json.get("id").toString().trim());
+		Long category = categoryService.findBySubCategoryId(Long.parseLong(json.get("id").toString()));
 		String categoryId = String.valueOf(category);
 		if (category != null) {
 			result.put("categoryId", categoryId);
@@ -122,7 +122,7 @@ public class CategoryController extends AbstractController {
 	public JSONObject findByCategoryId(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		logger.info("json: " + json);
 		JSONObject result = new JSONObject();
-		Category category = categoryService.findByCategoryId(json.get("id").toString().trim());
+		Category category = categoryService.findByCategoryId(Long.parseLong(json.get("id").toString()));
 		if (category != null) {
 			result.put("category", category);
 		}

@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
+import com.elibrary.service.CategoryService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
 
@@ -29,6 +31,9 @@ public class AuthorController extends AbstractController {
 	@Autowired
 	private AuthorService authorService;
 
+	@Autowired
+	private CategoryService categoryService;
+
 	private static Logger logger = Logger.getLogger(SubCategoryController.class);
 
 	@ResponseBody
@@ -37,16 +42,15 @@ public class AuthorController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject get() throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
-		
+
 		List<Author> authorList = new ArrayList<Author>();
 		authorList = authorService.getAll();
-	
+
 		result.put("status", true);
 		result.put("authors", authorList);
 		return result;
 	}
-	
-	
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "allBySelected", method = RequestMethod.POST)
@@ -81,25 +85,21 @@ public class AuthorController extends AbstractController {
 
 		int lastPageNo = authorList.size() % 10 == 0 ? authorList.size() / 10 : authorList.size() / 10 + 1;
 
-		List<Author> authors = getAuthorsByPagination(authorList, pageNo);
+		List<Author> authors = getAuthorByPaganation(authorList, pageNo);
 
 		result.put("status", true);
 		result.put("current_page", pageNo);
 		result.put("last_page", lastPageNo);
 		result.put("total_count", authorList.size());
-		result.put("authors", authorList);
+		result.put("authors", authors);
 		return result;
 	}
-	
-	
-	
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
 	@JsonView(Views.Summary.class)
-	public JSONObject getAllByPaganation(@RequestHeader("token") String token, @RequestBody JSONObject json)
-			throws ServiceUnavailableException {
+	public JSONObject getAllByPaganation(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -121,12 +121,10 @@ public class AuthorController extends AbstractController {
 
 			Long categoryId = category.getId();
 			List<Author> localAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.LOCAL);
-			int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10
-					: localAuthorList.size() / 10 + 1;
+			int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
 
 			List<Author> interAuthorList = authorService.getAuthorListByCategory(categoryId, AuthorType.INTERNATIONAL);
-			int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10
-					: interAuthorList.size() / 10 + 1;
+			int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
 
 			resultJson.put("status", true);
 			resultJson.put("current_page", page);
@@ -139,12 +137,10 @@ public class AuthorController extends AbstractController {
 
 		// all
 		List<Author> localAuthorList = authorService.getAuthorList(AuthorType.LOCAL);
-		int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10
-				: localAuthorList.size() / 10 + 1;
+		int localLastPageNo = localAuthorList.size() % 10 == 0 ? localAuthorList.size() / 10 : localAuthorList.size() / 10 + 1;
 
 		List<Author> interAuthorList = authorService.getAuthorList(AuthorType.INTERNATIONAL);
-		int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10
-				: interAuthorList.size() / 10 + 1;
+		int interLastPageNo = interAuthorList.size() % 10 == 0 ? interAuthorList.size() / 10 : interAuthorList.size() / 10 + 1;
 
 		resultJson.put("status", true);
 		resultJson.put("current_page", page);
@@ -170,5 +166,39 @@ public class AuthorController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {
 		return authorService.countAuthor() + "";
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "search", method = RequestMethod.POST) // authorsearch
+	@JsonView(Views.Summary.class)
+	public JSONObject getHomePageByCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("err_msg", "Unauthorized Request");
+			return resultJson;
+		}
+
+		Object name = json.get("name");
+		if (name == null || name.toString().isEmpty()) {
+			resultJson.put("status", false);
+			resultJson.put("err_msg", "Searchterm must not null");
+			return resultJson;
+		}
+
+		Category category = getCategory(json);
+		int page = getPage(json);
+
+		List<Long> authorIdList = authorService.getAuthorIdByCategoryIdAndName(category.getId(), name.toString());
+		int lastPageNo = authorIdList.size() % 10 == 0 ? authorIdList.size() / 10 : authorIdList.size() / 10 + 1;
+
+		resultJson.put("author", getAuthorsByPagination(authorIdList, page));
+		resultJson.put("current_page", page);
+		resultJson.put("last_page", lastPageNo);
+		resultJson.put("total_count", authorIdList.size());
+		resultJson.put("status", true);
+		return resultJson;
 	}
 }

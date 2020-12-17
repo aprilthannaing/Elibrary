@@ -31,4 +31,6 @@ public interface AuthorService {
 
 	public Author findById(Long Id);
 
+	public List<Long> getAuthorIdByCategoryIdAndName(long categoryId, String name) throws SQLException, ClassNotFoundException;
+
 }

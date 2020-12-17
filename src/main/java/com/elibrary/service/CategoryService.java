@@ -11,13 +11,13 @@ public interface CategoryService {
 	public List<Category> getAll();
 
 	public Category findByBoId(String boId);
-	
+
 	public long countCategory();
-	
+
 	public long countActiveCategory();
-	
-	public Long findBySubCategoryId(String boId);
-	
-	public Category findByCategoryId(String id);
+
+	public Category findByCategoryId(Long id);
+
+	public Long findBySubCategoryId(Long id);
 
 }
