@@ -128,12 +128,14 @@ public class SubCategoryController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "boId", method = RequestMethod.POST)
+	@RequestMapping(value = "boId", method = RequestMethod.POST) // web
 	@JsonView(Views.Thin.class)
 	public JSONObject findByBoId(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = subCategoryService.findByBoId(json.get("boId").toString().trim());
+
 		result.put("subCategory", subCategory);
+		result.put("books", bookService.getBooksBySubCategoryId(subCategory.getId()));
 		return result;
 	}
 

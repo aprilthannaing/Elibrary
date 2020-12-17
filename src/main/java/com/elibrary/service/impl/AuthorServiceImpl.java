@@ -140,7 +140,13 @@ public class AuthorServiceImpl extends AbstractServiceImpl implements AuthorServ
 		if (hasResults) {
 			ResultSet rs = myCs.getResultSet();
 			while (rs.next()) {
-				if (Long.parseLong(rs.getString("CAT_ID")) == categoryId && rs.getString("AUTHOR_NAME").contains(name))
+				if (categoryId <= 0) {
+					if (rs.getString("AUTHOR_NAME").contains(name)) {
+						Long id = Long.parseLong(rs.getString("AUTHOR_ID"));
+						if (!authorIds.contains(id))
+							authorIds.add(id);
+					}
+				} else if (Long.parseLong(rs.getString("CAT_ID")) == categoryId && rs.getString("AUTHOR_NAME").contains(name))
 					authorIds.add(Long.parseLong(rs.getString("AUTHOR_ID")));
 			}
 

@@ -188,10 +188,10 @@ public class AuthorController extends AbstractController {
 			return resultJson;
 		}
 
-		Category category = getCategory(json);
 		int page = getPage(json);
+		Category category = getCategory(json);
 
-		List<Long> authorIdList = authorService.getAuthorIdByCategoryIdAndName(category.getId(), name.toString());
+		List<Long> authorIdList = authorService.getAuthorIdByCategoryIdAndName(category == null ? 0 : category.getId(), name.toString());
 		int lastPageNo = authorIdList.size() % 10 == 0 ? authorIdList.size() / 10 : authorIdList.size() / 10 + 1;
 
 		resultJson.put("author", getAuthorsByPagination(authorIdList, page));
