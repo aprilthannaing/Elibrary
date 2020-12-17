@@ -427,7 +427,8 @@ END
 //DELIMITER ;
 
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_BookId_ByAuthor`(IN ST NVARCHAR(1000), IN AuID NVARCHAR(30), IN CatID nvarchar(30))
+DELIMITER //
+CREATE PROCEDURE `GET_BookId_ByAuthor`(IN ST NVARCHAR(1000), IN AuID NVARCHAR(30), IN CatID nvarchar(30))
 BEGIN
  SELECT b.id
   , b.boId
@@ -444,6 +445,10 @@ WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
 AND ba.authorId=AuID
 AND bc.categoryId=CatID;
 END
+//DELIMITER ;
+
+
+
 call GET_BookId_ByAuthor('a',1,1);
 
  update history set ratingId=0;

@@ -33,7 +33,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String path;
 
-	// @JsonView(Views.Thin.class)
+	@JsonView(Views.Thin.class)
 	private String seriesIndex;
 
 	@JsonView(Views.Thin.class)
@@ -45,7 +45,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 	// @JsonView(Views.Thin.class)
 	private String size;
 
-	// @JsonView(Views.Thin.class)
+	 @JsonView(Views.Thin.class)
 	private String downloadApproval;
 
 	@JsonView(Views.Thin.class)

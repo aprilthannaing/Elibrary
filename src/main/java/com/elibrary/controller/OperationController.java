@@ -314,7 +314,7 @@ public class OperationController {
 				return resultJson;
 			}
 		}
-
+		
 		book.setCallNo(json.get("callNumber") != null ? json.get("callNumber").toString() : book.getCallNo());
 		book.setEdition(json.get("edition") != null ? json.get("edition").toString() : book.getEdition());
 		book.setVolume(json.get("volume") != null ? json.get("volume").toString() : book.getVolume());
@@ -360,8 +360,8 @@ public class OperationController {
 		return user;
 	}
 
-	private void setCategoryInfo(Category category, JSONObject json) {
-
+	private JSONObject setCategoryInfo(Category category, JSONObject json) {
+		JSONObject errorMessage = new JSONObject();
 		List<SubCategory> subCategoryList = new ArrayList<SubCategory>();
 		List<Object> subCategories = (List<Object>) json.get("categories");
 		for (Object object : subCategories) {
@@ -370,58 +370,104 @@ public class OperationController {
 				subCategoryList.add(subCategory);
 		}
 		category.setSubCategories(subCategoryList);
-		category.setMyanmarName(json.get("myanmarName").toString());
-		category.setEngName(json.get("engName").toString());
-		category.setPriority(Double.parseDouble(json.get("priority").toString()));
+		String myanmarName = json.get("myanmarName").toString();
+		String engName = json.get("engName").toString();
+		if ((myanmarName == null && engName == null)
+				|| (myanmarName.toString().isEmpty() && engName.toString().isEmpty())) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please enter myanmar name or english name for category!");
+			return errorMessage;
+		}
+		String priority = json.get("priority").toString();
+		if(priority == null || priority.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please enter priority!");
+			return errorMessage;
+		}
+		category.setMyanmarName(myanmarName);
+		category.setEngName(engName);
+		category.setPriority(Double.parseDouble(priority));
 		category.setEntityStatus(EntityStatus.ACTIVE);
+		return null;
 	}
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "savecategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public void saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject saveCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
 		Category category = new Category();
 		category.setBoId(SystemConstant.BOID_REQUIRED);
-		setCategoryInfo(category, json);
+		resultJson = setCategoryInfo(category, json);
+		if (resultJson != null) 
+			return resultJson;
+		resultJson = new JSONObject();
 		categoryService.save(category);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+		
+		
+
 	}
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "editcategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public void editCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject editCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
 		Category category = categoryService.findByBoId(json.get("boId").toString());
-		setCategoryInfo(category, json);
+		resultJson = setCategoryInfo(category, json);
+		if (resultJson != null) 
+			return resultJson;
+		resultJson = new JSONObject();
 		categoryService.save(category);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+		
 	}
 
-	private boolean setSubCategoryInfo(SubCategory subCategory, JSONObject json) throws ServiceUnavailableException {
+	private JSONObject setSubCategoryInfo(SubCategory subCategory, JSONObject json) {
+		JSONObject errorMessage = new JSONObject();
+
 		Object myanmarName = json.get("myanmarName");
 		Object engName = json.get("engName");
-		if ((myanmarName == null && engName == null) || (myanmarName.toString().isEmpty() && engName.toString().isEmpty()))
-			return false;
+		if ((myanmarName == null && engName == null)
+				|| (myanmarName.toString().isEmpty() && engName.toString().isEmpty())) {
+			errorMessage.put("stutus", "0");
+			errorMessage.put("msg", "Please enter myanmar name or english name for subcategory!");
+			return errorMessage;
+		}
 
 		Object priority = json.get("priority");
-		if (priority == null || priority.toString().isEmpty())
-			return false;
+		if (priority == null || priority.toString().isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please enter priority!");
+			return errorMessage;
+		}
 
 		Object categoryId = json.get("categoryBoId");
-		if (categoryId == null || categoryId.toString().isEmpty())
-			return false;
+		
+		if (categoryId == null || categoryId.toString().isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please choose category!");
+			return errorMessage;
+		}
 
 		Category category = categoryService.findByBoId(categoryId.toString());
 
 		subCategory.setMyanmarName(myanmarName.toString());
 		subCategory.setEngName(engName.toString());
-		subCategory.setPriority(Double.parseDouble(json.get("priority").toString()));
+		subCategory.setPriority(Double.parseDouble(priority.toString()));
 		subCategory.setEntityStatus(EntityStatus.ACTIVE);
 		subCategory.setCategoryBoId(categoryId.toString());
 
 		category.getSubCategories().add(subCategory);
-		categoryService.save(category);
-		return true;
+		
+		return null;
 	}
 
 	@ResponseBody
@@ -432,12 +478,15 @@ public class OperationController {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = new SubCategory();
 		subCategory.setBoId(SystemConstant.BOID_REQUIRED);
-		if (!setSubCategoryInfo(subCategory, json)) {
-			result.put("status", "0");
+
+		result = setSubCategoryInfo(subCategory, json);
+		if (result != null) 
 			return result;
-		}
+		
+		result = new JSONObject();
 		subCategoryService.save(subCategory);
 		result.put("status", "1");
+		result.put("msg", "Success!");
 		return result;
 	}
 
@@ -448,24 +497,44 @@ public class OperationController {
 	public JSONObject editSubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
 		SubCategory subCategory = subCategoryService.findByBoId(json.get("boId").toString());
-		if (!setSubCategoryInfo(subCategory, json)) {
-			result.put("status", "0");
+
+		result = setSubCategoryInfo(subCategory, json);
+		if (result != null) 
 			return result;
-		}
+		result = new JSONObject();
 		subCategoryService.save(subCategory);
 		result.put("status", "1");
+		result.put("msg", "Success!");
 		return result;
+
+		
 	}
 
-	private boolean setAuthorProfile(Author author, JSONObject json) throws IOException {
+	private JSONObject setAuthorProfile(Author author, JSONObject json) throws IOException {
+		JSONObject errorMessage = new JSONObject();
+
 		String imageSrc = json.get("imageSrc").toString();
+		if(imageSrc == null || imageSrc.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please select an image!");
+			return errorMessage;
+		}
 		imageSrc = imageSrc.split("base64")[1];
 
 		String filePath = IMAGEUPLOADURL.trim() + "AuthorProfile//";
-		String pictureName = json.get("profilePicture").toString().split("\\\\")[2];
+		String profile = json.get("profilePicture").toString();
+		if(profile == null || profile.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please select a profile picture!");
+			return errorMessage;
+		}
+		String pictureName = profile.split("\\\\")[2];
 		String profilePicture = "/AuthorProfile/" + pictureName;
-		if (authorService.isDuplicateProfile(profilePicture))
-			return false;
+		if (authorService.isDuplicateProfile(profilePicture)) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "The profile picture is already registered!");
+			return errorMessage;
+		}
 
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, pictureName);
@@ -473,16 +542,45 @@ public class OperationController {
 
 		/* to retrieve profile */
 		author.setProfilePicture("/AuthorProfile/" + pictureName);
-		return true;
+		return null;
 
 	}
 
-	private void setAuthorInfo(Author author, JSONObject json) {
+	private JSONObject setAuthorInfo(Author author, JSONObject json) {
+		JSONObject errorMessage = new JSONObject();
+		Object img = json.get("imageSrc").toString();
+		if (img == null || img.toString().isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please select author profile picture!");
+			return errorMessage;
+		}
 
-		author.setName(json.get("name").toString());
-		author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
-		author.setSort(json.get("sort").toString());
+		String name = json.get("name").toString();
+		if (name == null || name.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please enter author name!");
+			return errorMessage;
+		}
+		author.setName(name);
+
+		String sort = json.get("sort").toString();
+		if (sort == null || sort.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please enter sort!");
+			return errorMessage;
+		}
+
+		String authorType = json.get("authorType").toString();
+		if (authorType == null || authorType.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please choose author type!");
+			return errorMessage;
+		}
+
+		author.setAuthorType(AuthorType.valueOf(authorType.toUpperCase()));
+		author.setSort(sort);
 		author.setEntityStatus(EntityStatus.ACTIVE);
+		return null;
 	}
 
 	@ResponseBody
@@ -494,20 +592,21 @@ public class OperationController {
 
 		Author author = new Author();
 		author.setBoId(SystemConstant.BOID_REQUIRED);
-		setAuthorInfo(author, json);
+		resultJson = setAuthorInfo(author, json);
+		if (resultJson != null)
+			return resultJson;
 
 		if (json.get("imageSrc").toString().contains("base64")) {
-			if (!setAuthorProfile(author, json)) {
-				resultJson.put("status", "0");
-				resultJson.put("msg", "This Profile Picture is already registered!");
+			resultJson = setAuthorProfile(author, json);
+			if (resultJson != null)
 				return resultJson;
-			}
+
+			resultJson = new JSONObject();
+			authorService.save(author);
+			resultJson.put("status", "1");
+			resultJson.put("msg", "Success!");
 		}
 
-		authorService.save(author);
-
-		resultJson.put("status", "1");
-		resultJson.put("msg", "Success!");
 		return resultJson;
 	}
 
@@ -519,17 +618,49 @@ public class OperationController {
 		JSONObject resultJson = new JSONObject();
 
 		Author author = authorService.findByBoId(json.get("boId").toString());
-		setAuthorInfo(author, json);
+		resultJson = setAuthorInfo(author, json);
+		if(resultJson != null)
+			return resultJson;
 
 		if (json.get("imageSrc").toString().contains("base64")) {
-			if (!setAuthorProfile(author, json)) {
-				resultJson.put("status", "0");
-				resultJson.put("msg", "This Profile Picture is already registered!");
+			resultJson = setAuthorProfile(author, json);
+			if (resultJson != null)
 				return resultJson;
-			}
-		}
 
-		authorService.save(author);
+			authorService.save(author);
+			
+		}
+		resultJson = new JSONObject();
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+	
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "savePublisher", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject savePublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		Publisher publisher = new Publisher();
+		publisher.setBoId(SystemConstant.BOID_REQUIRED);
+		String name = json.get("name").toString();
+		if (name == null || name.isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please enter publisher name!");
+			return resultJson;
+		}
+		String sort = json.get("sort").toString();
+		if (sort == null || sort.isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please enter sort!");
+			return resultJson;
+		}
+		publisher.setName(name);
+		publisher.setSort(sort);
+		publisher.setEntityStatus(EntityStatus.ACTIVE);
+		publisherService.save(publisher);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
 		return resultJson;
@@ -537,27 +668,34 @@ public class OperationController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "savePublisher", method = RequestMethod.POST)
-	@JsonView(Views.Summary.class)
-	public void savePublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		Publisher publisher = new Publisher();
-		publisher.setBoId(SystemConstant.BOID_REQUIRED);
-		publisher.setName(json.get("name").toString());
-		publisher.setSort(json.get("sort").toString());
-		publisher.setEntityStatus(EntityStatus.ACTIVE);
-		publisherService.save(publisher);
-	}
-
-	@ResponseBody
-	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "editPublisher", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public void editPublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
-		Publisher publisher = publisherService.findByBoId(json.get("boId").toString());
-		publisher.setName(json.get("name").toString());
-		publisher.setSort(json.get("sort").toString());
+	public JSONObject editPublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		
+		String boId = json.get("boId").toString();
+
+				
+		String name = json.get("name").toString();
+		if(name == null || name.isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please enter the name!");
+			return resultJson;
+		}
+		String sort = json.get("sort").toString();
+		if(sort == null || sort.isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please enter sort!");
+			return resultJson;
+		}
+		Publisher publisher = publisherService.findByBoId(boId);
+		publisher.setName(name);
+		publisher.setSort(sort);
 		publisher.setEntityStatus(EntityStatus.ACTIVE);
 		publisherService.save(publisher);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
 	}
 
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
