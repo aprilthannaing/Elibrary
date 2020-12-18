@@ -18,6 +18,7 @@ import com.elibrary.dao.impl.BookDaoImpl;
 import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
+import com.elibrary.entity.State;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -387,6 +388,15 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (CollectionUtils.isEmpty(idList))
 			return new ArrayList<Long>();
 		return idList;
+	}
+
+	@Override
+	public List<Book> getPendingBooks() {
+		String query = "select book from Book book where state='" + State.PENDING + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Book> bookList = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(bookList))
+			return new ArrayList<Book>();
+		return bookList;
 	}
 
 }

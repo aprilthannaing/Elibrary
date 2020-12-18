@@ -51,6 +51,8 @@ public interface BookService {
 
 	public List<Book> getAllRecommendBooks(Long userId);
 
+	public List<Book> getPendingBooks();
+
 	public List<Book> getAllMostReadingBooks() throws ClassNotFoundException, SQLException;
 
 	public List<Long> getBookBySearchTerms(String searchTerms) throws SQLException, ClassNotFoundException;

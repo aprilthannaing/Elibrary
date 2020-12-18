@@ -104,6 +104,7 @@ public class OperationController {
 					authors.add(author);
 			}
 		}
+
 		book.setAuthors(authors);
 		List<Publisher> publishers = new ArrayList<Publisher>();
 		List<Object> publisherObjects = (List<Object>) json.get("publishers");
@@ -122,7 +123,7 @@ public class OperationController {
 		book.setSort(json.get("sort").toString());
 		book.setTitle(json.get("title").toString());
 		book.setISBN(json.get("ISBN").toString());
-		book.setState(State.PENDING);
+		book.setState(json.get("state") != null ? State.APPROVE : State.PENDING);
 		book.setEntityStatus(EntityStatus.ACTIVE);
 		Comment comment = new Comment();
 		comment.setBoId(SystemConstant.BOID_REQUIRED);
@@ -288,6 +289,7 @@ public class OperationController {
 			resultJson.put("msg", "Please choose Category!");
 			return resultJson;
 		}
+
 		Category category = categoryService.findByBoId(categoryObject.toString());
 		if (category != null)
 			book.setCategory(category);
@@ -330,6 +332,8 @@ public class OperationController {
 		book.setVolume(json.get("volume") != null ? json.get("volume").toString() : book.getVolume());
 		book.setAccessionNo(json.get("accessionNo") != null ? json.get("accessionNo").toString() : book.getAccessionNo());
 		setBookInfo(book, json);
+
+		logger.info("approve !!!!!!!!!!!!!" + book.getState());
 		bookService.save(book);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");

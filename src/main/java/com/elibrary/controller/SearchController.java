@@ -74,8 +74,6 @@ public class SearchController extends AbstractController {
 			}
 		}
 
-		logger.info("here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
 		List<Long> bookList = getBookList(json);
 		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
 		int pageNo = Integer.parseInt(pageObject.toString());

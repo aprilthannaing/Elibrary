@@ -86,6 +86,15 @@ public class BookController extends AbstractController {
 		return bookService.countBook() + "";
 	}
 
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "pending", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject getPendingBook() {
+		JSONObject resultJson = new JSONObject();
+		resultJson.put("books", bookService.getPendingBooks());
+		return resultJson;
+	}
+
 	/*
 	 * ""title"": "", ""page"": , ""author_id"": , ""sub_category_id"":
 	 * SUBCATEGORY1000102
