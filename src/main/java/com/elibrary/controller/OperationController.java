@@ -218,17 +218,16 @@ public class OperationController {
 			return resultJson;
 		}
 		Category category = categoryService.findByBoId(categoryObject.toString());
-		if (category != null) 
+		if (category != null)
 			book.setCategory(category);
-		
+
 		String accessionNo = json.get("accessionNo").toString();
-		if(accessionNo == null || accessionNo.isEmpty()) {
+		if (accessionNo == null || accessionNo.isEmpty()) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Please enter the accession No!");
 			return resultJson;
 		}
 		book.setAccessionNo(accessionNo);
-		
 
 		Object subCategoryObject = json.get("subCategory");
 		if (subCategoryObject == null || subCategoryObject.toString().isEmpty()) {
@@ -325,7 +324,7 @@ public class OperationController {
 				return resultJson;
 			}
 		}
-		
+
 		book.setCallNo(json.get("callNumber") != null ? json.get("callNumber").toString() : book.getCallNo());
 		book.setEdition(json.get("edition") != null ? json.get("edition").toString() : book.getEdition());
 		book.setVolume(json.get("volume") != null ? json.get("volume").toString() : book.getVolume());
@@ -384,14 +383,13 @@ public class OperationController {
 		category.setSubCategories(subCategoryList);
 		String myanmarName = json.get("myanmarName").toString();
 		String engName = json.get("engName").toString();
-		if ((myanmarName == null && engName == null)
-				|| (myanmarName.toString().isEmpty() && engName.toString().isEmpty())) {
+		if ((myanmarName == null && engName == null) || (myanmarName.toString().isEmpty() && engName.toString().isEmpty())) {
 			errorMessage.put("status", "0");
 			errorMessage.put("msg", "Please enter myanmar name or english name for category!");
 			return errorMessage;
 		}
 		String priority = json.get("priority").toString();
-		if(priority == null || priority.isEmpty()) {
+		if (priority == null || priority.isEmpty()) {
 			errorMessage.put("status", "0");
 			errorMessage.put("msg", "Please enter priority!");
 			return errorMessage;
@@ -412,15 +410,13 @@ public class OperationController {
 		Category category = new Category();
 		category.setBoId(SystemConstant.BOID_REQUIRED);
 		resultJson = setCategoryInfo(category, json);
-		if (resultJson != null) 
+		if (resultJson != null)
 			return resultJson;
 		resultJson = new JSONObject();
 		categoryService.save(category);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
 		return resultJson;
-		
-		
 
 	}
 
@@ -432,14 +428,14 @@ public class OperationController {
 		JSONObject resultJson = new JSONObject();
 		Category category = categoryService.findByBoId(json.get("boId").toString());
 		resultJson = setCategoryInfo(category, json);
-		if (resultJson != null) 
+		if (resultJson != null)
 			return resultJson;
 		resultJson = new JSONObject();
 		categoryService.save(category);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
 		return resultJson;
-		
+
 	}
 
 	private JSONObject setSubCategoryInfo(SubCategory subCategory, JSONObject json) {
@@ -447,8 +443,7 @@ public class OperationController {
 
 		Object myanmarName = json.get("myanmarName");
 		Object engName = json.get("engName");
-		if ((myanmarName == null && engName == null)
-				|| (myanmarName.toString().isEmpty() && engName.toString().isEmpty())) {
+		if ((myanmarName == null && engName == null) || (myanmarName.toString().isEmpty() && engName.toString().isEmpty())) {
 			errorMessage.put("stutus", "0");
 			errorMessage.put("msg", "Please enter myanmar name or english name for subcategory!");
 			return errorMessage;
@@ -462,7 +457,7 @@ public class OperationController {
 		}
 
 		Object categoryId = json.get("categoryBoId");
-		
+
 		if (categoryId == null || categoryId.toString().isEmpty()) {
 			errorMessage.put("status", "0");
 			errorMessage.put("msg", "Please choose category!");
@@ -478,7 +473,7 @@ public class OperationController {
 		subCategory.setCategoryBoId(categoryId.toString());
 
 		category.getSubCategories().add(subCategory);
-		
+
 		return null;
 	}
 
@@ -492,9 +487,9 @@ public class OperationController {
 		subCategory.setBoId(SystemConstant.BOID_REQUIRED);
 
 		result = setSubCategoryInfo(subCategory, json);
-		if (result != null) 
+		if (result != null)
 			return result;
-		
+
 		result = new JSONObject();
 		subCategoryService.save(subCategory);
 		result.put("status", "1");
@@ -511,7 +506,7 @@ public class OperationController {
 		SubCategory subCategory = subCategoryService.findByBoId(json.get("boId").toString());
 
 		result = setSubCategoryInfo(subCategory, json);
-		if (result != null) 
+		if (result != null)
 			return result;
 		result = new JSONObject();
 		subCategoryService.save(subCategory);
@@ -519,14 +514,13 @@ public class OperationController {
 		result.put("msg", "Success!");
 		return result;
 
-		
 	}
 
 	private JSONObject setAuthorProfile(Author author, JSONObject json) throws IOException {
 		JSONObject errorMessage = new JSONObject();
 
 		String imageSrc = json.get("imageSrc").toString();
-		if(imageSrc == null || imageSrc.isEmpty()) {
+		if (imageSrc == null || imageSrc.isEmpty()) {
 			errorMessage.put("status", "0");
 			errorMessage.put("msg", "Please select an image!");
 			return errorMessage;
@@ -535,7 +529,7 @@ public class OperationController {
 
 		String filePath = IMAGEUPLOADURL.trim() + "AuthorProfile//";
 		String profile = json.get("profilePicture").toString();
-		if(profile == null || profile.isEmpty()) {
+		if (profile == null || profile.isEmpty()) {
 			errorMessage.put("status", "0");
 			errorMessage.put("msg", "Please select a profile picture!");
 			return errorMessage;
@@ -575,12 +569,12 @@ public class OperationController {
 		}
 		author.setName(name);
 
-		String sort = json.get("sort").toString();
-		if (sort == null || sort.isEmpty()) {
-			errorMessage.put("status", "0");
-			errorMessage.put("msg", "Please enter sort!");
-			return errorMessage;
-		}
+		Object sort = json.get("sort");
+//		if (sort == null || sort.isEmpty()) {
+//			errorMessage.put("status", "0");
+//			errorMessage.put("msg", "Please enter sort!");
+//			return errorMessage;
+//		}
 
 		String authorType = json.get("authorType").toString();
 		if (authorType == null || authorType.isEmpty()) {
@@ -590,7 +584,7 @@ public class OperationController {
 		}
 
 		author.setAuthorType(AuthorType.valueOf(authorType.toUpperCase()));
-		author.setSort(sort);
+		author.setSort(sort != null ? sort.toString() : "");
 		author.setEntityStatus(EntityStatus.ACTIVE);
 		return null;
 	}
@@ -631,7 +625,7 @@ public class OperationController {
 
 		Author author = authorService.findByBoId(json.get("boId").toString());
 		resultJson = setAuthorInfo(author, json);
-		if(resultJson != null)
+		if (resultJson != null)
 			return resultJson;
 
 		if (json.get("imageSrc").toString().contains("base64")) {
@@ -640,13 +634,13 @@ public class OperationController {
 				return resultJson;
 
 			authorService.save(author);
-			
+
 		}
 		resultJson = new JSONObject();
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
 		return resultJson;
-	
+
 	}
 
 	@ResponseBody
@@ -684,18 +678,17 @@ public class OperationController {
 	@JsonView(Views.Summary.class)
 	public JSONObject editPublisher(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		
+
 		String boId = json.get("boId").toString();
 
-				
 		String name = json.get("name").toString();
-		if(name == null || name.isEmpty()) {
+		if (name == null || name.isEmpty()) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Please enter the name!");
 			return resultJson;
 		}
 		String sort = json.get("sort").toString();
-		if(sort == null || sort.isEmpty()) {
+		if (sort == null || sort.isEmpty()) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Please enter sort!");
 			return resultJson;
@@ -779,6 +772,7 @@ public class OperationController {
 	@RequestMapping(value = "deleteBook", method = RequestMethod.POST)
 	public JSONObject deleteBook(@RequestBody JSONObject json) throws ServiceUnavailableException {
 
+		logger.info("delete book!!!!!!!!!!!!!!!");
 		JSONObject resultJson = new JSONObject();
 		String bookId = json.get("bookId").toString();
 		Book book = bookService.findByBoId(bookId);
@@ -788,8 +782,16 @@ public class OperationController {
 			return resultJson;
 
 		}
+
+		logger.info("delete book222222!!!");
+
 		book.setEntityStatus(EntityStatus.DELETED);
+		logger.info("delete book222222!!!" + book.getEntityStatus());
+
 		bookService.save(book);
+
+		logger.info("after saving");
+
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;

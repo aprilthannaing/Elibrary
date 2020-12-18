@@ -20,6 +20,7 @@ import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.Views;
 import com.elibrary.service.AuthorService;
+import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -33,6 +34,9 @@ public class AuthorController extends AbstractController {
 
 	@Autowired
 	private CategoryService categoryService;
+
+	@Autowired
+	private BookService bookService;
 
 	private static Logger logger = Logger.getLogger(SubCategoryController.class);
 
@@ -157,7 +161,9 @@ public class AuthorController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject getAll(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject result = new JSONObject();
-		result.put("author", authorService.findByBoId(json.get("boId").toString()));
+		Author author = authorService.findByBoId(json.get("boId").toString());
+		result.put("author", author);
+		result.put("books", bookService.getBooksByAuthor(author.getId()));
 		return result;
 	}
 

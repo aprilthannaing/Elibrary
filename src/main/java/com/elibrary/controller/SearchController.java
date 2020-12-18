@@ -104,11 +104,17 @@ public class SearchController extends AbstractController {
 		Object end = json.get("end_date");
 
 		String searchTerms = searchTermObject.toString();
-		String startDate = start.toString() + "-01";
+		String startDate = "";
+		String endDate = "";
+		if (start != null && !start.toString().isEmpty())
+			startDate = start.toString() + "-01";
 
-		LocalDate convertedDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		convertedDate = convertedDate.withDayOfMonth(convertedDate.getMonth().length(convertedDate.isLeapYear()));
-		String endDate = convertedDate.toString();
+		if (end != null && !end.toString().isEmpty()) {
+			endDate = end.toString() + "-01";
+			LocalDate convertedDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			convertedDate = convertedDate.withDayOfMonth(convertedDate.getMonth().length(convertedDate.isLeapYear()));
+			endDate = convertedDate.toString();
+		}
 
 		if (category != null && author != null)
 			return searchTerms.isEmpty() ? bookService.getBooksByDate(category.getId(), author.getId(), startDate, endDate) : bookService.getBookBySearchTerms(category.getId(), author.getId(), searchTerms);

@@ -382,8 +382,6 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 
 	@Override
 	public List<Long> getBooksByDate(String startDate, String endDate) throws SQLException, ClassNotFoundException {
-		logger.info("startDate!!!!!!!!!!!!!!" + startDate);
-		logger.info("endDate!!!!!!!!!!!!!!" + endDate);
 
 		String query = "select book.id from Book book where publishedDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Long> idList = bookDao.findLongByQueryString(query);
