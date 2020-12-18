@@ -1,6 +1,8 @@
 package com.elibrary.controller;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -72,6 +74,8 @@ public class SearchController extends AbstractController {
 			}
 		}
 
+		logger.info("here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
 		List<Long> bookList = getBookList(json);
 		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
 		int pageNo = Integer.parseInt(pageObject.toString());
@@ -100,8 +104,11 @@ public class SearchController extends AbstractController {
 		Object end = json.get("end_date");
 
 		String searchTerms = searchTermObject.toString();
-		String startDate = start.toString();
-		String endDate = end.toString();
+		String startDate = start.toString() + "-01";
+
+		LocalDate convertedDate = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		convertedDate = convertedDate.withDayOfMonth(convertedDate.getMonth().length(convertedDate.isLeapYear()));
+		String endDate = convertedDate.toString();
 
 		if (category != null && author != null)
 			return searchTerms.isEmpty() ? bookService.getBooksByDate(category.getId(), author.getId(), startDate, endDate) : bookService.getBookBySearchTerms(category.getId(), author.getId(), searchTerms);
