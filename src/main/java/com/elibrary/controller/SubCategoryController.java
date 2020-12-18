@@ -168,5 +168,29 @@ public class SubCategoryController extends AbstractController {
 
 		return "success";
 	}
-
+	
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "setDisplayList", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject setDisplayList(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject ();
+		List<Object> subCategories = (List<Object>) reqJson.get("subcategoryBoId");
+		
+		for (Object object : subCategories) {
+			SubCategory subCategory = subCategoryService.findByBoId(object.toString());
+			if (subCategory != null) {
+				subCategory.setDisplay("true");
+				subCategoryService.save(subCategory);
+			}
+				
+				
+		}
+		resultJson.put("status","1");
+		resultJson.put("msg", "Success!");
+		return resultJson;
+		
+		
+	}
+	
 }
