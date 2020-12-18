@@ -218,10 +218,17 @@ public class OperationController {
 			return resultJson;
 		}
 		Category category = categoryService.findByBoId(categoryObject.toString());
-		if (category != null) {
+		if (category != null) 
 			book.setCategory(category);
-			book.setAccessionNo(book.getCategory().getEngName().substring(0, 1) + (bookService.countBook() + 1));
+		
+		String accessionNo = json.get("accessionNo").toString();
+		if(accessionNo == null || accessionNo.isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please enter the accession No!");
+			return resultJson;
 		}
+		book.setAccessionNo(accessionNo);
+		
 
 		Object subCategoryObject = json.get("subCategory");
 		if (subCategoryObject == null || subCategoryObject.toString().isEmpty()) {
@@ -322,6 +329,7 @@ public class OperationController {
 		book.setCallNo(json.get("callNumber") != null ? json.get("callNumber").toString() : book.getCallNo());
 		book.setEdition(json.get("edition") != null ? json.get("edition").toString() : book.getEdition());
 		book.setVolume(json.get("volume") != null ? json.get("volume").toString() : book.getVolume());
+		book.setAccessionNo(json.get("accessionNo") != null ? json.get("accessionNo").toString() : book.getAccessionNo());
 		setBookInfo(book, json);
 		bookService.save(book);
 		resultJson.put("status", "1");

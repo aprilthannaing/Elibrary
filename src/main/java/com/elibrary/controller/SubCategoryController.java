@@ -66,7 +66,8 @@ public class SubCategoryController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "byengcategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject byEngCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject byEngCategory(@RequestHeader("token") String token, @RequestBody JSONObject json)
+			throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -104,7 +105,8 @@ public class SubCategoryController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "bymaincategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject byMainCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject byMainCategory(@RequestHeader("token") String token, @RequestBody JSONObject json)
+			throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -153,8 +155,10 @@ public class SubCategoryController extends AbstractController {
 	public String importCategory() throws ServiceUnavailableException {
 		subCategoryService.getAll().forEach(sub -> {
 			Long categoryId = categoryService.findBySubCategoryId(sub.getId());
+			logger.info(categoryId);
 			Category category = categoryService.findByCategoryId(categoryId);
-			sub.setCategoryBoId(category.getBoId());
+			if (category != null)
+				sub.setCategoryBoId(category.getBoId());
 			try {
 				subCategoryService.save(sub);
 			} catch (ServiceUnavailableException e) {
