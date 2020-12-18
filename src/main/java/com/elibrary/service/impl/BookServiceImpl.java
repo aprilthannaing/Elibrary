@@ -43,7 +43,6 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 			if (book.isBoIdRequired(book.getBoId()))
 				book.setBoId(getBoId());
 
-			book.setEntityStatus(EntityStatus.ACTIVE);
 			bookDao.saveOrUpdate(book);
 		} catch (com.mchange.rmi.ServiceUnavailableException e) {
 			logger.error("Error: " + e.getMessage());
