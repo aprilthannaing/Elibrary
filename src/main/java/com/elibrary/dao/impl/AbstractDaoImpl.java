@@ -113,6 +113,15 @@ public abstract class AbstractDaoImpl<E, I extends Serializable> implements Abst
 		entityList = query.getResultList();
 		return entityList;
 	}
+	
+	public List<E> maxResultbyQuery(String queryString, int maxValue,int firstValue) {
+		List<E> entityList;
+		Query query = entityManager.createQuery(queryString);
+		query.setMaxResults(maxValue);
+		query.setFirstResult(firstValue);
+		entityList = query.getResultList();
+		return entityList;
+	}
 
 	public Session getSession() {
 		return entityManager.unwrap(Session.class);

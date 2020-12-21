@@ -83,9 +83,9 @@ public class UserServiceImpl extends AbstractController implements UserService {
 //				+ " FROM user user, (SELECT @row_number:=0) AS temp where entityStatus<>'DELETED' " + whereclause 
 //				+ " ORDER BY id desc) AS RowConstrainedResult"
 //				+ " WHERE ( row_num > "+ l_startRecord +" and row_num <= "+ l_endRecord +" )";
-		//String query =  "select t from (select @rownum:=@rownum+1 rownumber, user from user user cross join (SELECT @rownum:=0) r order by id desc)As  t" + 
+		//String query =  "select t from (select @rownum:=@rownum+1 rownumber, user from user user cross join (SELECT user.rownum:=0) r order by id desc)As  t" + 
 		//"WHERE ( rownumber > "+l_startRecord+" and rownumber <= "+l_endRecord+" )";
-		List<User> userList = userDao.byQuery(query);
+		List<User> userList = userDao.maxResultbyQuery(query,l_endRecord,l_startRecord);
 		for (User row : userList) {
 			row.setDeptType(row.getDepartment().getId());
 			row.setDeptName(row.getDepartment().getName());

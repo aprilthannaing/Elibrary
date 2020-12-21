@@ -50,6 +50,8 @@ public interface AbstractDao<E, I extends Serializable> {
 	public List<E> getEntitiesByQuery(String queryString, int count);
 	
 	public List<Long> findLongByQueryString(String queryString, int count);
+	
+	public List<E> maxResultbyQuery(String queryString, int maxValue,int firstValue);
 
 
 }
