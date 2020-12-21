@@ -6,10 +6,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.elibrary.dao.ConstituencyDao;
 import com.elibrary.dao.DepartmentDao;
 import com.elibrary.dao.ListOfValueDao;
 import com.elibrary.dao.PositionDao;
 import com.elibrary.dao.impl.BookDaoImpl;
+import com.elibrary.entity.Constituency;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.header;
@@ -29,6 +31,9 @@ import com.elibrary.service.ListOfValueService;
 	
 	@Autowired
 	private PositionDao positionDao;
+	
+	@Autowired
+	private ConstituencyDao constituencyDao;
 	
 	public static Logger logger = Logger.getLogger(BookDaoImpl.class);
 	
@@ -119,9 +124,6 @@ import com.elibrary.service.ListOfValueService;
 			if (req.isIdRequired(req.getId())) {
 				id = getIdByDepartment();
 				req.setBoId("Dept" + id);
-				//long[] longlist = getIdByPosition();
-				//req.setId(longlist[0]);
-				//req.setBoId("P" + longlist[1]);
 			}else 
 				id = req.getId(); 
 			
@@ -144,38 +146,6 @@ import com.elibrary.service.ListOfValueService;
 			return 1;
 		return idList.get(0) + 1;
 	} 
-	//department
-//	public String saveDepartment(Department req){
-//		try {
-//			if (req.isIdRequired(req.getId())) {
-//				long[] longlist = getIdByDepartment();
-//				//req.setId(longlist[0]);
-//				req.setBoId("Dept" + longlist[1]);
-//			}
-//			if(departmentDao.checkSaveOrUpdate(req))
-//				return req.getBoId();
-//			else 
-//				return "";
-//			
-//		}catch(com.mchange.rmi.ServiceUnavailableException e){
-//			logger.error("Error: "+ e.getMessage());
-//			
-//		}
-//		return "";
-//	}
-//	
-//	private long[] getIdByDepartment() {
-//		long[] longList = new long[2];
-//		long id = countIdByDepartment();
-//		longList[0] = id + 1;
-//		longList[1] = id + 1000;
-//		return  longList;
-//	}
-//	
-//	public long countIdByDepartment() {
-//		String query = "select count(*) from Department";
-//		return departmentDao.findLongByQueryString(query).get(0);
-//	}
 	
 	public List<Department> checkDepartment(long hboid) {
 		String query = "from Department where hluttawboId=" + hboid;
@@ -213,9 +183,6 @@ import com.elibrary.service.ListOfValueService;
 				if (req.isIdRequired(req.getId())) {
 					id = countPositionId();
 					req.setBoId("P" + id);
-					//long[] longlist = getIdByPosition();
-					//req.setId(longlist[0]);
-					//req.setBoId("P" + longlist[1]);
 				}
 				if(positionDao.checkSaveOrUpdate(req))
 					return id;
@@ -278,6 +245,53 @@ import com.elibrary.service.ListOfValueService;
 			String query = "from Position where id=" + id;
 			List<Position> posList = positionDao.byQuery(query);
 			return posList.get(0);
+		}
+		
+		public List<Constituency> checkConstituency(long hboid) {
+			String query = "from Constituency where hluttawboId=" + hboid;
+			List<Constituency> deptList = constituencyDao.byQuery(query);
+			return deptList;
+		}
+		
+		public long saveConstituency(Constituency req){
+			try {
+				long id = 0;
+				if (req.isIdRequired(req.getId())) {
+					id = getIdByConstituency();
+					req.setBoId("Dept" + id);
+				}else 
+					id = req.getId(); 
+				
+				if(constituencyDao.checkSaveOrUpdate(req))
+					return id;
+				else 
+					return 0;
+				
+			}catch(com.mchange.rmi.ServiceUnavailableException e){
+				logger.error("Error: "+ e.getMessage());
+				
+			}
+			return 0;
+		}
+		
+		public long getIdByConstituency() {
+			String query = "select max(id) from Constituency";
+			List<Long> idList = departmentDao.findLongByQueryString(query);
+			if(idList.get(0) == null)
+				return 1;
+			return idList.get(0) + 1;
+		} 
+		
+		public List<Hluttaw> getHluttawByRepresentative() {
+			String query = "from Hluttaw where boId <> 'H2'";
+			List<Hluttaw> hluttawList = hluttawDao.byQuery(query);
+			return hluttawList;
+		}
+		
+		public Constituency getConstituencyById(long id) {
+			String query = "from Constituency where id=" + id ;
+			List<Constituency> constList = constituencyDao.byQuery(query);
+			return constList.get(0);
 		}
 	
 }

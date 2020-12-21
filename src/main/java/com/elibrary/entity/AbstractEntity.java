@@ -17,11 +17,11 @@ public class AbstractEntity {
 	@JsonView(Views.Thin.class)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true, nullable = false)
-	private long Id;
+	private long Id = 0;
 
 	@JsonView(Views.Thin.class)
 	@Column(name = "boId", nullable = false)
-	private String boId;
+	private String boId = "";
 
 	@Column(name = "entityStatus")
 	@Enumerated(EnumType.STRING)

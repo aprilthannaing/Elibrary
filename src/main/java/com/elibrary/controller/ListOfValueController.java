@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elibrary.entity.Constituency;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
@@ -123,9 +125,14 @@ public class ListOfValueController {
 	@RequestMapping(value = "getHluttaw", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject getHluttaw(@RequestBody String req){
+	public JSONObject getHluttaw(@RequestBody JSONObject req){
 		JSONObject jsonResponse = new JSONObject();
-		List<Hluttaw> htawList = listOfValueService.getHluttaw();
+		List<Hluttaw> htawList = new ArrayList<Hluttaw>();
+		if(req.get("type").toString().equals("representative")) {
+			htawList = listOfValueService.getHluttawByRepresentative();
+		}else 
+			htawList = listOfValueService.getHluttaw();
+		
 		JSONObject[] jsonArr = new JSONObject[htawList.size()];
 		for(int i=0; i< htawList.size(); i++) {
 			JSONObject json = new JSONObject();
@@ -197,6 +204,76 @@ public class ListOfValueController {
 			jsonArr[i] = json;
 		}
 		jsonResponse.put("refDept", jsonArr);
+		
+		return jsonResponse;
+	}
+	
+	////////constituencySetup////////////////////
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "constituencySetup", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public listOfValueObj constituencySetup(@RequestBody listOfValueObj req){
+		Constituency constituency = new Constituency();
+		Hluttaw htaw = listOfValueService.checkHluttawById(Long.parseLong(req.getCode()));
+			List<Constituency> constList = listOfValueService.checkConstituency(htaw.getId());
+			if(constList.size() > 0) {
+				for(int i = 0 ; i < req.getLov().length; i ++) {
+					for(int j = 0 ; j < constList.size(); j ++) {
+						String id = String.valueOf(constList.get(j).getId());
+						if(id.equals(req.getLov()[i].getValue())) {
+							if(req.getLov()[i].getStatus().equals("INACTIVE"))
+								constList.get(j).setEntityStatus(EntityStatus.INACTIVE);
+							constList.get(j).setCode(req.getLov()[i].getCode());
+							constList.get(j).setName(req.getLov()[i].getCaption());
+							long value = listOfValueService.saveConstituency(constList.get(j));
+							req.getLov()[i].setValue(value+"");
+						}
+					}
+					if(req.getLov()[i].getValue().equals("")){
+						constituency = new Constituency();
+						constituency.setHluttaw(htaw);
+						constituency.setEntityStatus(EntityStatus.ACTIVE);
+						constituency.setCode(req.getLov()[i].getCode());
+						constituency.setName(req.getLov()[i].getCaption());
+						long value = listOfValueService.saveConstituency(constituency);
+						req.getLov()[i].setValue(value+"");
+						req.getLov()[i].setStatus(constituency.getEntityStatus().name());
+					}
+				}
+				return req;
+			}
+			for(int i = 0 ; i < req.getLov().length; i ++) {
+				constituency = new Constituency();
+				constituency.setHluttaw(htaw);
+				constituency.setEntityStatus(EntityStatus.ACTIVE);
+				constituency.setCode(req.getLov()[i].getCode());
+				constituency.setName(req.getLov()[i].getCaption());
+				long value = listOfValueService.saveConstituency(constituency);
+				req.getLov()[i].setValue(value+"");
+			}
+			return req;
+		
+	}
+	
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "getConstituency", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject  getConstituency(@RequestBody String req){
+		JSONObject jsonResponse = new JSONObject();
+		Hluttaw htawList = listOfValueService.checkHluttawById(Long.parseLong(req));
+		List<Constituency> constList = listOfValueService.checkConstituency(htawList.getId());
+		JSONObject[] jsonArr = new JSONObject[constList.size()];
+		for(int i=0; i< constList.size(); i++) {
+			JSONObject json = new JSONObject();
+			json.put("value", constList.get(i).getId());
+			json.put("caption", constList.get(i).getName());
+			json.put("code", constList.get(i).getCode());
+			json.put("status", constList.get(i).getEntityStatus().name());
+			jsonArr[i] = json;
+		}
+		jsonResponse.put("refConst", jsonArr);
 		
 		return jsonResponse;
 	}

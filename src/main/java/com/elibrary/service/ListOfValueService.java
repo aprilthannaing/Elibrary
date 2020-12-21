@@ -2,6 +2,7 @@ package com.elibrary.service;
 
 import java.util.List;
 
+import com.elibrary.entity.Constituency;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.header;
 import com.elibrary.entity.Hluttaw;
@@ -24,4 +25,8 @@ public interface ListOfValueService {
 	public Position getPositionbyId(long id) ;
 	public long saveDepartment(Department req);
 	public List<Department> checkDepartmentAll();
+	public List<Constituency> checkConstituency(long hboid);
+	public long saveConstituency(Constituency req);
+	public List<Hluttaw> getHluttawByRepresentative();
+	public Constituency getConstituencyById(long id);
 }

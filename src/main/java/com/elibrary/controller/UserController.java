@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.AES;
+import com.elibrary.entity.Constituency;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Hluttaw;
@@ -77,8 +78,10 @@ public class UserController extends AbstractController {
 				Hluttaw htaw = listOfValueService.checkHluttawById(req.getHlutawType());
 				Department dept = new Department();
 				Position pos = new Position();
+				Constituency consti = new Constituency();
 				dept = listOfValueService.checkDepartmentbyId(req.getDeptType());
 				pos = listOfValueService.getPositionbyId(req.getPositionType());
+				consti = listOfValueService.getConstituencyById(req.getConstituencyType());
 				if (!req.getBoId().equals("")) {
 					user = userservice.selectUserByKey(req.getBoId());
 					msg = "Update Successfully";
@@ -96,6 +99,8 @@ public class UserController extends AbstractController {
 					user.setFromUserId(loginUserid);
 					msg = "Insert Successfully";
 				}
+				user.setCurrentAddress(req.getCurrentAddress());
+				user.setPermanentAddress(req.getPermanentAddress());
 				user.setModifiedDate(dateFormat());
 				user.setHluttaw(htaw);
 				user.setHlutawType(req.getHlutawType());// response
@@ -103,6 +108,7 @@ public class UserController extends AbstractController {
 				user.setDeptType(req.getDeptType());// response
 				user.setPosition(pos);
 				user.setPositionType(req.getPositionType());// response
+				user.setConstituency(consti);
 				user.setName(req.getName());
 				user.setEmail(req.getEmail().trim());
 				user.setPhoneNo(req.getPhoneNo().trim());
@@ -124,10 +130,10 @@ public class UserController extends AbstractController {
 				if (status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
 				else if (status.equals("ACTIVE")) {
-					if(!status.equals(user.getEntityStatus().name())) {
-						mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account", "Welcome!Please verify your email address for Elibray System.\n"
-									+ "Your password is "+ user.getPassword() + ".");
-					}
+					//if(!status.equals(user.getEntityStatus().name())) {
+					//	mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account", "Welcome!Please verify your email address for Elibray System.\n"
+					//				+ "Your password is "+ user.getPassword() + ".");
+					//}
 					user.setEntityStatus(EntityStatus.ACTIVE);
 				}
 				else if (status.equals("EXPIRED"))
@@ -351,8 +357,8 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			 mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-					 + "Your new password is " + user.getPassword());
+			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+			//		 + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -391,8 +397,8 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			 mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-					 + "Your new password is " + user.getPassword());
+			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+			//		 + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -517,7 +523,7 @@ public class UserController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject changeStatus(@RequestBody ArrayList<String> arrayList, @RequestParam("sessionId") String sessionId) {
 		JSONObject jsonRes = new JSONObject();
-		String rowCount = "";
+		int rowCount = "";
 		try {
 			String loginUserid = userservice.sessionActive(sessionId);
 			if (!loginUserid.equals("") || loginUserid.equals("000")) {
@@ -532,7 +538,7 @@ public class UserController extends AbstractController {
 				user.setModifiedDate(dateFormat());
 				user.setEntityStatus(EntityStatus.ACTIVE);
 				userservice.save(user);
-				rowCount += i;
+				rowCount = i + 1;
 
 			}
 			jsonRes.put("code", "000");
@@ -562,8 +568,8 @@ public class UserController extends AbstractController {
 
 			String code = getRandomNumberString();
 
-			 mailService.sendMail(json.get("email").toString(), "Elibrary : Email Address Verification", "Please verify your email address for Elibray System.\n"
-			 + "Your verification code is " + code);
+			// mailService.sendMail(json.get("email").toString(), "Elibrary : Email Address Verification", "Please verify your email address for Elibray System.\n"
+			// + "Your verification code is " + code);
 			user.setVerificationCode(code);
 			userservice.save(user);
 			String sessionId = saveSession(user);
@@ -627,8 +633,8 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-					 + "Your new password is " + user.getPassword());
+			//mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+			//		 + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
@@ -658,8 +664,8 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-					 + "Your new password is " + user.getPassword());
+			//mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
+			//		 + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}

@@ -19,6 +19,22 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Table(name = "user")
 public class User extends AbstractEntity implements Serializable {
 	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "constituency")
+	private Constituency constituency;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private long constituencyType;
+	
+	@JsonView(Views.Thin.class)
+	@Column(name = "permanentAddress")
+	private String permanentAddress;
+	
+	@JsonView(Views.Thin.class)
+	@Column(name = "currentAddress")
+	private String currentAddress;
+	
 	@JsonView(Views.Thin.class)
 	@Column(name = "name")
 	private String name;
@@ -86,6 +102,10 @@ public class User extends AbstractEntity implements Serializable {
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String positionName;
+	
+	@Transient
+	@JsonView(Views.Thin.class)
+	private String constituencyName;
 	
 	@Transient
 	@JsonView(Views.Thin.class)
@@ -314,6 +334,46 @@ public class User extends AbstractEntity implements Serializable {
 
 	public void setExpiredDate(String expiredDate) {
 		this.expiredDate = expiredDate;
+	}
+
+	public String getPermanentAddress() {
+		return permanentAddress;
+	}
+
+	public void setPermanentAddress(String permanentAddress) {
+		this.permanentAddress = permanentAddress;
+	}
+
+	public String getCurrentAddress() {
+		return currentAddress;
+	}
+
+	public void setCurrentAddress(String currentAddress) {
+		this.currentAddress = currentAddress;
+	}
+
+	public long getConstituencyType() {
+		return constituencyType;
+	}
+
+	public void setConstituencyType(long constituencyType) {
+		this.constituencyType = constituencyType;
+	}
+
+	public Constituency getConstituency() {
+		return constituency;
+	}
+
+	public void setConstituency(Constituency constituency) {
+		this.constituency = constituency;
+	}
+
+	public String getConstituencyName() {
+		return constituencyName;
+	}
+
+	public void setConstituencyName(String constituencyName) {
+		this.constituencyName = constituencyName;
 	}
 
 }

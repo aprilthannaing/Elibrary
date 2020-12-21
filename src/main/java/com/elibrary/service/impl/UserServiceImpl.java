@@ -94,6 +94,10 @@ public class UserServiceImpl extends AbstractController implements UserService {
 			row.setHlutawType(row.getHluttaw().getId());
 			row.setHlutawName(row.getHluttaw().getName());
 			row.setStatus(row.getEntityStatus().name());
+			if(row.getConstituency() != null) {
+				row.setConstituencyName(row.getConstituency().getName());
+				row.setConstituencyType(row.getConstituency().getId());
+			}
 			response.add(row);
 		}
 		return response;
@@ -114,6 +118,14 @@ public class UserServiceImpl extends AbstractController implements UserService {
 			row.setHlutawName(row.getHluttaw().getName());
 			row.setStatus(row.getEntityStatus().name());
 			row.setRoleType(row.getRole().name());
+			if(row.getConstituency() != null) {
+				row.setConstituencyType(row.getConstituency().getId());
+				row.setConstituencyName(row.getConstituency().getName());
+			}
+//				else {
+//				row.setConstituencyName(row.getConstituency().getName());
+//			}
+			
 			response.add(row);
 		}
 
