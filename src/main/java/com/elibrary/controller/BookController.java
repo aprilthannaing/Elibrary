@@ -86,15 +86,6 @@ public class BookController extends AbstractController {
 		return bookService.countBook() + "";
 	}
 
-	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "pending", method = RequestMethod.POST)
-	@JsonView(Views.Summary.class)
-	public JSONObject getPendingBook() {
-		JSONObject resultJson = new JSONObject();
-		resultJson.put("books", bookService.getPendingBooks());
-		return resultJson;
-	}
-
 	/*
 	 * ""title"": "", ""page"": , ""author_id"": , ""sub_category_id"":
 	 * SUBCATEGORY1000102
@@ -104,7 +95,8 @@ public class BookController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
 	@JsonView(Views.Thin.class)
-	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json)
+			throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -257,11 +249,13 @@ public class BookController extends AbstractController {
 		/* books by category and author */
 		Object categoryObject = json.get("category_id");
 		Object authorObject = json.get("author_id");
-		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null && !authorObject.toString().isEmpty()) {
+		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null
+				&& !authorObject.toString().isEmpty()) {
 			Author author = authorService.findByBoId(authorObject.toString());
 			List<Book> bookList = bookService.getBooksByAuthor(author.getId());
 			bookList.forEach(book -> {
-				if (book != null && book.getCategory() != null && book.getCategory().getBoId().equals(categoryObject.toString()))
+				if (book != null && book.getCategory() != null
+						&& book.getCategory().getBoId().equals(categoryObject.toString()))
 					books.add(book);
 			});
 			return books;
