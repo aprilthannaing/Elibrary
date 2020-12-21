@@ -455,4 +455,8 @@ call GET_BookId_ByAuthor('a',1,1);
   alter table subcategory drop column categoryId varchar(50); 
  alter table subcategory add column categoryBoId varchar(50);
  
+ alter table book add column currentPage int;
+ update book set currentPage=0;
+
+ 
 

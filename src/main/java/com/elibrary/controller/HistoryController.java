@@ -61,6 +61,30 @@ public class HistoryController extends AbstractController {
 		return bookService.findByBoId(bookId.toString());
 	}
 
+	private int getCurrentPage(@RequestBody JSONObject json) {
+		Object currentPage = json.get("current_page");
+		if (currentPage == null || currentPage.toString().isEmpty())
+			return 0;
+		return Integer.parseInt(currentPage.toString());
+	}
+
+	private void isRating(JSONObject json, JSONObject resultJson, History history, User user, Book book, Object ratingObject) throws ServiceUnavailableException {
+
+		Double ratingValue = Double.parseDouble(ratingObject.toString());
+		Rating rating = ratingService.findByUserandBook(user.getId(), book.getId());
+		if (rating == null) {
+			rating = new Rating();
+			rating.setBoId(SystemConstant.BOID_REQUIRED);
+		}
+
+		rating.setRating(ratingValue);
+		ratingService.save(rating);
+		book.getRatings().add(rating);
+		bookService.save(book);
+		history.setRatingId(rating.getId());
+		resultJson.put("total_rating", df2.format(ratingService.getAverageRating(book.getId())));
+	}
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "action", method = RequestMethod.POST)
@@ -109,42 +133,33 @@ public class HistoryController extends AbstractController {
 			return resultJson;
 		}
 
-		if (History.isUnFavourite(actionStatus)) {
-			historyService.unFavourite(user.getId(), book.getId());
-			resultJson.put("status", true);
-			resultJson.put("message", "Success");
-			return resultJson;
-		}
-
-		if (History.isUnBookMark(actionStatus)) {
-			historyService.unBookMark(user.getId(), book.getId());
-			resultJson.put("status", true);
-			resultJson.put("message", "Success");
+		Object ratingObject = json.get("rating");
+		if (ratingObject == null || ratingObject.toString().isEmpty()) {
+			resultJson.put("status", false);
+			resultJson.put("err_msg", "Rating must not empty!");
 			return resultJson;
 		}
 
 		History history = new History();
-		if (History.isRating(actionStatus)) {
-			Object ratingObject = json.get("rating");
-			if (ratingObject == null || ratingObject.toString().isEmpty()) {
-				resultJson.put("status", false);
-				resultJson.put("err_msg", "Rating must not empty!");
-				return resultJson;
-			}
+		switch (actionStatus) {
+		case RATING:
+			isRating(json, resultJson, history, user, book, ratingObject);
+			break;
+		case UNFAVOURITE:
+			historyService.unFavourite(user.getId(), book.getId());
+			resultJson.put("status", true);
+			resultJson.put("message", "Success");
+			return resultJson;
 
-			Double ratingValue = Double.parseDouble(ratingObject.toString());
-			Rating rating = ratingService.findByUserandBook(user.getId(), book.getId());
-			if (rating == null) {
-				rating = new Rating();
-				rating.setBoId(SystemConstant.BOID_REQUIRED);
-			}
-
-			rating.setRating(ratingValue);
-			ratingService.save(rating);
-			book.getRatings().add(rating);
+		case UNBOOKMARK:
+			historyService.unBookMark(user.getId(), book.getId());
+			resultJson.put("status", true);
+			resultJson.put("message", "Success");
+			return resultJson;
+		case BOOKMARK:
+			book.setCurrentPage(getCurrentPage(json));
 			bookService.save(book);
-			history.setRatingId(rating.getId());
-			resultJson.put("total_rating", df2.format(ratingService.getAverageRating(book.getId())));
+			break;
 		}
 
 		history.setBoId(SystemConstant.BOID_REQUIRED);

@@ -42,10 +42,13 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String accessionNo;
 
+	@JsonView(Views.Thin.class)
+	private int currentPage;
+
 	// @JsonView(Views.Thin.class)
 	private String size;
 
-	 @JsonView(Views.Thin.class)
+	@JsonView(Views.Thin.class)
 	private String downloadApproval;
 
 	@JsonView(Views.Thin.class)
@@ -99,6 +102,14 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	private double averageRating;
+
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	public void setCurrentPage(int currentPage) {
+		this.currentPage = currentPage;
+	}
 
 	public boolean isFavouriteStatus() {
 		return favouriteStatus;

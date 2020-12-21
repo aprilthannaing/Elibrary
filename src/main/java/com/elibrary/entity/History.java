@@ -91,4 +91,8 @@ public class History extends AbstractEntity implements Serializable {
 		return status == ActionStatus.UNBOOKMARK;
 	}
 
+	public static boolean isBookMark(ActionStatus status) {
+		return status == ActionStatus.BOOKMARK;
+	}
+
 }
