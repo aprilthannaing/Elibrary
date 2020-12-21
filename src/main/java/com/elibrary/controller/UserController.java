@@ -523,7 +523,7 @@ public class UserController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject changeStatus(@RequestBody ArrayList<String> arrayList, @RequestParam("sessionId") String sessionId) {
 		JSONObject jsonRes = new JSONObject();
-		int rowCount = "";
+		int rowCount = 0;
 		try {
 			String loginUserid = userservice.sessionActive(sessionId);
 			if (!loginUserid.equals("") || loginUserid.equals("000")) {
