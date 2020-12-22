@@ -457,6 +457,22 @@ call GET_BookId_ByAuthor('a',1,1);
  
  alter table book add column currentPage int;
  update book set currentPage=0;
+ 
+ CREATE TABLE `constituency` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `boId` varchar(255) NOT NULL,
+  `hluttawboId` bigint NOT NULL,
+  `code` varchar(20) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `hluttawboId` (`hluttawboId`),
+  CONSTRAINT `constituency_ibfk_1` FOREIGN KEY (`hluttawboId`) REFERENCES `hluttaw` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+
+alter table user add column permanentAddress varchar(225);
+alter table user add column currentAddress varchar(225);
+alter table user add column constituency bigint;
 
  
 
