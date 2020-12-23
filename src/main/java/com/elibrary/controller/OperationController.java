@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +97,7 @@ public class OperationController extends AbstractController {
 
 	@Autowired
 	private FeedbackService feedbackService;
-	
+
 	@Autowired
 	private AdvertisementService advertisementService;
 
@@ -965,8 +964,6 @@ public class OperationController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		
-		
 
 		String imageSrc = json.get("image").toString();
 		if (imageSrc == null || imageSrc.isEmpty()) {
@@ -983,39 +980,33 @@ public class OperationController extends AbstractController {
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, pictureName);
 		Files.write(destinationFile, imageBytes);
-		
+
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
-		advertisement.setName(pictureName);
+		advertisement.setName("Advertisement/" + pictureName);
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
 		advertisementService.save(advertisement);
-
-//		BufferedImage bimg = ImageIO.read(new File(filePath + pictureName));
-//		int width = bimg.getWidth();
-//		int height = bimg.getHeight();
-//
-//		resultJson.put("width", width);
-//		resultJson.put("height", height);
-		
 		resultJson.put("status", true);
 		resultJson.put("msg", "success!");
 		return resultJson;
 	}
-	
-	@RequestMapping(value = "getImage", method = RequestMethod.POST) // advertise
+
+	@RequestMapping(value = "banners", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject getImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
+	public JSONObject getImage(@RequestHeader("token") String token) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		
-		List<Advertisement> advertisements = advertisementService.getall();
-		
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
 		resultJson.put("status", true);
 		resultJson.put("msg", "Success!");
-		resultJson.put("advertisements", advertisements);
+		resultJson.put("advertisements", advertisementService.getall());
 		return resultJson;
-		
-		
+
 	}
 
 	private Feedback getFeedback(JSONObject json) {
