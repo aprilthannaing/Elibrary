@@ -1,6 +1,5 @@
 package com.elibrary.controller;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elibrary.entity.Advertisement;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Book;
@@ -45,6 +44,7 @@ import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.UserType;
 import com.elibrary.entity.Views;
+import com.elibrary.service.AdvertisementService;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
@@ -95,6 +95,9 @@ public class OperationController extends AbstractController {
 
 	@Autowired
 	private FeedbackService feedbackService;
+	
+	@Autowired
+	private AdvertisementService advertisementService;
 
 	@Value("${IMAGEUPLOADURL}")
 	private String IMAGEUPLOADURL;
@@ -946,8 +949,10 @@ public class OperationController extends AbstractController {
 	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException {
+	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
+		
+		
 
 		String imageSrc = json.get("image").toString();
 		if (imageSrc == null || imageSrc.isEmpty()) {
@@ -964,16 +969,39 @@ public class OperationController extends AbstractController {
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, pictureName);
 		Files.write(destinationFile, imageBytes);
+		
+		Advertisement advertisement = new Advertisement();
+		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
+		advertisement.setName(pictureName);
+		advertisement.setEntityStatus(EntityStatus.ACTIVE);
+		advertisementService.save(advertisement);
 
-		BufferedImage bimg = ImageIO.read(new File(filePath + pictureName));
-		int width = bimg.getWidth();
-		int height = bimg.getHeight();
-
-		resultJson.put("width", width);
-		resultJson.put("height", height);
+//		BufferedImage bimg = ImageIO.read(new File(filePath + pictureName));
+//		int width = bimg.getWidth();
+//		int height = bimg.getHeight();
+//
+//		resultJson.put("width", width);
+//		resultJson.put("height", height);
+		
 		resultJson.put("status", true);
 		resultJson.put("msg", "success!");
 		return resultJson;
+	}
+	
+	@RequestMapping(value = "getImage", method = RequestMethod.POST) // advertise
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject getImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		
+		List<Advertisement> advertisements = advertisementService.getall();
+		
+		resultJson.put("status", true);
+		resultJson.put("msg", "Success!");
+		resultJson.put("advertisements", advertisements);
+		return resultJson;
+		
+		
 	}
 
 }

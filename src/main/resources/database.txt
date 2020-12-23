@@ -468,7 +468,6 @@ call GET_BookId_ByAuthor('a',1,1);
  alter table book add column currentPage int;
  update book set currentPage=0;
  
-<<<<<<< Updated upstream
  CREATE TABLE `constituency` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `boId` varchar(255) NOT NULL,
@@ -484,7 +483,6 @@ call GET_BookId_ByAuthor('a',1,1);
 alter table user add column permanentAddress varchar(225);
 alter table user add column currentAddress varchar(225);
 alter table user add column constituency bigint;
-=======
  
  
  DELIMITER // 
@@ -591,7 +589,13 @@ END
 call GET_Popular_BookId('a');
  
 
->>>>>>> Stashed changes
-
+CREATE TABLE `advertisement` (
+ `id` bigint(20) NOT NULL AUTO_INCREMENT,
+ `boId` varchar(255) NOT NULL,
+ `name` varchar(100) DEFAULT NULL,
+ `pdf` varchar(100) DEFAULT NULL,
+ `entityStatus` varchar(100) DEFAULT NULL,
+PRIMARY KEY (`id`)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
  
 
