@@ -117,6 +117,16 @@ CONSTRAINT FOREIGN KEY (userId) REFERENCES user (id),
 CONSTRAINT FOREIGN KEY (bookId) REFERENCES book (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `feedback` (
+ `id` bigint(20) NOT NULL AUTO_INCREMENT,
+ `boId` varchar(255) NOT NULL,
+ `userId` bigint(20) NOT NULL,
+ `message` varchar(100) NOT NULL,  
+ `entityStatus` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+CONSTRAINT FOREIGN KEY (userId) REFERENCES user (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE category_subcategory(
 `id` bigint(20) NOT NULL AUTO_INCREMENT,
 categoryId bigint(20) NOT NULL,
@@ -458,6 +468,7 @@ call GET_BookId_ByAuthor('a',1,1);
  alter table book add column currentPage int;
  update book set currentPage=0;
  
+<<<<<<< Updated upstream
  CREATE TABLE `constituency` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `boId` varchar(255) NOT NULL,
@@ -473,6 +484,114 @@ call GET_BookId_ByAuthor('a',1,1);
 alter table user add column permanentAddress varchar(225);
 alter table user add column currentAddress varchar(225);
 alter table user add column constituency bigint;
+=======
+ 
+ 
+ DELIMITER // 
+DROP PROCEDURE IF EXISTS GET_Recommended_BookId;
+CREATE PROCEDURE GET_Recommended_BookId (IN ST nvarchar(300), UsrID nvarchar(20))
+BEGIN
+  SELECT
+    b.id,
+    b.boId
+  FROM book b
+    LEFT JOIN book_author ba
+      ON ba.bookId = B.id
+    LEFT JOIN book_category bc
+      ON BC.bookId = B.id
+    LEFT JOIN book_subcategory bs
+      ON BS.bookId = B.id
+    LEFT JOIN book_publisher bp
+      ON bp.bookId = b.id
+    LEFT JOIN history h
+      ON h.bookId = b.id
+  WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
+  , b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+  , (SELECT
+      a.name
+    FROM author a
+    WHERE a.id = ba.authorId), (SELECT
+      p.name
+    FROM publisher p
+    WHERE p.id = bp.publisherId), (SELECT
+      s.myanmarName
+    FROM subcategory s
+    WHERE s.id = bs.subcategoryId), (SELECT
+      s1.engName
+    FROM subcategory s1
+    WHERE s1.id = bs.subcategoryId), (SELECT
+      C.myanmarName
+    FROM category c
+    WHERE C.id = BC.categoryId), (SELECT
+      C.engName
+    FROM category c
+    WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST, '%')
+  AND (h.actionStatus = 'READ'
+  OR h.actionStatus = 'FAVOURITE')
+  AND H.userId = UsrID
+  GROUP BY b.id,
+           b.boId
+  ORDER BY COUNT(B.boId) DESC;
+END
+//
+DELIMITER ;
+
+call GET_Recommended_BookId('မြန်မာ့အတွဲ(၅၁)၊','10')
+
+
+
+USE elibrary;
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_Popular_BookId;
+CREATE PROCEDURE GET_Popular_BookId (IN ST nvarchar(300))
+BEGIN
+  SELECT
+    b.id,
+    b.boId
+  FROM book b
+    LEFT JOIN book_author ba
+      ON ba.bookId = B.id
+    LEFT JOIN book_category bc
+      ON BC.bookId = B.id
+    LEFT JOIN book_subcategory bs
+      ON BS.bookId = B.id
+    LEFT JOIN book_publisher bp
+      ON bp.bookId = b.id
+    LEFT JOIN history h
+      ON h.bookId = b.id
+  WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
+  , b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+  , (SELECT
+      a.name
+    FROM author a
+    WHERE a.id = ba.authorId), (SELECT
+      p.name
+    FROM publisher p
+    WHERE p.id = bp.publisherId), (SELECT
+      s.myanmarName
+    FROM subcategory s
+    WHERE s.id = bs.subcategoryId), (SELECT
+      s1.engName
+    FROM subcategory s1
+    WHERE s1.id = bs.subcategoryId), (SELECT
+      C.myanmarName
+    FROM category c
+    WHERE C.id = BC.categoryId), (SELECT
+      C.engName
+    FROM category c
+    WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST, '%')
+  AND h.actionStatus = 'READ'
+  GROUP BY b.id,
+           b.boId
+  ORDER BY COUNT(B.boId) DESC;
+END
+// DELIMITER ;
+
+
+call GET_Popular_BookId('a');
+ 
+
+>>>>>>> Stashed changes
 
  
 

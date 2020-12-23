@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
+import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
@@ -86,6 +87,51 @@ public class BookController extends AbstractController {
 		return bookService.countBook() + "";
 	}
 
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "pending", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject getPendingBook() {
+		JSONObject resultJson = new JSONObject();
+		resultJson.put("books", bookService.getPendingBooks());
+		return resultJson;
+	}
+
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "pendingCount", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject getPendingBookCount() {
+		JSONObject resultJson = new JSONObject();
+		resultJson.put("count", bookService.getPendingBookCount());
+		return resultJson;
+	}
+
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "approve", method = RequestMethod.POST) // approving without editing
+	@JsonView(Views.Summary.class)
+	public JSONObject approve(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		List<Object> bookBoIds = (List<Object>) json.get("bookBoIds");
+		for (Object boId : bookBoIds) {
+			Book book = bookService.findByBoId(boId.toString());
+			if (book == null)
+				continue;
+
+			book.setState(State.APPROVE);
+			bookService.save(book);
+		}
+
+		resultJson.put("status", true);
+		resultJson.put("message", "Success!");
+		return resultJson;
+	}
+
 	/*
 	 * ""title"": "", ""page"": , ""author_id"": , ""sub_category_id"":
 	 * SUBCATEGORY1000102
@@ -95,8 +141,7 @@ public class BookController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
 	@JsonView(Views.Thin.class)
-	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json)
-			throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -225,8 +270,6 @@ public class BookController extends AbstractController {
 			if (user == null)
 				return null;
 
-			// return historyService.getBooksByUser(user.getId(), ActionStatus.BOOKMARK);
-
 			Stack<Book> stackBooks = new Stack<Book>();
 			List<Book> newBookList = new ArrayList<Book>();
 			List<Book> bookList = historyService.getBooksByUser(user.getId(), ActionStatus.BOOKMARK);
@@ -238,7 +281,6 @@ public class BookController extends AbstractController {
 
 			for (int i = 0; i < bookList.size(); i++)
 				newBookList.add(stackBooks.pop());
-
 			return newBookList;
 		}
 
@@ -249,13 +291,11 @@ public class BookController extends AbstractController {
 		/* books by category and author */
 		Object categoryObject = json.get("category_id");
 		Object authorObject = json.get("author_id");
-		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null
-				&& !authorObject.toString().isEmpty()) {
+		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null && !authorObject.toString().isEmpty()) {
 			Author author = authorService.findByBoId(authorObject.toString());
 			List<Book> bookList = bookService.getBooksByAuthor(author.getId());
 			bookList.forEach(book -> {
-				if (book != null && book.getCategory() != null
-						&& book.getCategory().getBoId().equals(categoryObject.toString()))
+				if (book != null && book.getCategory() != null && book.getCategory().getBoId().equals(categoryObject.toString()))
 					books.add(book);
 			});
 			return books;

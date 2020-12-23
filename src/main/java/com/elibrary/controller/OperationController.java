@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -30,6 +33,7 @@ import com.elibrary.entity.Category;
 import com.elibrary.entity.Comment;
 import com.elibrary.entity.Department;
 import com.elibrary.entity.EntityStatus;
+import com.elibrary.entity.Feedback;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Journal;
 import com.elibrary.entity.Position;
@@ -45,8 +49,9 @@ import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
 import com.elibrary.service.CommentService;
-import com.elibrary.service.EmailService;
+import com.elibrary.service.FeedbackService;
 import com.elibrary.service.JournalService;
+import com.elibrary.service.MailService;
 import com.elibrary.service.PublisherService;
 import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
@@ -59,7 +64,7 @@ import com.mchange.rmi.ServiceUnavailableException;
 
 @RestController
 @RequestMapping("operation")
-public class OperationController {
+public class OperationController extends AbstractController {
 
 	@Autowired
 	private BookService bookService;
@@ -86,7 +91,10 @@ public class OperationController {
 	private CommentService commentService;
 
 	@Autowired
-	private EmailService emailService;
+	private MailService mailService;
+
+	@Autowired
+	private FeedbackService feedbackService;
 
 	@Value("${IMAGEUPLOADURL}")
 	private String IMAGEUPLOADURL;
@@ -538,6 +546,7 @@ public class OperationController {
 			errorMessage.put("msg", "Please select a profile picture!");
 			return errorMessage;
 		}
+
 		String pictureName = profile.split("\\\\")[2];
 		String profilePicture = "/AuthorProfile/" + pictureName;
 		if (authorService.isDuplicateProfile(profilePicture)) {
@@ -776,7 +785,6 @@ public class OperationController {
 	@RequestMapping(value = "deleteBook", method = RequestMethod.POST)
 	public JSONObject deleteBook(@RequestBody JSONObject json) throws ServiceUnavailableException {
 
-		logger.info("delete book!!!!!!!!!!!!!!!");
 		JSONObject resultJson = new JSONObject();
 		String bookId = json.get("bookId").toString();
 		Book book = bookService.findByBoId(bookId);
@@ -787,15 +795,8 @@ public class OperationController {
 
 		}
 
-		logger.info("delete book222222!!!");
-
 		book.setEntityStatus(EntityStatus.DELETED);
-		logger.info("delete book222222!!!" + book.getEntityStatus());
-
 		bookService.save(book);
-
-		logger.info("after saving");
-
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Your request is successful!!");
 		return resultJson;
@@ -903,6 +904,76 @@ public class OperationController {
 		}
 
 		return "success";
+	}
+
+	private String getContent(JSONObject json) {
+		Object content = json.get("message");
+		if (content == null || content.toString().isEmpty())
+			return null;
+		return content.toString();
+	}
+
+	@RequestMapping(value = "feedback", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject sendMail(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		User user = getUser(json);
+		if (user == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "User is not valid!");
+			return resultJson;
+		}
+
+		String content = getContent(json);
+		if (content == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Content must not empty!");
+			return resultJson;
+		}
+
+		Feedback feedback = new Feedback();
+		feedback.setBoId(SystemConstant.BOID_REQUIRED);
+		feedback.setMessage(content);
+		feedback.setEntityStatus(EntityStatus.ACTIVE);
+		feedbackService.save(feedback);
+
+		resultJson.put("status", true);
+		resultJson.put("message", "success!");
+		return resultJson;
+	}
+
+	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException {
+		JSONObject resultJson = new JSONObject();
+
+		String imageSrc = json.get("image").toString();
+		if (imageSrc == null || imageSrc.isEmpty()) {
+			resultJson.put("status", false);
+			resultJson.put("msg", "Please select an image!");
+			return resultJson;
+		}
+
+		String profile = json.get("profilePicture").toString();
+		String pictureName = profile.split("\\\\")[2];
+		String filePath = IMAGEUPLOADURL.trim() + "Advertisement//";
+
+		imageSrc = imageSrc.split("base64")[1];
+		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
+		Path destinationFile = Paths.get(filePath, pictureName);
+		Files.write(destinationFile, imageBytes);
+
+		BufferedImage bimg = ImageIO.read(new File(filePath + pictureName));
+		int width = bimg.getWidth();
+		int height = bimg.getHeight();
+
+		resultJson.put("width", width);
+		resultJson.put("height", height);
+		resultJson.put("status", true);
+		resultJson.put("msg", "success!");
+		return resultJson;
 	}
 
 }

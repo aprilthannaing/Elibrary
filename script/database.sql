@@ -119,7 +119,6 @@ CREATE TABLE `mpuPaymentTransaction` (
   PRIMARY KEY (`tranID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 ALTER TABLE session ADD COLUMN paymentType enum('MPU', 'CBPAY', 'VISA') DEFAULT NULL;
 ALTER TABLE session ADD COLUMN paymentConfirmationDate varchar(255) DEFAULT NULL;
 ALTER TABLE cbpaytransaction ADD COLUMN checkedDateTime varchar(255) DEFAULT NULL; 
@@ -128,6 +127,7 @@ ALTER TABLE cbpaytransaction ADD COLUMN sessionId varchar(255) DEFAULT NULL;
 ALTER TABLE visa ADD COLUMN entityStatus enum('ACTIVE','INACTIVE') NOT NULL;
 ALTER TABLE cbpaytransaction ADD COLUMN entityStatus enum('ACTIVE','INACTIVE') NOT NULL;
 ALTER TABLE mpupaymenttransaction ADD COLUMN entityStatus enum('ACTIVE','INACTIVE') NOT NULL;
+
 
 
 //user

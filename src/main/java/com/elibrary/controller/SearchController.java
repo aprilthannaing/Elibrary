@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
+import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
 import com.elibrary.service.BookService;
 import com.elibrary.service.SubCategoryService;
@@ -92,6 +94,13 @@ public class SearchController extends AbstractController {
 		return resultJson;
 	}
 
+	private String getTitle(JSONObject json) {
+		Object titleObject = json.get("title");
+		if (titleObject == null || titleObject.toString().isEmpty())
+			return null;
+		return titleObject.toString();
+	}
+
 	private List<Long> getBookList(JSONObject json) throws ClassNotFoundException, SQLException {
 		Category category = getCategory(json);
 		Author author = getAuthor(json);
@@ -112,6 +121,26 @@ public class SearchController extends AbstractController {
 			LocalDate convertedDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			convertedDate = convertedDate.withDayOfMonth(convertedDate.getMonth().length(convertedDate.isLeapYear()));
 			endDate = convertedDate.toString();
+		}
+
+		User user = getUser(json);
+		String title = getTitle(json);
+		if (title != null) {
+			ActionStatus actionStatus = ActionStatus.valueOf(getTitle(json).toUpperCase());
+			switch (actionStatus) {
+			case RECOMMEND:
+				return searchTerms.isEmpty() ? bookService.getBooksByDateAndActionStatus(startDate, endDate, actionStatus, user.getId()) : bookService.getBooksBySearchTermsAndRecommended(searchTerms, user.getId());
+
+			case POPULAR:
+				return searchTerms.isEmpty() ? bookService.getBooksByDateAndActionStatus(startDate, endDate, actionStatus, user.getId()) : bookService.getBooksBySearchTermsAndPopular(searchTerms);
+
+			case LATEST:
+				return searchTerms.isEmpty() ? bookService.getBooksByDate(startDate, endDate) : bookService.getBookBySearchTerms(searchTerms);
+
+			default: // favourite and bookmark
+				return searchTerms.isEmpty() ? bookService.getBooksByDateAndActionStatus(startDate, endDate, actionStatus, user.getId()) : bookService.getBooksBySearchTermsAndActionnStatus(searchTerms, actionStatus, user.getId());
+
+			}
 		}
 
 		if (category != null && author != null)

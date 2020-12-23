@@ -75,4 +75,14 @@ public interface BookService {
 
 	public Long getBookCount(long subcategoryId);
 
+	public List<Long> getBooksBySearchTermsAndActionnStatus(String searchTerms, ActionStatus actionStatus, Long userid) throws SQLException, ClassNotFoundException;
+
+	public List<Long> getBooksByDateAndActionStatus(String startDate, String endDate, ActionStatus actionStatus, Long userId) throws SQLException, ClassNotFoundException;
+
+	public List<Long> getBooksBySearchTermsAndRecommended(String searchTerms, Long userId) throws SQLException, ClassNotFoundException;
+
+	public List<Long> getBooksBySearchTermsAndPopular(String searchTerms) throws SQLException, ClassNotFoundException;
+
+	public Long getPendingBookCount();
+
 }
