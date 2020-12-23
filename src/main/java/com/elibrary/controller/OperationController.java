@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -37,6 +38,7 @@ import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Journal;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.Publisher;
+import com.elibrary.entity.Reply;
 import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.SystemConstant;
@@ -53,6 +55,7 @@ import com.elibrary.service.FeedbackService;
 import com.elibrary.service.JournalService;
 import com.elibrary.service.MailService;
 import com.elibrary.service.PublisherService;
+import com.elibrary.service.ReplyService;
 import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -98,6 +101,9 @@ public class OperationController extends AbstractController {
 	
 	@Autowired
 	private AdvertisementService advertisementService;
+
+	@Autowired
+	private ReplyService replyService;
 
 	@Value("${IMAGEUPLOADURL}")
 	private String IMAGEUPLOADURL;
@@ -253,7 +259,7 @@ public class OperationController extends AbstractController {
 			book.setSubCategory(subCategory);
 
 		Date date = new Date();
-		String createdDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
+		String createdDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date);
 		book.setCreatedDate(createdDate);
 
 		if (!setImage(json, book)) {
@@ -909,18 +915,25 @@ public class OperationController extends AbstractController {
 		return "success";
 	}
 
-	private String getContent(JSONObject json) {
-		Object content = json.get("message");
-		if (content == null || content.toString().isEmpty())
+	private String getMessage(JSONObject json) {
+		Object message = json.get("message");
+		if (message == null || message.toString().isEmpty())
 			return null;
-		return content.toString();
+		return message.toString();
 	}
 
 	@RequestMapping(value = "feedback", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
-	public JSONObject sendMail(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject sendFeedback(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
 		User user = getUser(json);
 		if (user == null) {
 			resultJson.put("status", false);
@@ -928,10 +941,10 @@ public class OperationController extends AbstractController {
 			return resultJson;
 		}
 
-		String content = getContent(json);
+		String content = getMessage(json);
 		if (content == null) {
 			resultJson.put("status", false);
-			resultJson.put("message", "Content must not empty!");
+			resultJson.put("message", "Message must not empty!");
 			return resultJson;
 		}
 
@@ -939,6 +952,7 @@ public class OperationController extends AbstractController {
 		feedback.setBoId(SystemConstant.BOID_REQUIRED);
 		feedback.setMessage(content);
 		feedback.setEntityStatus(EntityStatus.ACTIVE);
+		feedback.setUserId(user);
 		feedbackService.save(feedback);
 
 		resultJson.put("status", true);
@@ -1002,6 +1016,81 @@ public class OperationController extends AbstractController {
 		return resultJson;
 		
 		
+	}
+
+	private Feedback getFeedback(JSONObject json) {
+		Object feedbackId = json.get("feedbackId");
+		if (feedbackId == null || feedbackId.toString().isEmpty())
+			return null;
+		return feedbackService.findByBoId(feedbackId.toString());
+	}
+
+	@RequestMapping(value = "reply", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject reply(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		Feedback feedback = getFeedback(json);
+		if (feedback == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "This feedback is not found!");
+			return resultJson;
+		}
+
+		String message = getMessage(json);
+		if (message == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Message must not empty!");
+			return resultJson;
+		}
+
+		Reply reply = new Reply();
+		reply.setBoId(SystemConstant.BOID_REQUIRED);
+		Date date = new Date();
+		String createdDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date); // dd-M-yyyy hh:mm:ss
+		reply.setDateTime(createdDate);
+		reply.setMessage(message);
+		reply.setEntityStatus(EntityStatus.ACTIVE);
+		replyService.save(reply);
+
+		feedback.setReplyId(reply);
+		feedbackService.save(feedback);
+
+		resultJson.put("status", true);
+		resultJson.put("message", "success!");
+		return resultJson;
+	}
+
+	@RequestMapping(value = "replyNoti", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject replyNoti(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		User user = getUser(json);
+		if (user == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "User is not valid!");
+			return resultJson;
+		}
+
+		resultJson.put("feedbacks", feedbackService.findByUserId(user.getId()));
+		resultJson.put("status", true);
+		resultJson.put("message", "success!");
+		return resultJson;
 	}
 
 }

@@ -121,10 +121,21 @@ CREATE TABLE `feedback` (
  `id` bigint(20) NOT NULL AUTO_INCREMENT,
  `boId` varchar(255) NOT NULL,
  `userId` bigint(20) NOT NULL,
- `message` varchar(100) NOT NULL,  
+ `replyId` bigint(20) DEFAULT NULL, 
+ `message` varchar(500) NOT NULL,  
  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
+ CONSTRAINT FOREIGN KEY (replyId) REFERENCES reply (id),
 CONSTRAINT FOREIGN KEY (userId) REFERENCES user (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `reply` (
+ `id` bigint(20) NOT NULL AUTO_INCREMENT,
+ `boId` varchar(255) NOT NULL,
+ `message` varchar(500) NOT NULL,  
+ `dateTime` varchar(50) DEFAULT NULL, 
+ `entityStatus` varchar(100) DEFAULT NULL, 
+  PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE category_subcategory(
@@ -144,6 +155,7 @@ CREATE TABLE `publisher` (
  `entityStatus` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `rating` (
@@ -483,7 +495,7 @@ call GET_BookId_ByAuthor('a',1,1);
 alter table user add column permanentAddress varchar(225);
 alter table user add column currentAddress varchar(225);
 alter table user add column constituency bigint;
- 
+
  
  DELIMITER // 
 DROP PROCEDURE IF EXISTS GET_Recommended_BookId;
@@ -597,5 +609,6 @@ CREATE TABLE `advertisement` (
  `entityStatus` varchar(100) DEFAULT NULL,
 PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
  
 

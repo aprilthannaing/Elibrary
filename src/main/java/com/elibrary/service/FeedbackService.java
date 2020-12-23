@@ -7,4 +7,8 @@ public interface FeedbackService {
 
 	public void save(Feedback feedback) throws ServiceUnavailableException;
 
+	public Feedback findByBoId(String boId);
+
+	public Feedback findByUserId(Long userId);
+
 }
