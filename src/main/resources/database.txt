@@ -611,4 +611,5 @@ PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
  
+alter table advertisement add column type varchar(50);
 

@@ -1,6 +1,9 @@
 package com.elibrary.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -14,6 +17,11 @@ public class Advertisement extends AbstractEntity{
 
 	@JsonView(Views.Thin.class)
 	private String pdf;
+	
+	@JsonView(Views.Thin.class)
+	@Column(name = "type")
+	@Enumerated(EnumType.STRING)
+	private AdvertisementType type;
 
 	public String getName() {
 		return name;
@@ -29,6 +37,14 @@ public class Advertisement extends AbstractEntity{
 
 	public void setPdf(String pdf) {
 		this.pdf = pdf;
+	}
+
+	public AdvertisementType getType() {
+		return type;
+	}
+
+	public void setType(AdvertisementType type) {
+		this.type = type;
 	}
 	
 }

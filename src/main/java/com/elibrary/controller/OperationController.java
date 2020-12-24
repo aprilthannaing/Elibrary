@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Advertisement;
+import com.elibrary.entity.AdvertisementType;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Book;
@@ -986,42 +990,12 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
-	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
-	@ResponseBody
-	@JsonView(Views.Summary.class)
-	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
-		JSONObject resultJson = new JSONObject();
-
-		String imageSrc = json.get("image").toString();
-		if (imageSrc == null || imageSrc.isEmpty()) {
-			resultJson.put("status", false);
-			resultJson.put("msg", "Please select an image!");
-			return resultJson;
-		}
-
-		String profile = json.get("profilePicture").toString();
-		String pictureName = profile.split("\\\\")[2];
-		String filePath = IMAGEUPLOADURL.trim() + "Advertisement//";
-
-		imageSrc = imageSrc.split("base64")[1];
-		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
-		Path destinationFile = Paths.get(filePath, pictureName);
-		Files.write(destinationFile, imageBytes);
-
-		Advertisement advertisement = new Advertisement();
-		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
-		advertisement.setName("Advertisement/" + pictureName);
-		advertisement.setEntityStatus(EntityStatus.ACTIVE);
-		advertisementService.save(advertisement);
-		resultJson.put("status", true);
-		resultJson.put("msg", "success!");
-		return resultJson;
-	}
 
 	@RequestMapping(value = "banners", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject getImage(@RequestHeader("token") String token) throws IOException, ServiceUnavailableException {
+	
 		JSONObject resultJson = new JSONObject();
 		if (!isTokenRight(token)) {
 			resultJson.put("status", false);
@@ -1108,6 +1082,60 @@ public class OperationController extends AbstractController {
 		resultJson.put("feedbacks", feedbackService.findByUserId(user.getId()));
 		resultJson.put("status", true);
 		resultJson.put("message", "success!");
+		return resultJson;
+	}
+	
+	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		
+		String image = json.get("image").toString();
+		String imageName = json.get("imageName").toString();
+		if(image == null || image.isEmpty() || imageName == null || imageName.isEmpty()) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Please select an image!");
+			return resultJson;
+		}
+		
+		String pdf = json.get("pdf").toString();
+		String pdfName = json.get("pdfName").toString();
+		
+		String filePath = IMAGEUPLOADURL.trim() + "Advertisement//";
+		image = image.split("base64")[1];
+		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(image.replaceAll(" ", "+"));
+		Path destinationFile = Paths.get(filePath, imageName);
+		Files.write(destinationFile, imageBytes);
+		
+		BufferedImage bimg = ImageIO.read(new File(filePath + imageName));
+		int width          = bimg.getWidth();
+		int height         = bimg.getHeight();
+		
+		String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
+		pdf = pdf.split("base64")[1];
+		byte[] pdfBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf.replaceAll(" ", "+"));
+		Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
+		Files.write(destinationPDFFile, pdfBytes);
+		
+		Advertisement advertisement = new Advertisement();
+		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
+		advertisement.setName("Advertisement/" + imageName);
+		advertisement.setPdf("Advertisement/" + pdfName);
+		advertisement.setEntityStatus(EntityStatus.ACTIVE);
+		if(width == 1170 && height == 268) {
+			advertisement.setType(AdvertisementType.Web);
+		}
+		
+		else if(width == 991 && height == 350 ) {
+			advertisement.setType(AdvertisementType.Mobile);
+		}
+		
+		advertisementService.save(advertisement);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "success!");
+		resultJson.put("width", width);
+		resultJson.put("height", height);
 		return resultJson;
 	}
 
