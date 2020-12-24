@@ -178,6 +178,8 @@ public class AbstractController {
 
 		for (int i = lastIndex; i >= startIndex; i--) {
 			Book book = bookService.findById(bookList.get(i));
+			if (book == null)
+				continue;
 			setBookInfo(book, user);
 			resultBookList.add(book);
 		}

@@ -1,5 +1,6 @@
 package com.elibrary.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,13 +16,13 @@ import com.elibrary.service.AdvertisementService;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @Service("advertisementService")
-public class AdvertisementServiceImpl implements AdvertisementService{
-	
+public class AdvertisementServiceImpl implements AdvertisementService {
+
 	@Autowired
 	private AdvertisementDao advertisementDao;
-	
+
 	public static Logger logger = Logger.getLogger(AdvertisementDaoImpl.class);
-	
+
 	@Override
 	public void save(Advertisement advertisement) throws ServiceUnavailableException {
 		try {
@@ -37,7 +38,7 @@ public class AdvertisementServiceImpl implements AdvertisementService{
 	private Long plus() {
 		return countAdvertisement() + 10000;
 	}
-	
+
 	@Override
 	public long countAdvertisement() {
 		String query = "select count(*) from Advertisement";
@@ -49,11 +50,11 @@ public class AdvertisementServiceImpl implements AdvertisementService{
 	}
 
 	@Override
-	public List<Advertisement> getall() {
+	public List<Advertisement> getAll() {
 		String query = "select advertisement from Advertisement advertisement where entityStatus='" + EntityStatus.ACTIVE + "'";
-		List<Advertisement> advertisements = advertisementDao.getEntitiesByQuery(query); 
+		List<Advertisement> advertisements = advertisementDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(advertisements))
-			return null;
+			return new ArrayList<Advertisement>();
 		return advertisements;
 	}
 }

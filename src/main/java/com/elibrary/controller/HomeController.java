@@ -23,6 +23,7 @@ import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
+import com.elibrary.service.AdvertisementService;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
@@ -49,6 +50,9 @@ public class HomeController extends AbstractController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private AdvertisementService advertisementService;
 
 	private static Logger logger = Logger.getLogger(HomeController.class);
 
@@ -116,6 +120,7 @@ public class HomeController extends AbstractController {
 		resultJson.put("recommend_book", setBookInfo(bookService.getRecommendBook(user.getId()), user)); // 12
 		resultJson.put("local_author", getAuthors(AuthorType.LOCAL)); // 12
 		resultJson.put("international_author", getAuthors(AuthorType.INTERNATIONAL));
+		resultJson.put("advertisements", advertisementService.getAll());
 		resultJson.put("main_category", categoryList); // 6
 		return resultJson;
 	}

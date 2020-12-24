@@ -167,8 +167,34 @@ public class OperationController extends AbstractController {
 		return true;
 	}
 
+	private void addWaterMark(String pdfName) {
+		try {
+
+			String pdfFilePath = IMAGEUPLOADURL.trim();
+			PdfReader reader = new PdfReader(pdfFilePath + "BookFile/" + pdfName.trim());
+			PdfReader.unethicalreading = true;
+			int n = reader.getNumberOfPages();
+			PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(pdfFilePath + "WaterMarkFile/" + pdfName.trim()));
+			int i = 0;
+			PdfContentByte under;
+			Image img = Image.getInstance(pdfFilePath + "watermark.jpeg");
+			img.setAbsolutePosition(0, 0);
+
+			while (i < n) {
+				i++;
+				under = stamp.getOverContent(i);
+				under.addImage(img);
+			}
+			stamp.close();
+
+		} catch (Exception de) {
+			de.printStackTrace();
+		}
+
+	}
+
 	private boolean setPDFFile(JSONObject json, Book book) throws IOException {
-		String pdf = json.get("pdfName").toString();
+		String pdf = json.get("pdf").toString();
 		if (pdf == null || pdf.toString().isEmpty()) {
 			return false;
 		}
@@ -192,8 +218,9 @@ public class OperationController extends AbstractController {
 		book.setSize(file.length() / 1024 + "KB");
 		FileOutputStream fop = new FileOutputStream(file);
 		fop.write(decodedBytes);
+		addWaterMark(pdfName);
 
-		book.setPath("/BookFile/" + pdfName.trim());
+		book.setPath("/WaterMarkFile/" + pdfName.trim());
 		return true;
 	}
 
@@ -1004,7 +1031,7 @@ public class OperationController extends AbstractController {
 
 		resultJson.put("status", true);
 		resultJson.put("msg", "Success!");
-		resultJson.put("advertisements", advertisementService.getall());
+		resultJson.put("advertisements", advertisementService.getAll());
 		return resultJson;
 
 	}
