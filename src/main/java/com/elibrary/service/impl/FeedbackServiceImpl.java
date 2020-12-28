@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.FeedbackDao;
 import com.elibrary.dao.impl.CategoryDaoImpl;
+import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Feedback;
 import com.elibrary.service.FeedbackService;
@@ -38,8 +39,9 @@ public class FeedbackServiceImpl implements FeedbackService {
 	private Long plus() {
 		return countFeedback() + 10000;
 	}
-
-	private long countFeedback() {
+	
+	@Override
+	public long countFeedback() {
 		String query = "select count(*) from Feedback";
 		return feedbackDao.findLongByQueryString(query).get(0);
 	}
@@ -65,5 +67,15 @@ public class FeedbackServiceImpl implements FeedbackService {
 			return null;
 		return feedbackList;
 	}
+
+	@Override
+	public List<Feedback> getAll() {
+		String query = "select feedback from Feedback feedback where entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Feedback> feedbacks = feedbackDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(feedbacks))
+			return null;
+		return feedbacks;
+	}
+
 
 }

@@ -12,5 +12,9 @@ public interface FeedbackService {
 	public Feedback findByBoId(String boId);
 
 	public List<Feedback> findByUserId(Long userId);
+	
+	public List<Feedback> getAll();
+	
+	public long countFeedback();
 
 }
