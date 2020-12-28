@@ -45,7 +45,7 @@ public class Book extends AbstractReadingObject implements Serializable {
 	@JsonView(Views.Thin.class)
 	private int currentPage;
 
-	// @JsonView(Views.Thin.class)
+	@JsonView(Views.Thin.class)
 	private String size;
 
 	@JsonView(Views.Thin.class)

@@ -11,27 +11,31 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.elibrary.entity.Book;
+import com.elibrary.entity.Category;
+import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
 import com.elibrary.service.BookService;
+import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mchange.rmi.ServiceUnavailableException;
 
 @RestController
 @RequestMapping("dashboard")
-public class DashBoardController {
+public class DashBoardController extends AbstractController {
 
 	@Autowired
 	private UserService userService;
 
 	@Autowired
 	private BookService bookService;
+
+	@Autowired
+	private SubCategoryService subCategoryService;
 
 	private static Logger logger = Logger.getLogger(DashBoardController.class);
 
@@ -44,6 +48,7 @@ public class DashBoardController {
 		List<String> nameList = new ArrayList<String>();
 		List<Long> bookCount = new ArrayList<Long>();
 		List<User> librarianList = userService.getLibrarians();
+
 		if (librarianList == null) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "There is no Librarian!");
@@ -63,12 +68,40 @@ public class DashBoardController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "booksbysubcategory", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject getBooksBySubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		Category category = getCategory(json);
+		if (category == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Please choose category!");
+			return resultJson;
+		}
+
+		List<String> nameList = new ArrayList<String>();
+		List<Long> bookCount = new ArrayList<Long>();
+
+		List<SubCategory> subs = subCategoryService.byCategory(category.getId());
+		subs.forEach(sub -> {
+			nameList.add(sub.getMyanmarName() + (sub.getEngName().isEmpty() ? "" : "( " + sub.getEngName() + " )"));
+			bookCount.add((long) bookService.getBooksBySubCategoryId(sub.getId()).size());
+		});
+
+		resultJson.put("status", true);
+		resultJson.put("bookCount", bookCount);
+		resultJson.put("nameList", nameList);
+		return resultJson;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "librarian/booklist", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
 	public JSONObject getBookList(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		List<List<Book>> bookList = new ArrayList<List<Book>>();
-		List<Book> books = new ArrayList<Book>();
+		List<List<Long>> bookList = new ArrayList<List<Long>>();
+		List<Long> books = new ArrayList<Long>();
 
 		List<User> librarianList = userService.getLibrarians();
 		if (librarianList == null) {
@@ -94,9 +127,15 @@ public class DashBoardController {
 			return resultJson;
 		}
 
+		int pageNo = getPage(json);
 		books = bookList.get(index);
-		resultJson.put("status", "1");
-		resultJson.put("bookList", books);
+		int lastPageNo = books.size() % 10 == 0 ? books.size() / 10 : books.size() / 10 + 1;
+
+		resultJson.put("bookList", getBooksByPaganationWithBookIds(json, books, pageNo));
+		resultJson.put("status", true);
+		resultJson.put("current_page", pageNo);
+		resultJson.put("last_page", lastPageNo);
+		resultJson.put("total_count", books.size());
 		return resultJson;
 	}
 

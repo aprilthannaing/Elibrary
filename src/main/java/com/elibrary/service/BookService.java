@@ -23,7 +23,7 @@ public interface BookService {
 
 	public long countBook();
 
-	public List<Book> getBookListByLibrarian(long librarianId);
+	public List<Long> getBookListByLibrarian(long librarianId);
 
 	public long getBookCountByLibrarian(long librarianId);
 

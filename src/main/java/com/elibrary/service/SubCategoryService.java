@@ -19,4 +19,7 @@ public interface SubCategoryService {
 
 	public List<SubCategory> byAlphabet(String alpherbat, long categoryId);
 
+	public List<SubCategory> byCategoryAndDisplay(long categoryId);
+
+	public List<SubCategory> byCategory(long categoryId);
 }

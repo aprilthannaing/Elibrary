@@ -115,11 +115,11 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
-	public List<Book> getBookListByLibrarian(long librarianId) {
-		String query = "From Book book where uploader=" + librarianId;
-		List<Book> books = bookDao.getEntitiesByQuery(query);
+	public List<Long> getBookListByLibrarian(long librarianId) {
+		String query = "select id from Book where uploader=" + librarianId;
+		List<Long> books = bookDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(books))
-			return new ArrayList<Book>();
+			return new ArrayList<Long>();
 		return books;
 	}
 
@@ -464,6 +464,7 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		return bookList;
 	}
 
+	@Override
 	public Long getPendingBookCount() {
 		String query = "select count(*) from Book where state='" + State.PENDING + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Long> counts = bookDao.findLongByQueryString(query);
