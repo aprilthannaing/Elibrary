@@ -85,4 +85,8 @@ public interface BookService {
 
 	public Long getPendingBookCount();
 
+	public List<Long> getBookIdsBySubCategoryId(long subcategoryId);
+
+	public List<Long> getPopularBooksByCategory(Long categoryId) throws SQLException, ClassNotFoundException;
+
 }

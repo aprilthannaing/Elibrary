@@ -66,8 +66,7 @@ public class SubCategoryController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "byengcategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject byEngCategory(@RequestHeader("token") String token, @RequestBody JSONObject json)
-			throws ServiceUnavailableException {
+	public JSONObject byEngCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -105,8 +104,7 @@ public class SubCategoryController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "bymaincategory", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject byMainCategory(@RequestHeader("token") String token, @RequestBody JSONObject json)
-			throws ServiceUnavailableException {
+	public JSONObject byMainCategory(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -123,8 +121,11 @@ public class SubCategoryController extends AbstractController {
 		}
 
 		Category category = categoryService.findByBoId(mainCategory.toString());
+		List<SubCategory> subCategories = category.getSubCategories();
 		resultJson.put("status", true);
-		resultJson.put("subcategories", category.getSubCategories());
+		resultJson.put("subcategories", subCategories);
+		resultJson.put("total_count", subCategories.size());
+
 		return resultJson;
 	}
 
@@ -168,29 +169,27 @@ public class SubCategoryController extends AbstractController {
 
 		return "success";
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "setDisplayList", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject setDisplayList(@RequestBody JSONObject reqJson) throws ServiceUnavailableException {
-		JSONObject resultJson = new JSONObject ();
+		JSONObject resultJson = new JSONObject();
 		List<Object> subCategories = (List<Object>) reqJson.get("subcategoryBoId");
-		
+
 		for (Object object : subCategories) {
 			SubCategory subCategory = subCategoryService.findByBoId(object.toString());
 			if (subCategory != null) {
 				subCategory.setDisplay("true");
 				subCategoryService.save(subCategory);
 			}
-				
-				
+
 		}
-		resultJson.put("status","1");
+		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
 		return resultJson;
-		
-		
+
 	}
-	
+
 }

@@ -160,6 +160,15 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
+	public List<Long> getBookIdsBySubCategoryId(long subcategoryId) {
+		String query = "select book.id from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bookId from Book_SubCategory bc where bc.subcategoryId=" + subcategoryId + ")";
+		List<Long> bookIds = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(bookIds))
+			return new ArrayList<Long>();
+		return bookIds;
+	}
+
+	@Override
 	public Long getBookCount(long subcategoryId) {
 		String query = "select count(*) from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bookId from Book_SubCategory bc where bc.subcategoryId=" + subcategoryId + ")";
 		List<Long> books = bookDao.findLongByQueryString(query);
@@ -471,6 +480,24 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (CollectionUtils.isEmpty(counts))
 			return (long) 0;
 		return counts.get(0);
+	}
+
+	@Override
+	public List<Long> getPopularBooksByCategory(Long categoryId) throws SQLException, ClassNotFoundException {
+		List<Long> IdList = new ArrayList<Long>();
+		String storedProc = "{call GET_PopularBook_byCatID(?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, categoryId + "");
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next() && IdList.size() < 20) {
+				IdList.add(Long.parseLong(rs.getString("Book")));
+			}
+			con.close();
+		}
+		return IdList;
 	}
 
 }
