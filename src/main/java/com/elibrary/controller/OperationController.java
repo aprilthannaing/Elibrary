@@ -1139,6 +1139,25 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 	
+	@RequestMapping(value = "getAdvertisements", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject getAdvertisements(@RequestHeader("token") String token) throws IOException, ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		List<Advertisement> advertisements = advertisementService.getAll();
+		resultJson.put("status", "1");
+		resultJson.put("advertisements", advertisements);
+		return resultJson;
+		
+	}
+	
 	@RequestMapping(value = "getFeedbacks", method = RequestMethod.GET) 
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1163,5 +1182,39 @@ public class OperationController extends AbstractController {
 	public String getCount() throws ServiceUnavailableException {
 		return feedbackService.countFeedback() + "";
 	}
+	
+	@RequestMapping(value = "advertisementCount", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public String getAdvertisementCount() throws ServiceUnavailableException {
+		return advertisementService.countAdvertisement() + "";
+	}
+	
+	
+	@RequestMapping(value = "deleteAdvertisement", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject deleteAdvertisement(@RequestHeader("token") String token, @RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+		String advertisementId = json.get("boId").toString();
+		Advertisement advertisement = advertisementService.findByBoId(advertisementId);
+		if (advertisement == null) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Advertisement Id is invalid!!");
+			return resultJson;
+
+		}
+
+		advertisement.setEntityStatus(EntityStatus.DELETED);
+		advertisementService.save(advertisement);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Your request is successful!!");
+		return resultJson;	}
+	
+	
 
 }

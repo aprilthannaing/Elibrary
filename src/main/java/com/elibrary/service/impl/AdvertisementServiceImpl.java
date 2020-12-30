@@ -11,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 import com.elibrary.dao.AdvertisementDao;
 import com.elibrary.dao.impl.AdvertisementDaoImpl;
 import com.elibrary.entity.Advertisement;
+import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.AdvertisementService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -56,5 +57,14 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 		if (CollectionUtils.isEmpty(advertisements))
 			return new ArrayList<Advertisement>();
 		return advertisements;
+	}
+
+	@Override
+	public Advertisement findByBoId(String boId) {
+		String query = "select advertisement from Advertisement advertisement where boId='" + boId + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Advertisement> advertisement = advertisementDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(advertisement))
+			return null;
+		return advertisement.get(0);
 	}
 }

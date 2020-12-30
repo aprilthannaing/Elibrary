@@ -500,4 +500,15 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		return IdList;
 	}
 
+	@Override
+	public List<Book> getBooksByCreatedDate(String startDate, String endDate) throws SQLException {
+		String query = "select book from Book book where createdDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "' order by book.createdDate asc";
+		List<Book> bookList = bookDao.getList(query);
+		if (CollectionUtils.isEmpty(bookList))
+			return new ArrayList<Book>();
+		return bookList;
+	}
+	
+	
+
 }

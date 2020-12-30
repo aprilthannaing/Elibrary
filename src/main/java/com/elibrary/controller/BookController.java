@@ -1,11 +1,16 @@
 package com.elibrary.controller;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -318,6 +323,30 @@ public class BookController extends AbstractController {
 			return null;
 		return bookService.getBooksBySubCategoryId(subcategory.getId());
 
+	}
+	
+	@RequestMapping(value = "exportExcel", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject exportExcel(@RequestBody JSONObject json) throws IOException, SQLException {
+		JSONObject resultJson = new JSONObject();
+		
+		String startDate = json.get("start date").toString();
+		String endDate = json.get("end date").toString();
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		Boolean result = writeBookSheet(workbook, startDate, endDate);
+		if(result == false) {
+			resultJson.put("status", "0");
+			return resultJson;
+		}
+		
+		try (FileOutputStream outputStream = new FileOutputStream("BookSheet.xlsx")) {
+	        workbook.write(outputStream);
+	        resultJson.put("status", "1");
+			return resultJson;
+	    }
+		
+		
+		
 	}
 
 }

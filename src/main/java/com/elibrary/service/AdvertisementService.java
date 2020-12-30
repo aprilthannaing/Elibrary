@@ -12,5 +12,7 @@ public interface AdvertisementService {
 	public long countAdvertisement();
 
 	public List<Advertisement> getAll();
+	
+	public Advertisement findByBoId(String boId);
 
 }
