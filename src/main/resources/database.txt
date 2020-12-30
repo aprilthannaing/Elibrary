@@ -612,4 +612,29 @@ PRIMARY KEY (`id`)
 
  
 alter table advertisement add column type varchar(50);
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_BookId_fromHistory;
+CREATE PROCEDURE GET_BookId_fromHistory(IN ST nvarchar(300), UsrID varchar(20), ActSt varchar(40))
+BEGIN
+ SELECT b.id , b.boId -- , b.title -- , h.actionStatus -- , h.userId
+  FROM book b
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category bc ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+  LEFT JOIN history h ON h.bookId=b.id
+WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
+,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+, (SELECT a.name FROM author a WHERE a.id=ba.authorId) 
+, (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
+, (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId)
+, (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId)
+, (SELECT C.engName FROM category c WHERE C.id=BC.categoryId)
+, (SELECT C.engName FROM category c WHERE C.id=BC.categoryId)) LIKE CONCAT('%',ST,'%')
+AND h.userId=UsrID
+AND h.actionStatus=ActSt
+;
+END
+//
+DELIMITER ;
 
