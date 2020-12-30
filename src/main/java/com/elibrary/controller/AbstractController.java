@@ -298,8 +298,7 @@ public class AbstractController {
 
 		CellStyle cellStyle = workbook.createCellStyle();
 		cellStyle.setFont(font);
-		cellStyle.setWrapText(true);
-
+	
 		Cell cell;
 		if (row == null)
 			row = sheet.createRow(rowNumber);
