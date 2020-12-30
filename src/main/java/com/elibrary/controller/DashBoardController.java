@@ -47,7 +47,7 @@ public class DashBoardController extends AbstractController {
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "librarian/bookentry", method = RequestMethod.POST)
-	@JsonView(Views.Summary.class)
+	@JsonView(Views.Thin.class)
 	public JSONObject getAll() throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 		List<String> nameList = new ArrayList<String>();
@@ -62,7 +62,8 @@ public class DashBoardController extends AbstractController {
 
 		librarianList.forEach(librarian -> {
 			nameList.add(librarian.getName());
-			bookCount.add(bookService.getBookCountByLibrarian(librarian.getId()));
+			//bookCount.add(bookService.getBookCountByLibrarian(librarian.getId()));
+			bookCount.add((long)123);
 
 		});
 		resultJson.put("status", "1");
@@ -91,23 +92,12 @@ public class DashBoardController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject getBookList(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		List<List<Long>> bookList = new ArrayList<List<Long>>();
 		List<Long> books = new ArrayList<Long>();
 
 		List<User> librarianList = userService.getLibrarians();
 		if (librarianList == null) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "There is no Librarian!");
-			return resultJson;
-		}
-
-		librarianList.forEach(librarian -> {
-			bookList.add(bookService.getBookListByLibrarian(librarian.getId()));
-		});
-
-		if (CollectionUtils.isEmpty(bookList)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "There is no Book!");
 			return resultJson;
 		}
 
@@ -118,8 +108,11 @@ public class DashBoardController extends AbstractController {
 			return resultJson;
 		}
 
+		User user = librarianList.get(index);
+		if (user != null)
+			books.addAll(bookService.getBookListByLibrarian(user.getId()));
+
 		int pageNo = getPage(json);
-		books = bookList.get(index);
 		int lastPageNo = books.size() % 10 == 0 ? books.size() / 10 : books.size() / 10 + 1;
 
 		resultJson.put("bookList", getBooksByPaganationWithBookIds(json, books, pageNo));
@@ -207,7 +200,8 @@ public class DashBoardController extends AbstractController {
 
 		List<Category> categories = categoryService.getAll();
 		categories.forEach(category -> {
-			nameList.add(category.getMyanmarName() + (category.getEngName().isEmpty() ? "" : " ( " + category.getEngName() + " )"));
+			nameList.add(category.getMyanmarName()
+					+ (category.getEngName().isEmpty() ? "" : " ( " + category.getEngName() + " )"));
 			try {
 				bookCount.add((long) bookService.getPopularBooksByCategory(category.getId()).size());
 			} catch (Exception e) {

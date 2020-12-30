@@ -1,6 +1,5 @@
 package com.elibrary.controller;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.Stack;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -113,7 +114,8 @@ public class BookController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "approve", method = RequestMethod.POST) // approving without editing
 	@JsonView(Views.Summary.class)
-	public JSONObject approve(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject approve(@RequestHeader("token") String token, @RequestBody JSONObject json)
+			throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -146,7 +148,8 @@ public class BookController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
 	@JsonView(Views.Thin.class)
-	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json)
+			throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -296,11 +299,13 @@ public class BookController extends AbstractController {
 		/* books by category and author */
 		Object categoryObject = json.get("category_id");
 		Object authorObject = json.get("author_id");
-		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null && !authorObject.toString().isEmpty()) {
+		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null
+				&& !authorObject.toString().isEmpty()) {
 			Author author = authorService.findByBoId(authorObject.toString());
 			List<Book> bookList = bookService.getBooksByAuthor(author.getId());
 			bookList.forEach(book -> {
-				if (book != null && book.getCategory() != null && book.getCategory().getBoId().equals(categoryObject.toString()))
+				if (book != null && book.getCategory() != null
+						&& book.getCategory().getBoId().equals(categoryObject.toString()))
 					books.add(book);
 			});
 			return books;
@@ -324,29 +329,49 @@ public class BookController extends AbstractController {
 		return bookService.getBooksBySubCategoryId(subcategory.getId());
 
 	}
-	
-	@RequestMapping(value = "exportExcel", method = RequestMethod.POST)
+
+	private String getStartDate(String param) {
+		String[] str = param.split(",");
+		String startDate = "";
+		String[] start = str[0].split(" ");
+		startDate = start[3] + "-" + parseMonthToInt(start[1]) + "-" + start[2];
+		return startDate;
+	}
+
+	private String getEndDate(String param) {
+		String[] str = param.split(",");
+		String endDate = "";
+		String[] start = str[1].split(" ");
+		endDate = start[3] + "-" + parseMonthToInt(start[1]) + "-" + start[2];
+		return endDate;
+	}
+
+	@RequestMapping(value = "exportEntry", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
-	public JSONObject exportExcel(@RequestBody JSONObject json) throws IOException, SQLException {
+	public JSONObject exportExcel(@RequestParam("input") String param, HttpServletResponse response)
+			throws IOException, SQLException {
 		JSONObject resultJson = new JSONObject();
-		
-		String startDate = json.get("start date").toString();
-		String endDate = json.get("end date").toString();
+		String startDate = getStartDate(param);
+		String endDate = getEndDate(param);
+
+		logger.info("StartDate: !!!!!!!!!!" + startDate);
+		logger.info("endDate: !!!!!!!!!!" + endDate);
+
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		Boolean result = writeBookSheet(workbook, startDate, endDate);
-		if(result == false) {
+		XSSFSheet sheet = workbook.createSheet("Book");
+		writeTitle(workbook, sheet, "Book Entries By  Librarian");
+
+		List<Book> bookList = bookService.getBooksByCreatedDate(startDate, endDate);
+		Boolean result = writeBookSheet(workbook, bookList, startDate, endDate);
+		if (result == false) {
 			resultJson.put("status", "0");
 			return resultJson;
 		}
-		
-		try (FileOutputStream outputStream = new FileOutputStream("BookSheet.xlsx")) {
-	        workbook.write(outputStream);
-	        resultJson.put("status", "1");
-			return resultJson;
-	    }
-		
-		
-		
+
+		workbook.write(response.getOutputStream());
+		resultJson.put("status", "1");
+		return resultJson;
+
 	}
 
 }

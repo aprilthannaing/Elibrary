@@ -990,12 +990,11 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
-
 	@RequestMapping(value = "banners", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject getImage(@RequestHeader("token") String token) throws IOException, ServiceUnavailableException {
-	
+
 		JSONObject resultJson = new JSONObject();
 		if (!isTokenRight(token)) {
 			resultJson.put("status", false);
@@ -1084,53 +1083,53 @@ public class OperationController extends AbstractController {
 		resultJson.put("message", "success!");
 		return resultJson;
 	}
-	
+
 	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		
+
 		String image = json.get("image").toString();
 		String imageName = json.get("imageName").toString();
-		if(image == null || image.isEmpty() || imageName == null || imageName.isEmpty()) {
+		if (image == null || image.isEmpty() || imageName == null || imageName.isEmpty()) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Please select an image!");
 			return resultJson;
 		}
-		
+
 		String pdf = json.get("pdf").toString();
 		String pdfName = json.get("pdfName").toString();
-		
+
 		String filePath = IMAGEUPLOADURL.trim() + "Advertisement//";
 		image = image.split("base64")[1];
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(image.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, imageName);
 		Files.write(destinationFile, imageBytes);
-		
+
 		BufferedImage bimg = ImageIO.read(new File(filePath + imageName));
-		int width          = bimg.getWidth();
-		int height         = bimg.getHeight();
-		
+		int width = bimg.getWidth();
+		int height = bimg.getHeight();
+
 		String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
 		pdf = pdf.split("base64")[1];
 		byte[] pdfBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf.replaceAll(" ", "+"));
 		Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
 		Files.write(destinationPDFFile, pdfBytes);
-		
+
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
 		advertisement.setName("Advertisement/" + imageName);
 		advertisement.setPdf("Advertisement/" + pdfName);
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
-		if(width == 1170 && height == 268) {
+		if (width == 1170 && height == 268) {
 			advertisement.setType(AdvertisementType.Web);
 		}
-		
-		else if(width == 991 && height == 350 ) {
+
+		else if (width == 991 && height == 350) {
 			advertisement.setType(AdvertisementType.Mobile);
 		}
-		
+
 		advertisementService.save(advertisement);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "success!");
@@ -1138,13 +1137,13 @@ public class OperationController extends AbstractController {
 		resultJson.put("height", height);
 		return resultJson;
 	}
-	
+
 	@RequestMapping(value = "getAdvertisements", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject getAdvertisements(@RequestHeader("token") String token) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		
+
 		if (!isTokenRight(token)) {
 			resultJson.put("status", false);
 			resultJson.put("message", "Unauthorized Request");
@@ -1155,15 +1154,15 @@ public class OperationController extends AbstractController {
 		resultJson.put("status", "1");
 		resultJson.put("advertisements", advertisements);
 		return resultJson;
-		
+
 	}
-	
-	@RequestMapping(value = "getFeedbacks", method = RequestMethod.GET) 
+
+	@RequestMapping(value = "getFeedbacks", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject getFeedbacks(@RequestHeader("token") String token) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		
+
 		if (!isTokenRight(token)) {
 			resultJson.put("status", false);
 			resultJson.put("message", "Unauthorized Request");
@@ -1174,22 +1173,21 @@ public class OperationController extends AbstractController {
 		resultJson.put("status", "1");
 		resultJson.put("feedbacks", feedbacks);
 		return resultJson;
-		
+
 	}
-	
+
 	@RequestMapping(value = "feedbackCount", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {
 		return feedbackService.countFeedback() + "";
 	}
-	
+
 	@RequestMapping(value = "advertisementCount", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getAdvertisementCount() throws ServiceUnavailableException {
 		return advertisementService.countAdvertisement() + "";
 	}
-	
-	
+
 	@RequestMapping(value = "deleteAdvertisement", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1213,8 +1211,7 @@ public class OperationController extends AbstractController {
 		advertisementService.save(advertisement);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Your request is successful!!");
-		return resultJson;	}
-	
-	
+		return resultJson;
+	}
 
 }

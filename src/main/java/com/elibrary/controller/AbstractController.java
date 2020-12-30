@@ -283,9 +283,8 @@ public class AbstractController {
 		return resultAuthorList;
 
 	}
-	
-	public void writeValueinSpecificeCellWithColumn(Workbook workbook, String sheetName, String columnName,
-			int rowNumber, String value, short fontSize, short color) {
+
+	public void writeValueinSpecificeCellWithColumn(Workbook workbook, String sheetName, String columnName, int rowNumber, String value, short fontSize, short color) {
 
 		Sheet sheet = workbook.getSheet(sheetName);
 		Row row = null;
@@ -312,9 +311,8 @@ public class AbstractController {
 		cell.setCellStyle(cellStyle);
 		cell.setCellValue(value);
 	}
-	
-	public void writeValueinSpecificeCellWithBackGroundColor(Workbook workbook, String sheetName, String columnName,
-			int rowNumber, String value, short fontSize, short color) {
+
+	public void writeValueinSpecificeCellWithBackGroundColor(Workbook workbook, String sheetName, String columnName, int rowNumber, String value, short fontSize, short color) {
 
 		Sheet sheet = workbook.getSheet(sheetName);
 		Row row = null;
@@ -344,154 +342,136 @@ public class AbstractController {
 		cell.setCellValue(value);
 	}
 
-	
 	public void writeTitle(XSSFWorkbook workbook, XSSFSheet sheet, String title) {
 
-		writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "H", 0, title,
-				(short) 20, IndexedColors.BLUE.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "A", 2, " ISBN ",
-				(short) 13, IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "B", 2, " Title ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "C", 2, " Edition ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "D", 2, " Publisher ",
-				(short) 13, IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "E", 2, " Call No. ",
-				(short) 13, IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "F", 2, " Accession No. ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "G", 2, " Author Name ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "H", 2, " Subcategory ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "I", 2, " Category ",
-				(short) 13, IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "J", 2, " Published Date ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "K", 2, " State ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "L", 2, " Modified Date ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "M", 2, " Created Date ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "N", 2, " Sort ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "O", 2, " Path ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "P", 2, " Series Index ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "Q", 2, " Size ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "R", 2, " Download Approval ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "S", 2, " Uploader ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "T", 2, " Own Rating ", (short) 13,
-				IndexedColors.BLACK.index);
-		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "U", 2, " Average Rating ", (short) 13,
-				IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "H", 0, title, (short) 20, IndexedColors.BLUE.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "A", 2, " ISBN ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "B", 2, " Title ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "C", 2, " Edition ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "D", 2, " Publisher ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "E", 2, " Call No. ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "F", 2, " Accession No. ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "G", 2, " Author Name ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "H", 2, " Subcategory ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "I", 2, " Category ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "J", 2, " Published Date ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "K", 2, " State ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "L", 2, " Modified Date ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "M", 2, " Created Date ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "N", 2, " Sort ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "O", 2, " Path ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "P", 2, " Series Index ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "Q", 2, " Size ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "R", 2, " Download Approval ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "S", 2, " Uploader ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "T", 2, " Own Rating ", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "U", 2, " Average Rating ", (short) 13, IndexedColors.BLACK.index);
 	}
-	
-	public boolean writeBookSheet(XSSFWorkbook workbook, String startDate, String endDate) throws SQLException {
-		XSSFSheet sheet = workbook.createSheet("Book");
-		writeTitle(workbook, sheet, "Library Book Checkout Sheet");
-		
-		List<Book> bookList = bookService.getBooksByCreatedDate(startDate, endDate);
+
+	public boolean writeBookSheet(XSSFWorkbook workbook, List<Book> bookList, String startDate, String endDate) throws SQLException {
+		XSSFSheet sheet = workbook.getSheetAt(0);
+
 		int count = 3;
 		for (Book book : bookList) {
 			if (book == null)
 				continue;
-			
+
 			List<Publisher> publishers = book.getPublishers();
-			for(Publisher publisher : publishers) {
+			for (Publisher publisher : publishers) {
 				logger.info("Publisher Name: " + publisher.getName());
 			}
 			List<Author> authors = book.getAuthors();
-			for(Author author : authors) {
+			for (Author author : authors) {
 				logger.info("Author Name: " + author.getName());
 			}
 			SubCategory subcategory = book.getSubCategory();
 			Category category = book.getCategory();
 			User user = book.getUploader();
 			String uploader = "";
-			if(user == null || user.toString().isEmpty()) {
-				
+			if (user == null || user.toString().isEmpty()) {
+
 				uploader = "";
 			}
-			
-			
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "A", count, book.getISBN(),
-					(short) 13, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "B", count, book.getTitle(),
-					(short) 13, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "C", count, book.getEdition(),
-					(short) 13, IndexedColors.BLACK.index);
+
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "A", count, book.getISBN(), (short) 13, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "B", count, book.getTitle(), (short) 13, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "C", count, book.getEdition(), (short) 13, IndexedColors.BLACK.index);
 			String publisherNames = "";
-			for(Publisher publisher: publishers) {
+			for (Publisher publisher : publishers) {
 				String publisherName = publisher.getName();
 				logger.info(publisherName);
-				
+
 				publisherNames += publisherName + ",";
-				
+
 			}
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "D", count, publisherNames,
-					(short) 13, IndexedColors.BLACK.index);
-			
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "E", count, book.getCallNo(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "F", count, book.getAccessionNo() + "",
-					(short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "D", count, publisherNames, (short) 13, IndexedColors.BLACK.index);
+
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "E", count, book.getCallNo(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "F", count, book.getAccessionNo() + "", (short) 10, IndexedColors.BLACK.index);
 			String authorNames = "";
-			for(Author author: authors) {
+			for (Author author : authors) {
 				String authorName = author.getName();
-				
+
 				authorNames += authorName + ",";
 			}
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "G", count, authorNames + "\n",
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "H", count, subcategory.getMyanmarName(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "I", count, category.getMyanmarName(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "J", count, book.getPublishedDate(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "K", count, book.getState().toString(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "L", count, book.getModifiedDate(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "M", count, book.getCreatedDate(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "N", count, book.getSort(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "O", count, book.getPath(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "P", count, book.getSeriesIndex(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "Q", count, book.getSize(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "R", count, book.getDownloadApproval(),
-					(short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "S", count, uploader,
-					(short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "G", count, authorNames + "\n", (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "H", count, subcategory.getMyanmarName(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "I", count, category.getMyanmarName(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "J", count, book.getPublishedDate(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "K", count, book.getState().toString(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "L", count, book.getModifiedDate(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "M", count, book.getCreatedDate(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "N", count, book.getSort(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "O", count, book.getPath(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "P", count, book.getSeriesIndex(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "Q", count, book.getSize(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "R", count, book.getDownloadApproval(), (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "S", count, uploader, (short) 10, IndexedColors.BLACK.index);
 
 			Double rate = book.getOwnRating();
 			String rating = rate.toString();
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "T", count, rating,
-					(short) 10, IndexedColors.BLACK.index);
-			
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "T", count, rating, (short) 10, IndexedColors.BLACK.index);
+
 			Double averageRate = book.getAverageRating();
 			String averageRating = averageRate.toString();
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "U", count, averageRating,
-					(short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "U", count, averageRating, (short) 10, IndexedColors.BLACK.index);
 			count++;
 		}
-		
+
 		if (sheet.getLastRowNum() == 0 && sheet.getRow(0) == null) {
-	        return false;
-	    }
-		else return true;
+			return false;
+		} else
+			return true;
 
+	}
 
+	public String parseMonthToInt(String month) {
+		switch (month) {
+		case "Jan":
+			return "01";
+		case "Feb":
+			return "02";
+		case "Mar":
+			return "03";
+		case "Apr":
+			return "04";
+		case "May":
+			return "05";
+		case "June":
+			return "06";
+		case "July":
+			return "07";
+		case "Aug":
+			return "08";
+		case "Sep":
+			return "09";
+		case "Oct":
+			return "10";
+		case "Nov":
+			return "11";
+		case "Dec":
+			return "12";
+		}
+		return "-1";
 	}
 }

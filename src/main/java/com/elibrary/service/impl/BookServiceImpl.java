@@ -125,11 +125,11 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 
 	@Override
 	public long getBookCountByLibrarian(long librarianId) {
-		String query = "from Book book where uploader=" + librarianId;
-		List<Book> books = bookDao.getEntitiesByQuery(query);
+		String query = "select count(*) from Book where uploader=" + librarianId;
+		List<Long> books = bookDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(books))
 			return 0;
-		return books.size();
+		return books.get(0);
 	}
 
 	@Override
@@ -508,7 +508,5 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 			return new ArrayList<Book>();
 		return bookList;
 	}
-	
-	
 
 }
