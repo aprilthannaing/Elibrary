@@ -1,12 +1,12 @@
 package com.elibrary.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
@@ -62,8 +63,8 @@ public class DashBoardController extends AbstractController {
 
 		librarianList.forEach(librarian -> {
 			nameList.add(librarian.getName());
-			//bookCount.add(bookService.getBookCountByLibrarian(librarian.getId()));
-			bookCount.add((long)123);
+			// bookCount.add(bookService.getBookCountByLibrarian(librarian.getId()));
+			bookCount.add((long) 123);
 
 		});
 		resultJson.put("status", "1");
@@ -74,7 +75,7 @@ public class DashBoardController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "librarian/booksearch", method = RequestMethod.POST)
+	@RequestMapping(value = "librarian/booksearch", method = RequestMethod.POST) // pending
 	@JsonView(Views.Summary.class)
 	public JSONObject search(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -200,8 +201,7 @@ public class DashBoardController extends AbstractController {
 
 		List<Category> categories = categoryService.getAll();
 		categories.forEach(category -> {
-			nameList.add(category.getMyanmarName()
-					+ (category.getEngName().isEmpty() ? "" : " ( " + category.getEngName() + " )"));
+			nameList.add(category.getMyanmarName() + (category.getEngName().isEmpty() ? "" : " ( " + category.getEngName() + " )"));
 			try {
 				bookCount.add((long) bookService.getPopularBooksByCategory(category.getId()).size());
 			} catch (Exception e) {
@@ -219,21 +219,15 @@ public class DashBoardController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "popularbooks", method = RequestMethod.POST)
 	@JsonView(Views.Summary.class)
-	public JSONObject getPopulars(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject getPopulars(@RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 		int index = Integer.parseInt(json.get("index").toString());
 		List<Category> categories = categoryService.getAll();
-		List<List<Long>> bookCountList = new ArrayList<List<Long>>();
+		List<Long> bookIds = new ArrayList<Long>();
 
-		categories.forEach(category -> {
-			try {
-				bookCountList.add(bookService.getPopularBooksByCategory(category.getId()));
-			} catch (Exception e) {
-				logger.error("Error Exception: " + e);
-			}
-		});
+		Category category = categories.get(index);
+		bookIds.addAll(bookService.getPopularBooksByCategory(category.getId()));
 
-		List<Long> bookIds = bookCountList.get(index);
 		int pageNo = getPage(json);
 		int lastPageNo = bookIds.size() % 10 == 0 ? bookIds.size() / 10 : bookIds.size() / 10 + 1;
 

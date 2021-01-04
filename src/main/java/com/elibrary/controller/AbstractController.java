@@ -367,7 +367,7 @@ public class AbstractController {
 		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "U", 2, " Average Rating ", (short) 13, IndexedColors.BLACK.index);
 	}
 
-	public boolean writeBookSheet(XSSFWorkbook workbook, List<Book> bookList, String startDate, String endDate) throws SQLException {
+	public boolean writeBookSheet(XSSFWorkbook workbook, List<Book> bookList) throws SQLException {
 		XSSFSheet sheet = workbook.getSheetAt(0);
 
 		int count = 3;

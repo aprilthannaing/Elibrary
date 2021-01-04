@@ -84,10 +84,21 @@ public interface BookService {
 	public List<Long> getBooksBySearchTermsAndPopular(String searchTerms) throws SQLException, ClassNotFoundException;
 
 	public Long getPendingBookCount();
-	
+
 	public List<Long> getBookIdsBySubCategoryId(long subcategoryId);
 
 	public List<Long> getPopularBooksByCategory(Long categoryId) throws SQLException, ClassNotFoundException;
-	
+
 	public List<Book> getBooksByCreatedDate(String startDate, String endDate) throws SQLException;
+
+	public List<Book> getBooksByLibrarian(long librarianId);
+
+	public List<Book> getBooksByLibrarian(long librarianId, String startDate, String endDate);
+
+	public List<Book> getPopularBookListByCategory(Long categoryId) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getPopularBookListByCategory(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getBookListByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
 }

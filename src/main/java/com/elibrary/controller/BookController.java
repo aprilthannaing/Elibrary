@@ -1,3 +1,4 @@
+
 package com.elibrary.controller;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
+import com.elibrary.entity.Category;
 import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
@@ -114,8 +116,7 @@ public class BookController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "approve", method = RequestMethod.POST) // approving without editing
 	@JsonView(Views.Summary.class)
-	public JSONObject approve(@RequestHeader("token") String token, @RequestBody JSONObject json)
-			throws ServiceUnavailableException {
+	public JSONObject approve(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -148,8 +149,7 @@ public class BookController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "", method = RequestMethod.POST) // mobile
 	@JsonView(Views.Thin.class)
-	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json)
-			throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+	public JSONObject getBooks(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 
 		if (!isTokenRight(token)) {
@@ -299,13 +299,11 @@ public class BookController extends AbstractController {
 		/* books by category and author */
 		Object categoryObject = json.get("category_id");
 		Object authorObject = json.get("author_id");
-		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null
-				&& !authorObject.toString().isEmpty()) {
+		if (categoryObject != null && !categoryObject.toString().isEmpty() && authorObject != null && !authorObject.toString().isEmpty()) {
 			Author author = authorService.findByBoId(authorObject.toString());
 			List<Book> bookList = bookService.getBooksByAuthor(author.getId());
 			bookList.forEach(book -> {
-				if (book != null && book.getCategory() != null
-						&& book.getCategory().getBoId().equals(categoryObject.toString()))
+				if (book != null && book.getCategory() != null && book.getCategory().getBoId().equals(categoryObject.toString()))
 					books.add(book);
 			});
 			return books;
@@ -348,21 +346,103 @@ public class BookController extends AbstractController {
 
 	@RequestMapping(value = "exportEntry", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
-	public JSONObject exportExcel(@RequestParam("input") String param, HttpServletResponse response)
-			throws IOException, SQLException {
+	public JSONObject exportExcel(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException {
 		JSONObject resultJson = new JSONObject();
-		String startDate = getStartDate(param);
-		String endDate = getEndDate(param);
-
-		logger.info("StartDate: !!!!!!!!!!" + startDate);
-		logger.info("endDate: !!!!!!!!!!" + endDate);
 
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		XSSFSheet sheet = workbook.createSheet("Book");
 		writeTitle(workbook, sheet, "Book Entries By  Librarian");
 
-		List<Book> bookList = bookService.getBooksByCreatedDate(startDate, endDate);
-		Boolean result = writeBookSheet(workbook, bookList, startDate, endDate);
+		List<User> librarianList = userService.getLibrarians();
+		String[] str = param.split(",");
+		int index = Integer.parseInt(str[2]);
+		User user = librarianList.get(index);
+		List<Book> books = new ArrayList<Book>();
+
+		/* have not start date and end date */
+		if (param.startsWith(","))
+			books.addAll(bookService.getBooksByLibrarian(user.getId()));
+		else {
+			String startDate = getStartDate(param);
+			String endDate = getEndDate(param);
+			books.addAll(bookService.getBooksByLibrarian(user.getId(), startDate, endDate));
+		}
+
+		Boolean result = writeBookSheet(workbook, books);
+		if (result == false) {
+			resultJson.put("status", "0");
+			return resultJson;
+		}
+
+		workbook.write(response.getOutputStream());
+		resultJson.put("status", "1");
+		return resultJson;
+
+	}
+
+	@RequestMapping(value = "exportPopularBooks", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public JSONObject exportPopularBooks(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException, ClassNotFoundException {
+		JSONObject resultJson = new JSONObject();
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("Book");
+		writeTitle(workbook, sheet, "Popular Books By Main Category");
+
+		List<Category> categories = categoryService.getAll();
+		String[] str = param.split(",");
+		int index = Integer.parseInt(str[2]);
+		Category category = categories.get(index);
+		List<Book> books = new ArrayList<Book>();
+
+		/* have not start date and end date */
+		if (param.startsWith(","))
+			books.addAll(bookService.getPopularBookListByCategory(category.getId()));
+		else {
+			String startDate = getStartDate(param);
+			String endDate = getEndDate(param);
+			books.addAll(bookService.getPopularBookListByCategory(category.getId(), startDate, endDate));
+		}
+
+		Boolean result = writeBookSheet(workbook, books);
+		if (result == false) {
+			resultJson.put("status", "0");
+			return resultJson;
+		}
+
+		workbook.write(response.getOutputStream());
+		resultJson.put("status", "1");
+		return resultJson;
+
+	}
+
+	@RequestMapping(value = "exportBooksByCategory", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public JSONObject exportBooksByCategory(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException, ClassNotFoundException {
+		JSONObject resultJson = new JSONObject();
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("Book");
+		writeTitle(workbook, sheet, "Popular Books By Main Category");
+
+		String[] str = param.split(",");
+		SubCategory subCategory = subCategoryService.findByBoId(str[3]);
+		List<Book> books = new ArrayList<Book>();
+
+		/* have not start date and end date */
+		if (param.startsWith(","))
+			books.addAll(bookService.getBooksBySubCategoryId(subCategory.getId()));
+		else {
+			String startDate = getStartDate(param);
+			String endDate = getEndDate(param);
+			
+			logger.info("startDate!!!!!!!!!!!!!!!" + startDate);
+			logger.info("endDate!!!!!!!!!!!!!!!" + endDate);
+
+			books.addAll(bookService.getBookListByDateAndSubCategory(subCategory.getId(), startDate, endDate));
+		}
+
+		Boolean result = writeBookSheet(workbook, books);
 		if (result == false) {
 			resultJson.put("status", "0");
 			return resultJson;
