@@ -66,20 +66,24 @@ public class DashBoardController extends AbstractController {
 
 		Date date = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String startDate = dateFormat.format(date);
-		Date end = dateFormat.parse(startDate);
-		Calendar c = Calendar.getInstance();
-		c.setTime(end);
-		c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-		String endDate = dateFormat.format(end);
+		String endDate = dateFormat.format(date);
 
-		logger.info("startDate !!!!!!!!!" + startDate);
-		logger.info("endDate !!!!!!!!!" + end);
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.MONTH, -9);
+		Date start = c.getTime();
+		String startDate = dateFormat.format(start);
+
+		
+		
 
 		librarianList.forEach(librarian -> {
 			nameList.add(librarian.getName());
+			logger.info("startDate !!!!!!!!!" + startDate);
+			logger.info("endDate !!!!!!!!!" + endDate);
+			logger.info("librarian.getId() !!!!!!!!!" + librarian.getId());
+
 			bookCount.add(bookService.getBookCountByLibrarian(librarian.getId(), startDate, endDate));
-			// bookCount.add((long) 123);
+			logger.info("bookCount!!!!!!!!!" + bookService.getBookCountByLibrarian(librarian.getId(), startDate, endDate));
 
 		});
 		resultJson.put("status", "1");
@@ -133,22 +137,22 @@ public class DashBoardController extends AbstractController {
 			resultJson.put("msg", "There is no Book!");
 			return resultJson;
 		}
-		
+
 		Date date = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		String startDate = dateFormat.format(date);
-		Date end = dateFormat.parse(startDate);
+		String endDate = dateFormat.format(date);
+
 		Calendar c = Calendar.getInstance();
-		c.setTime(end);
-		c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-		String endDate = dateFormat.format(end);
+		c.add(Calendar.MONTH, -9);
+		Date start = c.getTime();
+		String startDate = dateFormat.format(start);
 
 		logger.info("startDate !!!!!!!!!" + startDate);
-		logger.info("endDate !!!!!!!!!" + end);
+		logger.info("endDate !!!!!!!!!" + endDate);
 
 		User user = librarianList.get(index);
 		if (user != null)
-			books.addAll(bookService.getBookListByLibrarian(user.getId()));
+			books.addAll(bookService.getBookListByLibrarian(user.getId(), startDate, endDate));
 
 		int pageNo = getPage(json);
 		int lastPageNo = books.size() % 10 == 0 ? books.size() / 10 : books.size() / 10 + 1;

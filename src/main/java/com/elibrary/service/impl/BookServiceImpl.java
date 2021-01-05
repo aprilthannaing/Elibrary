@@ -115,8 +115,8 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
-	public List<Long> getBookListByLibrarian(long librarianId) {
-		String query = "select id from Book where uploader=" + librarianId + " and entityStatus='" + EntityStatus.ACTIVE + "'";
+	public List<Long> getBookListByLibrarian(long librarianId, String startDate, String endDate) {
+		String query = "select id from Book where uploader=" + librarianId + " and createdDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Long> books = bookDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Long>();
