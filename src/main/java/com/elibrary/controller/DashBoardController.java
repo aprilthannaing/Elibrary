@@ -1,7 +1,11 @@
 package com.elibrary.controller;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
@@ -47,9 +50,9 @@ public class DashBoardController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "librarian/bookentry", method = RequestMethod.POST)
+	@RequestMapping(value = "librarian/bookentry", method = RequestMethod.POST) // 1
 	@JsonView(Views.Thin.class)
-	public JSONObject getAll() throws ServiceUnavailableException {
+	public JSONObject getAll() throws ServiceUnavailableException, ParseException {
 		JSONObject resultJson = new JSONObject();
 		List<String> nameList = new ArrayList<String>();
 		List<Long> bookCount = new ArrayList<Long>();
@@ -61,10 +64,22 @@ public class DashBoardController extends AbstractController {
 			return resultJson;
 		}
 
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String startDate = dateFormat.format(date);
+		Date end = dateFormat.parse(startDate);
+		Calendar c = Calendar.getInstance();
+		c.setTime(end);
+		c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+		String endDate = dateFormat.format(end);
+
+		logger.info("startDate !!!!!!!!!" + startDate);
+		logger.info("endDate !!!!!!!!!" + end);
+
 		librarianList.forEach(librarian -> {
 			nameList.add(librarian.getName());
-			// bookCount.add(bookService.getBookCountByLibrarian(librarian.getId()));
-			bookCount.add((long) 123);
+			bookCount.add(bookService.getBookCountByLibrarian(librarian.getId(), startDate, endDate));
+			// bookCount.add((long) 123);
 
 		});
 		resultJson.put("status", "1");
@@ -75,23 +90,33 @@ public class DashBoardController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "librarian/booksearch", method = RequestMethod.POST) // pending
+	@RequestMapping(value = "librarian/booksearch", method = RequestMethod.POST) // 1
 	@JsonView(Views.Summary.class)
-	public JSONObject search(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject search(@RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 		List<User> librarianList = userService.getLibrarians();
 		int index = Integer.parseInt(json.get("index").toString());
 		User user = librarianList.get(index);
+		String searchTerms = json.get("searchTerms").toString();
 
-		resultJson.put("librarian Name", librarianList.get(index).getName());
+		List<Long> bookList = bookService.getBookBySearchTermsAndUploader(searchTerms, user.getId());
+		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
+		Object pageObject = json.get("page");
+		int pageNo = Integer.parseInt(pageObject.toString());
+
+		resultJson.put("status", true);
+		resultJson.put("current_page", pageNo);
+		resultJson.put("last_page", lastPageNo);
+		resultJson.put("total_count", bookList.size());
+		resultJson.put("books", getBooksByPaganationWithBookIds(json, bookList, pageNo));
 		return resultJson;
 	}
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "librarian/booklist", method = RequestMethod.POST)
+	@RequestMapping(value = "librarian/booklist", method = RequestMethod.POST) // 1
 	@JsonView(Views.Summary.class)
-	public JSONObject getBookList(@RequestBody JSONObject json) throws ServiceUnavailableException {
+	public JSONObject getBookList(@RequestBody JSONObject json) throws ServiceUnavailableException, ParseException {
 		JSONObject resultJson = new JSONObject();
 		List<Long> books = new ArrayList<Long>();
 
@@ -108,6 +133,18 @@ public class DashBoardController extends AbstractController {
 			resultJson.put("msg", "There is no Book!");
 			return resultJson;
 		}
+		
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String startDate = dateFormat.format(date);
+		Date end = dateFormat.parse(startDate);
+		Calendar c = Calendar.getInstance();
+		c.setTime(end);
+		c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+		String endDate = dateFormat.format(end);
+
+		logger.info("startDate !!!!!!!!!" + startDate);
+		logger.info("endDate !!!!!!!!!" + end);
 
 		User user = librarianList.get(index);
 		if (user != null)
@@ -126,7 +163,7 @@ public class DashBoardController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "booksbysubcategory", method = RequestMethod.POST)
+	@RequestMapping(value = "booksbysubcategory", method = RequestMethod.POST) // 2
 	@JsonView(Views.Summary.class)
 	public JSONObject getBooksBySubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -154,7 +191,7 @@ public class DashBoardController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "booklistbysubcategory", method = RequestMethod.POST)
+	@RequestMapping(value = "booklistbysubcategory", method = RequestMethod.POST) // 2
 	@JsonView(Views.Summary.class)
 	public JSONObject getBookListBySubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -186,7 +223,7 @@ public class DashBoardController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "popularbookcount", method = RequestMethod.POST)
+	@RequestMapping(value = "popularbookcount", method = RequestMethod.POST) // 3
 	@JsonView(Views.Summary.class)
 	public JSONObject getPopularBookCount(@RequestHeader("token") String token) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -217,7 +254,7 @@ public class DashBoardController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
-	@RequestMapping(value = "popularbooks", method = RequestMethod.POST)
+	@RequestMapping(value = "popularbooks", method = RequestMethod.POST) // 3
 	@JsonView(Views.Summary.class)
 	public JSONObject getPopulars(@RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
@@ -236,6 +273,31 @@ public class DashBoardController extends AbstractController {
 		resultJson.put("current_page", pageNo);
 		resultJson.put("last_page", lastPageNo);
 		resultJson.put("total_count", bookIds.size());
+		return resultJson;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "popualrbooksearch", method = RequestMethod.POST) // 3
+	@JsonView(Views.Summary.class)
+	public JSONObject popualrbooksearch(@RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+		JSONObject resultJson = new JSONObject();
+		int index = Integer.parseInt(json.get("index").toString());
+		List<Category> categories = categoryService.getAll();
+		Category category = categories.get(index);
+		String searchTerms = json.get("searchTerms").toString();
+
+		List<Long> bookList = bookService.getPopularBookBySearchTermsAndCategory(category.getId(), searchTerms);
+		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
+		Object pageObject = json.get("page");
+		int pageNo = Integer.parseInt(pageObject.toString());
+
+		resultJson.put("status", true);
+		resultJson.put("current_page", pageNo);
+		resultJson.put("last_page", lastPageNo);
+		resultJson.put("total_count", bookList.size());
+		resultJson.put("books", getBooksByPaganationWithBookIds(json, bookList, pageNo));
+
 		return resultJson;
 	}
 

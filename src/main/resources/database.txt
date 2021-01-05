@@ -638,3 +638,150 @@ END
 //
 DELIMITER ;
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_PopularBook_byCatIDCreateDt;
+CREATE PROCEDURE GET_PopularBook_byCatIDCreateDt (IN CatID nvarchar(50), SDate date,EDate date )
+BEGIN
+  SELECT
+    H.bookId 'Book',
+    B.boId,
+    H.actionStatus,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+  FROM history H
+    , book_category BC
+    , book B
+  WHERE BC.bookId = H.bookId
+  AND B.id=H.bookId
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BC.categoryId = CatID
+  AND  CONVERT(B.createdDate,DATETIME) BETWEEN SDate and EDate
+  GROUP BY H.actionStatus,
+           BC.categoryId
+  ORDER BY TOT_COUNT DESC;
+END
+//
+DELIMITER ;
+
+CALL GET_PopularBook_byCatIDCreateDt('1','2020-06-01','2020-06-24');
+
+
+USE elibrary;
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_PopularBook_bySTandUploader;
+CREATE PROCEDURE GET_PopularBook_bySTandUploader (IN ST nvarchar(100), Updr nvarchar(50) )
+BEGIN
+  SELECT
+  H.bookId 'Book',
+  B.boId,
+--   H.actionStatus,
+  B.uploader,
+  SUM(CASE WHEN (H.actionStatus = "READ" OR
+      H.actionStatus = "FAVOURITE" OR
+      H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+FROM history H,    
+  book B
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category BC ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+WHERE BC.bookId = H.bookId
+AND B.id = H.bookId
+AND (H.actionStatus = "READ"
+OR H.actionStatus = "FAVOURITE"
+OR H.actionStatus = "BOOKMARK")
+AND CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
+, b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+, (SELECT
+    a.name
+  FROM author a
+  WHERE a.id = ba.authorId), (SELECT
+    p.name
+  FROM publisher p
+  WHERE p.id = bp.publisherId), (SELECT
+    s.myanmarName
+  FROM subcategory s
+  WHERE s.id = bs.subcategoryId), (SELECT
+    s1.engName
+  FROM subcategory s1
+  WHERE s1.id = bs.subcategoryId), (SELECT
+    C.myanmarName
+  FROM category c
+  WHERE C.id = BC.categoryId), (SELECT
+    C.engName
+  FROM category c
+  WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST , '%')
+  AND B.uploader=Updr
+GROUP BY 
+         B.boId,
+         H.bookId
+ORDER BY TOT_COUNT DESC;
+END
+// DELIMITER ;
+
+
+CALL GET_PopularBook_bySTandUploader('1', '7');
+
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_PopularBook_byCatIDandSearchTerm;
+CREATE PROCEDURE GET_PopularBook_byCatIDandSearchTerm (IN CatID nvarchar(50), ST nvarchar(100))
+BEGIN
+  SELECT
+    H.bookId 'Book',
+    H.boId,
+    H.actionStatus,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+  FROM  history H,
+        book B
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category BC ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+  WHERE BC.bookId = H.bookId
+  AND H.bookId=B.id
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BC.categoryId = CatID
+  AND CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
+, b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+, (SELECT
+    a.name
+  FROM author a
+  WHERE a.id = ba.authorId), (SELECT
+    p.name
+  FROM publisher p
+  WHERE p.id = bp.publisherId), (SELECT
+    s.myanmarName
+  FROM subcategory s
+  WHERE s.id = bs.subcategoryId), (SELECT
+    s1.engName
+  FROM subcategory s1
+  WHERE s1.id = bs.subcategoryId), (SELECT
+    C.myanmarName
+  FROM category c
+  WHERE C.id = BC.categoryId), (SELECT
+    C.engName
+  FROM category c
+  WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST , '%')
+  GROUP BY H.actionStatus,
+           BC.categoryId
+  ORDER BY TOT_COUNT DESC;
+END
+//
+DELIMITER ;
+
+
+CALL GET_PopularBook_byCatIDandSearchTerm('3','1');
+
+alter table reply add column viewStatus varchar(50);
+update reply set viewStatus=false;
+
+

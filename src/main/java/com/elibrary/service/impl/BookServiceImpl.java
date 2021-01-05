@@ -142,8 +142,8 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
-	public long getBookCountByLibrarian(long librarianId) {
-		String query = "select count(*) from Book where uploader=" + librarianId;
+	public long getBookCountByLibrarian(long librarianId, String startDate, String endDate) {
+		String query = "select count(*) from Book where uploader=" + librarianId + " and createdDate between '" + startDate + "' and '" + endDate + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Long> books = bookDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(books))
 			return 0;
@@ -573,6 +573,44 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (CollectionUtils.isEmpty(bookList))
 			return new ArrayList<Book>();
 		return bookList;
+	}
+
+	@Override
+	public List<Long> getBookBySearchTermsAndUploader(String searchTerms, Long uploader) throws SQLException, ClassNotFoundException {
+		List<Long> IdList = new ArrayList<Long>();
+		String storedProc = "{call GET_PopularBook_bySTandUploader(?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, searchTerms);
+		myCs.setString(2, uploader + "");
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				IdList.add(Long.parseLong(rs.getString("Book")));
+			}
+			con.close();
+		}
+		return IdList;
+	}
+
+	@Override
+	public List<Long> getPopularBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Long> IdList = new ArrayList<Long>();
+		String storedProc = "{call GET_PopularBook_byCatIDandSearchTerm(?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, categoryId + "");
+		myCs.setString(2, searchTerms);
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				IdList.add(Long.parseLong(rs.getString("Book")));
+			}
+			con.close();
+		}
+		return IdList;
 	}
 
 }

@@ -1176,6 +1176,42 @@ public class OperationController extends AbstractController {
 
 	}
 
+	private String getFeedbackBoId(JSONObject json) {
+		Object feedback = json.get("feedback_id");
+		if (feedback == null || feedback.toString().isEmpty())
+			return "";
+		return feedback.toString();
+	}
+
+	private Long getUserId(JSONObject json) {
+		Object user = json.get("user_id");
+		if (user == null || user.toString().isEmpty())
+			return (long) 0;
+		return Long.parseLong(user.toString());
+	}
+
+	@RequestMapping(value = "view", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject getFeedbacks(@RequestHeader("token") String token, @RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		Feedback feedback = feedbackService.findByBoId(getFeedbackBoId(json));
+		Reply reply = feedback.getReplyId();
+		reply.setViewStatus(true);
+		replyService.save(reply);
+		resultJson.put("status", true);
+		resultJson.put("message", "success");
+		return resultJson;
+
+	}
+
 	@RequestMapping(value = "feedbackCount", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {

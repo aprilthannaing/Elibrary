@@ -23,9 +23,7 @@ public interface BookService {
 
 	public long countBook();
 
-	public List<Long> getBookListByLibrarian(long librarianId);
-
-	public long getBookCountByLibrarian(long librarianId);
+	public long getBookCountByLibrarian(long librarianId, String startDate, String endDate);
 
 	public Long getBookCountWriteByAuthor(long authorId);
 
@@ -100,5 +98,11 @@ public interface BookService {
 	public List<Book> getPopularBookListByCategory(Long categoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
 	public List<Book> getBookListByDateAndSubCategory(Long subcategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
+	public List<Long> getBookBySearchTermsAndUploader(String searchTerms, Long uploader) throws SQLException, ClassNotFoundException;
+
+	public List<Long> getPopularBookBySearchTermsAndCategory(Long categoryId, String searchTerms) throws SQLException, ClassNotFoundException;
+
+	public List<Long> getBookListByLibrarian(long librarianId);
 
 }

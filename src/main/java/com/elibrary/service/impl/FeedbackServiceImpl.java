@@ -39,7 +39,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 	private Long plus() {
 		return countFeedback() + 10000;
 	}
-	
+
 	@Override
 	public long countFeedback() {
 		String query = "select count(*) from Feedback";
@@ -69,6 +69,15 @@ public class FeedbackServiceImpl implements FeedbackService {
 	}
 
 	@Override
+	public Long getNotiCount(Long userId) {
+		String query = "select count(*) from Feedback feedback where userId=" + userId + " and replyId <> NULL and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Long> feedbackList = feedbackDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(feedbackList))
+			return (long) 0;
+		return feedbackList.get(0);
+	}
+
+	@Override
 	public List<Feedback> getAll() {
 		String query = "select feedback from Feedback feedback where entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Feedback> feedbacks = feedbackDao.getEntitiesByQuery(query);
@@ -76,6 +85,5 @@ public class FeedbackServiceImpl implements FeedbackService {
 			return null;
 		return feedbacks;
 	}
-
 
 }

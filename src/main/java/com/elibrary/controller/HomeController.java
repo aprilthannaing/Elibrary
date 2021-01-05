@@ -27,6 +27,7 @@ import com.elibrary.service.AdvertisementService;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
+import com.elibrary.service.FeedbackService;
 import com.elibrary.service.HistoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -53,6 +54,9 @@ public class HomeController extends AbstractController {
 
 	@Autowired
 	private AdvertisementService advertisementService;
+
+	@Autowired
+	private FeedbackService feedbackService;
 
 	private static Logger logger = Logger.getLogger(HomeController.class);
 
@@ -122,6 +126,7 @@ public class HomeController extends AbstractController {
 		resultJson.put("international_author", getAuthors(AuthorType.INTERNATIONAL));
 		resultJson.put("advertisements", advertisementService.getAll());
 		resultJson.put("main_category", categoryList); // 6
+		resultJson.put("notiCount", feedbackService.getNotiCount(user.getId()));
 		return resultJson;
 	}
 
