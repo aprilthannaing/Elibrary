@@ -885,6 +885,7 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "deleteUser", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -906,6 +907,7 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "watermark", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -951,7 +953,8 @@ public class OperationController extends AbstractController {
 			return null;
 		return message.toString();
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "feedback", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -989,7 +992,7 @@ public class OperationController extends AbstractController {
 		resultJson.put("message", "success!");
 		return resultJson;
 	}
-
+	
 	@RequestMapping(value = "banners", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1016,6 +1019,7 @@ public class OperationController extends AbstractController {
 		return feedbackService.findByBoId(feedbackId.toString());
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "reply", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1059,6 +1063,7 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+	
 	@RequestMapping(value = "replyNoti", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1157,6 +1162,7 @@ public class OperationController extends AbstractController {
 
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "getFeedbacks", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(Views.Summary.class)

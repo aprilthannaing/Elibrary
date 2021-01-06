@@ -375,6 +375,7 @@ public class BookController extends AbstractController {
 		}
 
 		workbook.write(response.getOutputStream());
+	
 		resultJson.put("status", "1");
 		return resultJson;
 

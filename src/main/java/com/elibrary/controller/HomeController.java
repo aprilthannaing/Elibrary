@@ -129,7 +129,32 @@ public class HomeController extends AbstractController {
 		resultJson.put("notiCount", feedbackService.getNotiCount(user.getId()));
 		return resultJson;
 	}
+	
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "notiCount", method = RequestMethod.POST) // page by category
+	@JsonView(Views.Summary.class)
+	public JSONObject countNoti(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+		JSONObject resultJson = new JSONObject();
+		Object userId = json.get("user_id");
+		User user = userService.findByBoId(userId.toString());
+		if (user == null) {
+			resultJson.put("status", false);
+			resultJson.put("err_msg", "This user is not found!");
+			return resultJson;
+		}
 
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("err_msg", "Unauthorized Request");
+			return resultJson;
+		}
+		resultJson.put("status", true);
+		resultJson.put("notiCount", feedbackService.getNotiCount(user.getId()));
+		
+		return resultJson; 
+
+	}
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "book", method = RequestMethod.POST) // page by category
@@ -165,10 +190,13 @@ public class HomeController extends AbstractController {
 		}
 
 		Category category = categoryService.findByBoId(categoryId.toString());
+		List<Book> bookList= setBookInfo(bookService.getLatestBooksByCategoryId(category.getId()), user);
+		int bookCount = bookList.size();
 		resultJson.put("local_author", getAuthors(category, AuthorType.LOCAL));
 		resultJson.put("international_author", getAuthors(category, AuthorType.INTERNATIONAL));
 		resultJson.put("sub_category", getDisplaySubCategories(category));
-		resultJson.put("latest_book", setBookInfo(bookService.getLatestBooksByCategoryId(category.getId()), user));
+		resultJson.put("latest_book", bookList);
+		resultJson.put("book_count", bookCount);
 		resultJson.put("status", true);
 		return resultJson;
 	}
