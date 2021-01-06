@@ -333,8 +333,7 @@ public class DashBoardController extends AbstractController {
 		int index = Integer.parseInt(json.get("index").toString());
 		Category category = null;
 		SubCategory subCategory = getSubCategory(json);
-		logger.info("subCategory !!!!!!!!!!!");
-		if (subCategory != null)
+		if (subCategory != null && subCategory.getCategoryBoId() != null)
 			category = categoryService.findByBoId(subCategory.getCategoryBoId());
 		else {
 			List<Category> categories = categoryService.getAll();

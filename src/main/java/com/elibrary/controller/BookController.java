@@ -435,11 +435,44 @@ public class BookController extends AbstractController {
 		else {
 			String startDate = getStartDate(param);
 			String endDate = getEndDate(param);
-			
-			logger.info("startDate!!!!!!!!!!!!!!!" + startDate);
-			logger.info("endDate!!!!!!!!!!!!!!!" + endDate);
-
 			books.addAll(bookService.getBookListByDateAndSubCategory(subCategory.getId(), startDate, endDate));
+		}
+
+		Boolean result = writeBookSheet(workbook, books);
+		if (result == false) {
+			resultJson.put("status", "0");
+			return resultJson;
+		}
+
+		workbook.write(response.getOutputStream());
+		resultJson.put("status", "1");
+		return resultJson;
+
+	}
+	
+	@RequestMapping(value = "exportPopularBooksBySubCategory", method = RequestMethod.GET)
+	@JsonView(Views.Summary.class)
+	public JSONObject exportPopularBooksBySubCategory(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException, ClassNotFoundException {
+		JSONObject resultJson = new JSONObject();
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("Book");
+		writeTitle(workbook, sheet, "Popular Books By Sub Category");
+
+		String[] str = param.split(",");
+		SubCategory subCategory = subCategoryService.findByBoId(str[3]);
+		List<Book> books = new ArrayList<Book>();
+
+		/* have not start date and end date */
+		if (param.startsWith(",")) {
+			bookService.getPopularBooksBySubCategory(subCategory.getId()).forEach(id->{
+				books.add(bookService.findById(id));
+			});
+		}
+		else {
+			String startDate = getStartDate(param);
+			String endDate = getEndDate(param);
+			books.addAll(bookService.getBookListByDateAndSubCategory(subCategory.getId(), startDate, endDate)); //pending
 		}
 
 		Boolean result = writeBookSheet(workbook, books);

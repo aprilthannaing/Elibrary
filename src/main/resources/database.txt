@@ -812,3 +812,30 @@ DELIMITER ;
 
 CALL GET_PopularBook_byCatIDandSearchTerm('3','1');
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_PopularBook_byCatID;
+CREATE PROCEDURE GET_PopularBook_byCatID (IN CatID nvarchar(50))
+BEGIN
+  SELECT
+    H.bookId 'Book',
+    H.boId,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+  FROM history H,
+       book_category BC
+  WHERE BC.bookId = H.bookId
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BC.categoryId = CatID
+  GROUP BY BC.categoryId
+  ORDER BY TOT_COUNT DESC;
+END
+//
+DELIMITER ;
+
+-- ------------------------------ --------------------------------- ---------------------------
+
+CALL GET_PopularBook_byCatID('1');
+

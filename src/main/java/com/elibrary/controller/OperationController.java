@@ -1250,4 +1250,21 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+	/* run for data migration */
+	@RequestMapping(value = "setCategory", method = RequestMethod.GET)
+	@JsonView(Views.Thin.class)
+	public String setCategory() {
+		List<SubCategory> subCategoryList = subCategoryService.getAll();
+		subCategoryList.forEach(sub -> {
+			Category category = categoryService.findByCategoryId(categoryService.findBySubCategoryId(sub.getId()));			
+			sub.setCategoryBoId(category.getBoId());
+			try {
+				subCategoryService.save(sub);
+			} catch (ServiceUnavailableException e) {
+				logger.info("Error: " + e);
+			}
+		});
+		return "success";
+	}
+
 }
