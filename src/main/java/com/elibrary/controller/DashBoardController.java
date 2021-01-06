@@ -52,10 +52,9 @@ public class DashBoardController extends AbstractController {
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "librarian/bookentry", method = RequestMethod.POST) // 1
 	@JsonView(Views.Thin.class)
-	public JSONObject getAll() throws ServiceUnavailableException, ParseException {
+	public JSONObject getAll() throws ServiceUnavailableException, ParseException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 		List<String> nameList = new ArrayList<String>();
-		List<Long> bookCount = new ArrayList<Long>();
 		List<User> librarianList = userService.getLibrarians();
 
 		if (librarianList == null) {
@@ -63,6 +62,10 @@ public class DashBoardController extends AbstractController {
 			resultJson.put("msg", "There is no Librarian!");
 			return resultJson;
 		}
+
+		librarianList.forEach(librarian -> {
+			nameList.add(librarian.getName());
+		});
 
 		Date date = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -73,23 +76,7 @@ public class DashBoardController extends AbstractController {
 		Date start = c.getTime();
 		String startDate = dateFormat.format(start);
 
-		librarianList.forEach(librarian -> {
-			nameList.add(librarian.getName());
-//			logger.info("startDate !!!!!!!!!" + startDate);
-//			logger.info("endDate !!!!!!!!!" + endDate);
-//			logger.info("librarian.getId() !!!!!!!!!" + librarian.getId());
-
-			// bookCount.add(bookService.getBookCountByLibrarian(librarian.getId(),
-			// startDate, endDate));
-			// logger.info("bookCount!!!!!!!!!" +
-			// bookService.getBookCountByLibrarian(librarian.getId(), startDate, endDate));
-
-		});
-
-		bookCount.add((long) 753);
-		bookCount.add((long) 87);
-		bookCount.add((long) 108);
-
+		List<Long> bookCount = bookService.getEntriesByLibrarian(startDate, endDate);
 		resultJson.put("status", "1");
 		resultJson.put("bookCount", bookCount);
 		resultJson.put("nameList", nameList);

@@ -631,5 +631,24 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		}
 		return IdList;
 	}
+	
+	@Override
+	public List<Long> getEntriesByLibrarian(String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		List<Long> totalCount = new ArrayList<Long>();
+		String storedProc = "{call GET_BookCount_Librarian_byCreateDt(?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, startDate);
+		myCs.setString(2, endDate);
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				totalCount.add(Long.parseLong(rs.getString("BOOK_COUNT")));
+			}
+			con.close();
+		}
+		return totalCount;
+	}
 
 }
