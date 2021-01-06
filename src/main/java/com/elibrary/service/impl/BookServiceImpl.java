@@ -526,6 +526,25 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		}
 		return IdList;
 	}
+	
+	@Override
+	public List<Long> getPopularBooksBySubCategory(Long subCategoryId) throws SQLException, ClassNotFoundException {
+		List<Long> IdList = new ArrayList<Long>();
+		String storedProc = "{call GET_PopularBook_bySubCatID(?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, subCategoryId + "");
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next() && IdList.size() < 100) {
+				IdList.add(Long.parseLong(rs.getString("bookId")));
+			}
+			con.close();
+		}		
+		
+		return IdList;
+	}
 
 	@Override
 	public List<Book> getPopularBookListByCategory(Long categoryId) throws SQLException, ClassNotFoundException {
@@ -578,7 +597,7 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	@Override
 	public List<Long> getBookBySearchTermsAndUploader(String searchTerms, Long uploader) throws SQLException, ClassNotFoundException {
 		List<Long> IdList = new ArrayList<Long>();
-		String storedProc = "{call GET_PopularBook_bySTandUploader(?,?)}";
+		String storedProc = "{call GET_Book_bySTandUploader(?,?)}";
 		Connection con = getConnection();
 		CallableStatement myCs = con.prepareCall(storedProc);
 		myCs.setString(1, searchTerms);
@@ -587,7 +606,7 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (hasResults) {
 			ResultSet rs = myCs.getResultSet();
 			while (rs.next()) {
-				IdList.add(Long.parseLong(rs.getString("Book")));
+				IdList.add(Long.parseLong(rs.getString("ID")));
 			}
 			con.close();
 		}

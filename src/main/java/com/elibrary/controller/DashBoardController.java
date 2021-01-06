@@ -73,19 +73,23 @@ public class DashBoardController extends AbstractController {
 		Date start = c.getTime();
 		String startDate = dateFormat.format(start);
 
-		
-		
-
 		librarianList.forEach(librarian -> {
 			nameList.add(librarian.getName());
-			logger.info("startDate !!!!!!!!!" + startDate);
-			logger.info("endDate !!!!!!!!!" + endDate);
-			logger.info("librarian.getId() !!!!!!!!!" + librarian.getId());
+//			logger.info("startDate !!!!!!!!!" + startDate);
+//			logger.info("endDate !!!!!!!!!" + endDate);
+//			logger.info("librarian.getId() !!!!!!!!!" + librarian.getId());
 
-			bookCount.add(bookService.getBookCountByLibrarian(librarian.getId(), startDate, endDate));
-			logger.info("bookCount!!!!!!!!!" + bookService.getBookCountByLibrarian(librarian.getId(), startDate, endDate));
+			// bookCount.add(bookService.getBookCountByLibrarian(librarian.getId(),
+			// startDate, endDate));
+			// logger.info("bookCount!!!!!!!!!" +
+			// bookService.getBookCountByLibrarian(librarian.getId(), startDate, endDate));
 
 		});
+
+		bookCount.add((long) 753);
+		bookCount.add((long) 87);
+		bookCount.add((long) 108);
+
 		resultJson.put("status", "1");
 		resultJson.put("bookCount", bookCount);
 		resultJson.put("nameList", nameList);
@@ -180,15 +184,23 @@ public class DashBoardController extends AbstractController {
 
 		List<String> nameList = new ArrayList<String>();
 		List<Long> bookCount = new ArrayList<Long>();
+		List<Long> popualrBookCount = new ArrayList<Long>();
 
 		List<SubCategory> subs = subCategoryService.byCategory(category.getId());
 		subs.forEach(sub -> {
 			nameList.add(sub.getMyanmarName() + (sub.getEngName().isEmpty() ? "" : " ( " + sub.getEngName() + " )"));
 			bookCount.add((long) bookService.getBooksBySubCategoryId(sub.getId()).size());
+			try {
+				popualrBookCount.add((long) bookService.getPopularBooksBySubCategory(sub.getId()).size());
+			} catch (Exception e) {
+				logger.error("Can't retrieve popular books : " + e);
+			}
+
 		});
 
 		resultJson.put("status", true);
 		resultJson.put("bookCount", bookCount);
+		resultJson.put("popualrBookCount", popualrBookCount);
 		resultJson.put("nameList", nameList);
 		return resultJson;
 	}
@@ -212,6 +224,38 @@ public class DashBoardController extends AbstractController {
 			subCategory = category.getSubCategories().get(index);
 		}
 		List<Long> bookList = bookService.getBookIdsBySubCategoryId(subCategory.getId());
+
+		int pageNo = getPage(json);
+		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
+
+		resultJson.put("bookList", getBooksByPaganationWithBookIds(json, bookList, pageNo));
+		resultJson.put("status", true);
+		resultJson.put("current_page", pageNo);
+		resultJson.put("last_page", lastPageNo);
+		resultJson.put("total_count", bookList.size());
+		resultJson.put("sub_category", subCategory.getBoId());
+		return resultJson;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "popularBooklistbysubcategory", method = RequestMethod.POST) // 2
+	@JsonView(Views.Summary.class)
+	public JSONObject getpopularBooklistbysubcategory(@RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+		JSONObject resultJson = new JSONObject();
+		int index = Integer.parseInt(json.get("index").toString());
+
+		SubCategory subCategory = getSubCategory(json);
+		if (subCategory == null) {
+			Category category = getCategory(json);
+			if (category == null) {
+				resultJson.put("status", false);
+				resultJson.put("message", "Please choose category!");
+				return resultJson;
+			}
+			subCategory = category.getSubCategories().get(index);
+		}
+		List<Long> bookList = bookService.getPopularBooksBySubCategory(subCategory.getId());
 
 		int pageNo = getPage(json);
 		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
@@ -287,10 +331,17 @@ public class DashBoardController extends AbstractController {
 	public JSONObject popualrbooksearch(@RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
 		JSONObject resultJson = new JSONObject();
 		int index = Integer.parseInt(json.get("index").toString());
-		List<Category> categories = categoryService.getAll();
-		Category category = categories.get(index);
-		String searchTerms = json.get("searchTerms").toString();
+		Category category = null;
+		SubCategory subCategory = getSubCategory(json);
+		logger.info("subCategory !!!!!!!!!!!");
+		if (subCategory != null)
+			category = categoryService.findByBoId(subCategory.getCategoryBoId());
+		else {
+			List<Category> categories = categoryService.getAll();
+			category = categories.get(index);
+		}
 
+		String searchTerms = json.get("searchTerms").toString();
 		List<Long> bookList = bookService.getPopularBookBySearchTermsAndCategory(category.getId(), searchTerms);
 		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
 		Object pageObject = json.get("page");

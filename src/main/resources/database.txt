@@ -726,6 +726,37 @@ END
 CALL GET_PopularBook_bySTandUploader('1', '7');
 
 
+alter table reply add column viewStatus varchar(50);
+update reply set viewStatus=false;
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS GET_PopularBook_bySubCatID;
+CREATE PROCEDURE GET_PopularBook_bySubCatID (IN SubCatID nvarchar(50))
+BEGIN
+  SELECT
+    BS.bookId,
+    H.boId,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'    
+  FROM history H,
+       book_subcategory BS
+  WHERE BS.bookId = H.bookId
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BS.subcategoryId = SubCatID
+  GROUP BY BS.subcategoryId
+  ,        BS.bookId
+  ORDER BY TOT_COUNT DESC;
+END
+//
+DELIMITER ;
+
+CALL GET_PopularBook_bySubCatID('7');
+
+
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS GET_PopularBook_byCatIDandSearchTerm;
@@ -734,7 +765,7 @@ BEGIN
   SELECT
     H.bookId 'Book',
     H.boId,
-    H.actionStatus,
+    BC.categoryId,
     SUM(CASE WHEN (H.actionStatus = "READ" OR
         H.actionStatus = "FAVOURITE" OR
         H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
@@ -771,8 +802,8 @@ BEGIN
     C.engName
   FROM category c
   WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST , '%')
-  GROUP BY H.actionStatus,
-           BC.categoryId
+  GROUP BY BC.categoryId
+    , b.boId
   ORDER BY TOT_COUNT DESC;
 END
 //
@@ -780,8 +811,4 @@ DELIMITER ;
 
 
 CALL GET_PopularBook_byCatIDandSearchTerm('3','1');
-
-alter table reply add column viewStatus varchar(50);
-update reply set viewStatus=false;
-
 
