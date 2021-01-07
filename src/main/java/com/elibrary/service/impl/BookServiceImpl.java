@@ -650,5 +650,15 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		}
 		return totalCount;
 	}
+	
+	public List<Book> getBooks(){
+		String query = "select book from Book book where path like '%_ 2012 khun[_]c[_] _  m[_]n[_]maa%'";
+		//String query = "select book from Book book where path like '%40584%'";
+
+		List<Book> bookList = bookDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(bookList))
+			return new ArrayList<Book>();
+		return bookList;
+	}
 
 }

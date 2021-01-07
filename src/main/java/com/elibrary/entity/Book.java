@@ -52,6 +52,9 @@ public class Book extends AbstractReadingObject implements Serializable {
 	private String downloadApproval;
 
 	@JsonView(Views.Thin.class)
+	private String name;
+
+	@JsonView(Views.Thin.class)
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "book_subcategory", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "subcategoryId"))
 	private SubCategory subCategory;
@@ -102,6 +105,14 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	private double averageRating;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public int getCurrentPage() {
 		return currentPage;

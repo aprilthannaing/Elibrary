@@ -109,4 +109,6 @@ public interface BookService {
 
 	public List<Long> getEntriesByLibrarian(String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
+	public List<Book> getBooks();
+
 }

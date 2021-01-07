@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +16,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.apache.catalina.util.URLEncoder;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,32 +175,6 @@ public class OperationController extends AbstractController {
 		return true;
 	}
 
-	private void addWaterMark(String pdfName) {
-		try {
-
-			String pdfFilePath = IMAGEUPLOADURL.trim();
-			PdfReader reader = new PdfReader(pdfFilePath + "BookFile/" + pdfName.trim());
-			PdfReader.unethicalreading = true;
-			int n = reader.getNumberOfPages();
-			PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(pdfFilePath + "WaterMarkFile/" + pdfName.trim()));
-			int i = 0;
-			PdfContentByte under;
-			Image img = Image.getInstance(pdfFilePath + "watermark.jpeg");
-			img.setAbsolutePosition(0, 0);
-
-			while (i < n) {
-				i++;
-				under = stamp.getOverContent(i);
-				under.addImage(img);
-			}
-			stamp.close();
-
-		} catch (Exception de) {
-			de.printStackTrace();
-		}
-
-	}
-
 	private boolean setPDFFile(JSONObject json, Book book) throws IOException {
 		String pdf = json.get("pdf").toString();
 		if (pdf == null || pdf.toString().isEmpty()) {
@@ -222,8 +200,7 @@ public class OperationController extends AbstractController {
 		book.setSize(file.length() / 1024 + "KB");
 		FileOutputStream fop = new FileOutputStream(file);
 		fop.write(decodedBytes);
-		addWaterMark(pdfName);
-
+		addWaterMark(pdfFilePath + "BookFile/" + pdfName.trim(), pdfFilePath + "WaterMarkFile/" + pdfName.trim());
 		book.setPath("/WaterMarkFile/" + pdfName.trim());
 		return true;
 	}
@@ -953,7 +930,7 @@ public class OperationController extends AbstractController {
 			return null;
 		return message.toString();
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "feedback", method = RequestMethod.POST)
 	@ResponseBody
@@ -992,7 +969,7 @@ public class OperationController extends AbstractController {
 		resultJson.put("message", "success!");
 		return resultJson;
 	}
-	
+
 	@RequestMapping(value = "banners", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1063,7 +1040,6 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
-	
 	@RequestMapping(value = "replyNoti", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1262,7 +1238,7 @@ public class OperationController extends AbstractController {
 	public String setCategory() {
 		List<SubCategory> subCategoryList = subCategoryService.getAll();
 		subCategoryList.forEach(sub -> {
-			Category category = categoryService.findByCategoryId(categoryService.findBySubCategoryId(sub.getId()));			
+			Category category = categoryService.findByCategoryId(categoryService.findBySubCategoryId(sub.getId()));
 			sub.setCategoryBoId(category.getBoId());
 			try {
 				subCategoryService.save(sub);
@@ -1271,6 +1247,74 @@ public class OperationController extends AbstractController {
 			}
 		});
 		return "success";
+	}
+
+	private boolean addWaterMark(String file, String watermarkFile) {
+		try {
+
+			String pdfFilePath = IMAGEUPLOADURL.trim();
+			PdfReader reader = new PdfReader(file);
+			PdfReader.unethicalreading = true;
+			int n = reader.getNumberOfPages();
+			PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(watermarkFile));
+			int i = 0;
+			PdfContentByte under;
+			Image img = Image.getInstance(pdfFilePath + "watermark.PNG");
+			img.setAbsolutePosition(0, 0);
+
+			while (i < n) {
+				i++;
+				under = stamp.getOverContent(i);
+				under.addImage(img);
+			}
+			stamp.close();
+
+		} catch (Exception e) {
+			logger.error("Error: " + e + " File: " + file);
+			return false;
+		}
+		return true;
+
+	}
+
+	/* run for pdf files migration with water mark */
+	@RequestMapping(value = "uploadfiles", method = RequestMethod.POST)
+	@JsonView(Views.Thin.class)
+	public List<String> uploadfiles() throws URISyntaxException {
+		List<String> paths = new ArrayList<String>();
+		List<Book> books = bookService.getBooks();
+		logger.info("bookService.getPaths()!!!!!!!!!!!" + books.size());
+
+		int count = 1;
+		int errorCount = 0;
+
+		for (Book book : books) {
+			try {
+				URIBuilder ub = new URIBuilder("http://localhost:8080/");
+				String name = book.getName();
+				String path = book.getPath() + "/" + name;
+				ub.addParameter("q", path);
+				String pdf = ub.toString().replace("?q=", "").replace("+", " ").replace("%2F", "/") + ".pdf";
+				paths.add(pdf);
+
+				String pdfFilePath = IMAGEUPLOADURL.trim();
+				String watermarkFileName = "WaterMarkFile/" + "wartermark" + count + ".pdf";
+				if (!addWaterMark(pdfFilePath + path + ".pdf", pdfFilePath + watermarkFileName))
+					errorCount++;
+				logger.info("Error Count !!!!!!!!!!!!!!" + errorCount);
+				book.setPath("/" + watermarkFileName);
+				bookService.save(book);
+				count++;
+
+			} catch (URISyntaxException | ServiceUnavailableException e) {
+				logger.error("Error: " + e);
+			}
+		}
+
+		logger.info("Book Count !!!!!!!!!!!!!!" + count);
+
+		return paths;
+
 	}
 
 }

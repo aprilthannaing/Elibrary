@@ -480,6 +480,11 @@ call GET_BookId_ByAuthor('a',1,1);
  alter table book add column currentPage int;
  update book set currentPage=0;
  
+  alter table book add column name varchar(500);
+  alter table book add column uploader varchar(500);
+  
+ 
+ 
  CREATE TABLE `constituency` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `boId` varchar(255) NOT NULL,
@@ -495,6 +500,7 @@ call GET_BookId_ByAuthor('a',1,1);
 alter table user add column permanentAddress varchar(225);
 alter table user add column currentAddress varchar(225);
 alter table user add column constituency bigint;
+
 
  
  DELIMITER // 
