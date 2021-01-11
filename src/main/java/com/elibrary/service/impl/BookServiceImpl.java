@@ -526,7 +526,7 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		}
 		return IdList;
 	}
-	
+
 	@Override
 	public List<Long> getPopularBooksBySubCategory(Long subCategoryId) throws SQLException, ClassNotFoundException {
 		List<Long> IdList = new ArrayList<Long>();
@@ -541,8 +541,8 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 				IdList.add(Long.parseLong(rs.getString("bookId")));
 			}
 			con.close();
-		}		
-		
+		}
+
 		return IdList;
 	}
 
@@ -631,7 +631,7 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		}
 		return IdList;
 	}
-	
+
 	@Override
 	public List<Long> getEntriesByLibrarian(String startDate, String endDate) throws SQLException, ClassNotFoundException {
 		List<Long> totalCount = new ArrayList<Long>();
@@ -650,10 +650,10 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		}
 		return totalCount;
 	}
-	
-	public List<Book> getBooks(){
+
+	@Override
+	public List<Book> getBooks() {
 		String query = "select book from Book book where path like '%_ 2012 khun[_]c[_] _  m[_]n[_]maa%'";
-		//String query = "select book from Book book where path like '%40584%'";
 
 		List<Book> bookList = bookDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(bookList))

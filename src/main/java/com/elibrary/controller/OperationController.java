@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +15,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.apache.catalina.util.URLEncoder;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -1067,6 +1065,7 @@ public class OperationController extends AbstractController {
 
 	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
 	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@JsonView(Views.Summary.class)
 	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
@@ -1100,8 +1099,8 @@ public class OperationController extends AbstractController {
 
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
-		advertisement.setName("Advertisement/" + imageName);
-		advertisement.setPdf("Advertisement/" + pdfName);
+		// advertisement.setName("Advertisement/" + imageName);
+		advertisement.setPdf("/Advertisement/" + pdfName);
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
 		if (width == 1170 && height == 268) {
 			advertisement.setType(AdvertisementType.Web);
@@ -1280,8 +1279,11 @@ public class OperationController extends AbstractController {
 	/* run for pdf files migration with water mark */
 	@RequestMapping(value = "uploadfiles", method = RequestMethod.POST)
 	@JsonView(Views.Thin.class)
-	public List<String> uploadfiles() throws URISyntaxException {
-		List<String> paths = new ArrayList<String>();
+	public JSONObject uploadfiles() throws URISyntaxException, IOException {
+		JSONObject json = new JSONObject();
+		List<String> pdfs = new ArrayList<String>();
+		List<String> covers = new ArrayList<String>();
+
 		List<Book> books = bookService.getBooks();
 		logger.info("bookService.getPaths()!!!!!!!!!!!" + books.size());
 
@@ -1292,16 +1294,28 @@ public class OperationController extends AbstractController {
 			try {
 				URIBuilder ub = new URIBuilder("http://localhost:8080/");
 				String name = book.getName();
-				String path = book.getPath() + "/" + name;
-				ub.addParameter("q", path);
+				String path = book.getPath();
+
+				String pdfPath = path + "/" + name;
+				ub.addParameter("q", pdfPath);
 				String pdf = ub.toString().replace("?q=", "").replace("+", " ").replace("%2F", "/") + ".pdf";
-				paths.add(pdf);
+				pdfs.add(pdf);
 
 				String pdfFilePath = IMAGEUPLOADURL.trim();
 				String watermarkFileName = "WaterMarkFile/" + "wartermark" + count + ".pdf";
-				if (!addWaterMark(pdfFilePath + path + ".pdf", pdfFilePath + watermarkFileName))
+				if (!addWaterMark(pdfFilePath + pdfPath + ".pdf", pdfFilePath + watermarkFileName))
 					errorCount++;
 				logger.info("Error Count !!!!!!!!!!!!!!" + errorCount);
+
+				URIBuilder ub2 = new URIBuilder("http://localhost:8080/");
+				String coverPath = pdfFilePath + path + "/" + "cover.jpg";
+				covers.add(coverPath);
+
+				File initialImage = new File(coverPath);
+				BufferedImage bImage = ImageIO.read(initialImage);
+				ImageIO.write(bImage, "jpg", new File(pdfFilePath + "BookProfile/cover" + count + ".jpg"));
+
+				book.setCoverPhoto("/BookProfile/cover" + count + ".jpg");
 				book.setPath("/" + watermarkFileName);
 				bookService.save(book);
 				count++;
@@ -1312,8 +1326,9 @@ public class OperationController extends AbstractController {
 		}
 
 		logger.info("Book Count !!!!!!!!!!!!!!" + count);
-
-		return paths;
+		json.put("pdfs", pdfs);
+		json.put("covers", covers);
+		return json;
 
 	}
 

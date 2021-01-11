@@ -130,13 +130,13 @@ public class UserController extends AbstractController {
 				if (status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
 				else if (status.equals("ACTIVE")) {
-					//if(!status.equals(user.getEntityStatus().name())) {
-					//	mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account", "Welcome!Please verify your email address for Elibray System.\n"
-					//				+ "Your password is "+ user.getPassword() + ".");
-					//}
+					// if(!status.equals(user.getEntityStatus().name())) {
+					// mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account",
+					// "Welcome!Please verify your email address for Elibray System.\n"
+					// + "Your password is "+ user.getPassword() + ".");
+					// }
 					user.setEntityStatus(EntityStatus.ACTIVE);
-				}
-				else if (status.equals("EXPIRED"))
+				} else if (status.equals("EXPIRED"))
 					user.setEntityStatus(EntityStatus.EXPIRED);
 				userservice.save(user);
 				// saveHistory(user.getBoId(),loginUserid);
@@ -195,12 +195,12 @@ public class UserController extends AbstractController {
 
 		int lastPageNo = resList.size() % 10 == 0 ? resList.size() / 10 : resList.size() / 10 + 1;
 		List<User> users = getUsersByPagination(req, resList, req.getCurrentpage());
-		if(resList.size() > 0) {
+		if (resList.size() > 0) {
 			User user = resList.get(0);
 		}
 		resJson.put("users", resList);
 		resJson.put("currentPage", req.getCurrentpage());
-		//resJson.put("lastPage", lastPageNo);
+		// resJson.put("lastPage", lastPageNo);
 		resJson.put("totalCount", resList.size());
 		return resJson;
 	}
@@ -243,7 +243,7 @@ public class UserController extends AbstractController {
 				return resJson;
 			}
 			// String sessionid = userservice.checkSession(user);
-			resJson.put("message", message);
+			resJson.put("message", "success");
 			resJson.put("status", true);
 			resJson.put("token", sessionId);
 			JSONObject json1 = new JSONObject();
@@ -357,8 +357,9 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-			//		 + "Your new password is " + user.getPassword());
+			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
+			// "Please verify your email address for Elibray System.\n"
+			// + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -397,8 +398,9 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-			//		 + "Your new password is " + user.getPassword());
+			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
+			// "Please verify your email address for Elibray System.\n"
+			// + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -568,7 +570,8 @@ public class UserController extends AbstractController {
 
 			String code = getRandomNumberString();
 
-			// mailService.sendMail(json.get("email").toString(), "Elibrary : Email Address Verification", "Please verify your email address for Elibray System.\n"
+			// mailService.sendMail(json.get("email").toString(), "Elibrary : Email Address
+			// Verification", "Please verify your email address for Elibray System.\n"
 			// + "Your verification code is " + code);
 			user.setVerificationCode(code);
 			userservice.save(user);
@@ -633,8 +636,9 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			//mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-			//		 + "Your new password is " + user.getPassword());
+			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
+			// "Please verify your email address for Elibray System.\n"
+			// + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
@@ -664,14 +668,15 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			//mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n"
-			//		 + "Your new password is " + user.getPassword());
+			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
+			// "Please verify your email address for Elibray System.\n"
+			// + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
 		return resJson;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "signout", method = RequestMethod.POST)
 	@ResponseBody

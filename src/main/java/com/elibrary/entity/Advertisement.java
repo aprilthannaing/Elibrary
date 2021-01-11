@@ -10,18 +10,30 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
 @Table(name = "advertisement")
-public class Advertisement extends AbstractEntity{
-	
+public class Advertisement extends AbstractEntity {
+
 	@JsonView(Views.Thin.class)
 	private String name;
 
 	@JsonView(Views.Thin.class)
 	private String pdf;
-	
+
 	@JsonView(Views.Thin.class)
 	@Column(name = "type")
 	@Enumerated(EnumType.STRING)
 	private AdvertisementType type;
+
+	@JsonView(Views.Thin.class)
+	@Column(name = "linkType")
+	private String linkType;
+
+	public String getLinkType() {
+		return linkType;
+	}
+
+	public void setLinkType(String linkType) {
+		this.linkType = linkType;
+	}
 
 	public String getName() {
 		return name;
@@ -46,5 +58,5 @@ public class Advertisement extends AbstractEntity{
 	public void setType(AdvertisementType type) {
 		this.type = type;
 	}
-	
+
 }
