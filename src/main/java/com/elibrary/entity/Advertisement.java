@@ -25,15 +25,9 @@ public class Advertisement extends AbstractEntity {
 
 	@JsonView(Views.Thin.class)
 	@Column(name = "linkType")
-	private String linkType;
+	@Enumerated(EnumType.STRING)
+	private LinkType linkType;
 
-	public String getLinkType() {
-		return linkType;
-	}
-
-	public void setLinkType(String linkType) {
-		this.linkType = linkType;
-	}
 
 	public String getName() {
 		return name;
@@ -57,6 +51,14 @@ public class Advertisement extends AbstractEntity {
 
 	public void setType(AdvertisementType type) {
 		this.type = type;
+	}
+
+	public LinkType getLinkType() {
+		return linkType;
+	}
+
+	public void setLinkType(LinkType linkType) {
+		this.linkType = linkType;
 	}
 
 }

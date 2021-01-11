@@ -41,6 +41,7 @@ import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Feedback;
 import com.elibrary.entity.Hluttaw;
 import com.elibrary.entity.Journal;
+import com.elibrary.entity.LinkType;
 import com.elibrary.entity.Position;
 import com.elibrary.entity.Publisher;
 import com.elibrary.entity.Reply;
@@ -69,6 +70,7 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.mchange.rmi.ServiceUnavailableException;
+
 
 @RestController
 @RequestMapping("operation")
@@ -362,7 +364,8 @@ public class OperationController extends AbstractController {
 		return resultJson;
 
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "saveUser", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -729,7 +732,8 @@ public class OperationController extends AbstractController {
 		resultJson.put("msg", "Success!");
 		return resultJson;
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -967,7 +971,8 @@ public class OperationController extends AbstractController {
 		resultJson.put("message", "success!");
 		return resultJson;
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "banners", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1037,7 +1042,8 @@ public class OperationController extends AbstractController {
 		resultJson.put("message", "success!");
 		return resultJson;
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "replyNoti", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1063,6 +1069,8 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+		
+
 	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
 	@ResponseBody
 	@CrossOrigin(origins = "*")
@@ -1072,6 +1080,7 @@ public class OperationController extends AbstractController {
 
 		String image = json.get("image").toString();
 		String imageName = json.get("imageName").toString();
+
 		if (image == null || image.isEmpty() || imageName == null || imageName.isEmpty()) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Please select an image!");
@@ -1079,6 +1088,8 @@ public class OperationController extends AbstractController {
 		}
 
 		String pdf = json.get("pdf").toString();
+		 
+	    
 		String pdfName = json.get("pdfName").toString();
 
 		String filePath = IMAGEUPLOADURL.trim() + "Advertisement//";
@@ -1094,14 +1105,26 @@ public class OperationController extends AbstractController {
 		String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
 		pdf = pdf.split("base64")[1];
 		byte[] pdfBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf.replaceAll(" ", "+"));
+		
+
 		Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
-		Files.write(destinationPDFFile, pdfBytes);
+	    Files.write(destinationPDFFile, pdfBytes);
 
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
-		// advertisement.setName("Advertisement/" + imageName);
+		advertisement.setName("Advertisement/" + imageName);
 		advertisement.setPdf("/Advertisement/" + pdfName);
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
+		
+		Boolean is_pdf = pdfName.contains(".pdf");
+
+		logger.info("is pdf:" + is_pdf);
+
+		if(is_pdf == true)
+			advertisement.setLinkType(LinkType.pdf);
+		else 
+			advertisement.setLinkType(LinkType.web);
+		
 		if (width == 1170 && height == 268) {
 			advertisement.setType(AdvertisementType.Web);
 		}
@@ -1118,6 +1141,7 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "getAdvertisements", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1171,6 +1195,7 @@ public class OperationController extends AbstractController {
 		return Long.parseLong(user.toString());
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "view", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1193,18 +1218,21 @@ public class OperationController extends AbstractController {
 
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "feedbackCount", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {
 		return feedbackService.countFeedback() + "";
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "advertisementCount", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getAdvertisementCount() throws ServiceUnavailableException {
 		return advertisementService.countAdvertisement() + "";
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "deleteAdvertisement", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -1232,6 +1260,7 @@ public class OperationController extends AbstractController {
 	}
 
 	/* run for data migration */
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "setCategory", method = RequestMethod.GET)
 	@JsonView(Views.Thin.class)
 	public String setCategory() {
@@ -1277,6 +1306,7 @@ public class OperationController extends AbstractController {
 	}
 
 	/* run for pdf files migration with water mark */
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "uploadfiles", method = RequestMethod.POST)
 	@JsonView(Views.Thin.class)
 	public JSONObject uploadfiles() throws URISyntaxException, IOException {

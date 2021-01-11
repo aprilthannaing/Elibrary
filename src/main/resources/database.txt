@@ -868,3 +868,55 @@ DELIMITER;
 
 CALL GET_BookCount_Librarian_byCreateDt ('2011-06-01','2020-06-24');
 
+
+USE elibrary;
+DELIMITER//
+DROP PROCEDURE IF EXISTS GET_Book_bySTandUploader;
+CREATE PROCEDURE GET_Book_bySTandUploader (IN ST nvarchar(100), Updr nvarchar(50) )
+BEGIN
+  SELECT
+  B.id 'ID',
+  B.boId 'BOOK',
+  B.uploader
+FROM 
+  book B
+  LEFT JOIN book_author ba ON ba.bookId=B.id
+  LEFT JOIN book_category BC ON BC.bookId=B.id
+  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
+  LEFT JOIN book_publisher bp ON bp.bookId=b.id
+WHERE  CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
+, b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+, (SELECT
+    a.name
+  FROM author a
+  WHERE a.id = ba.authorId), (SELECT
+    p.name
+  FROM publisher p
+  WHERE p.id = bp.publisherId), (SELECT
+    s.myanmarName
+  FROM subcategory s
+  WHERE s.id = bs.subcategoryId), (SELECT
+    s1.engName
+  FROM subcategory s1
+  WHERE s1.id = bs.subcategoryId), (SELECT
+    C.myanmarName
+  FROM category c
+  WHERE C.id = BC.categoryId), (SELECT
+    C.engName
+  FROM category c
+  WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST , '%')
+  AND B.uploader=Updr
+  GROUP BY B.id
+  , B.boId
+  ORDER BY B.id DESC;
+END
+//
+DELIMITER;
+
+-- ------------------------------ --------------------------------- ---------------------------
+
+CALL GET_Book_bySTandUploader('1', '7');
+
+
+alter table advertisement add column linkType varchar(50);
+

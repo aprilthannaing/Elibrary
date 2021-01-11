@@ -205,6 +205,7 @@ public class UserController extends AbstractController {
 		return resJson;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "selectUserbykey", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -690,6 +691,7 @@ public class UserController extends AbstractController {
 		}
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "encrypt", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)
@@ -705,6 +707,7 @@ public class UserController extends AbstractController {
 
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "decrypt", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(Views.Summary.class)

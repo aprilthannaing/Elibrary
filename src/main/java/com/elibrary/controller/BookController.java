@@ -343,7 +343,8 @@ public class BookController extends AbstractController {
 		endDate = start[3] + "-" + parseMonthToInt(start[1]) + "-" + start[2];
 		return endDate;
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "exportEntry", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public JSONObject exportExcel(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException {
@@ -381,6 +382,7 @@ public class BookController extends AbstractController {
 
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "exportPopularBooks", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public JSONObject exportPopularBooks(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException, ClassNotFoundException {
@@ -416,7 +418,8 @@ public class BookController extends AbstractController {
 		return resultJson;
 
 	}
-
+	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "exportBooksByCategory", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public JSONObject exportBooksByCategory(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException, ClassNotFoundException {
@@ -451,6 +454,7 @@ public class BookController extends AbstractController {
 
 	}
 	
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "exportPopularBooksBySubCategory", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public JSONObject exportPopularBooksBySubCategory(@RequestParam("input") String param, HttpServletResponse response) throws IOException, SQLException, ClassNotFoundException {
