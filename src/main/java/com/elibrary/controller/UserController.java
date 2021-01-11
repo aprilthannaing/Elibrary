@@ -399,9 +399,7 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
-			// "Please verify your email address for Elibray System.\n"
-			// + "Your new password is " + user.getPassword());
+			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n" + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -410,14 +408,14 @@ public class UserController extends AbstractController {
 
 	public String goValidation(String email, String password) {
 		if (email.isEmpty() && password.isEmpty())
-			return "Please enter your email address and password";
+			return "Please enter your email address and password!";
 		if (email.isEmpty())
-			return "Please enter your email address";
+			return "Please enter your email address!";
 		if (!email.contains("@"))
-			return "Your email address is incorrect";
+			return "Your email address is incorrect!";
 
 		if (password != null && password.isEmpty())
-			return "Please enter your password";
+			return "Please enter your password!";
 		return "";
 	}
 
@@ -570,10 +568,7 @@ public class UserController extends AbstractController {
 			}
 
 			String code = getRandomNumberString();
-
-			// mailService.sendMail(json.get("email").toString(), "Elibrary : Email Address
-			// Verification", "Please verify your email address for Elibray System.\n"
-			// + "Your verification code is " + code);
+			mailService.sendMail(json.get("email").toString(), "Elibrary : Email Address Verification", "Please verify your email address for Elibray System.\n" + "Your verification code is " + code);
 			user.setVerificationCode(code);
 			userservice.save(user);
 			String sessionId = saveSession(user);
