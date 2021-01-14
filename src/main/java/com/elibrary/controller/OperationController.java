@@ -71,7 +71,6 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.mchange.rmi.ServiceUnavailableException;
 
-
 @RestController
 @RequestMapping("operation")
 public class OperationController extends AbstractController {
@@ -364,7 +363,7 @@ public class OperationController extends AbstractController {
 		return resultJson;
 
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "saveUser", method = RequestMethod.POST)
 	@ResponseBody
@@ -732,7 +731,7 @@ public class OperationController extends AbstractController {
 		resultJson.put("msg", "Success!");
 		return resultJson;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "deleteJournal", method = RequestMethod.POST)
 	@ResponseBody
@@ -971,7 +970,7 @@ public class OperationController extends AbstractController {
 		resultJson.put("message", "success!");
 		return resultJson;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "banners", method = RequestMethod.POST)
 	@ResponseBody
@@ -1042,7 +1041,7 @@ public class OperationController extends AbstractController {
 		resultJson.put("message", "success!");
 		return resultJson;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "replyNoti", method = RequestMethod.POST)
 	@ResponseBody
@@ -1069,8 +1068,6 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
-		
-
 	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
 	@ResponseBody
 	@CrossOrigin(origins = "*")
@@ -1088,8 +1085,7 @@ public class OperationController extends AbstractController {
 		}
 
 		String pdf = json.get("pdf").toString();
-		 
-	    
+
 		String pdfName = json.get("pdfName").toString();
 
 		String filePath = IMAGEUPLOADURL.trim() + "Advertisement//";
@@ -1105,26 +1101,25 @@ public class OperationController extends AbstractController {
 		String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
 		pdf = pdf.split("base64")[1];
 		byte[] pdfBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf.replaceAll(" ", "+"));
-		
 
 		Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
-	    Files.write(destinationPDFFile, pdfBytes);
+		Files.write(destinationPDFFile, pdfBytes);
 
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
 		advertisement.setName("Advertisement/" + imageName);
 		advertisement.setPdf("/Advertisement/" + pdfName);
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
-		
+
 		Boolean is_pdf = pdfName.contains(".pdf");
 
 		logger.info("is pdf:" + is_pdf);
 
-		if(is_pdf == true)
+		if (is_pdf == true)
 			advertisement.setLinkType(LinkType.pdf);
-		else 
+		else
 			advertisement.setLinkType(LinkType.web);
-		
+
 		if (width == 1170 && height == 268) {
 			advertisement.setType(AdvertisementType.Web);
 		}
@@ -1360,6 +1355,17 @@ public class OperationController extends AbstractController {
 		json.put("covers", covers);
 		return json;
 
+	}
+
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "version", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Thin.class)
+	private JSONObject getVersion() {
+		JSONObject resultJson = new JSONObject();
+		resultJson.put("appLink", "Cj0KCQiA0fr_BRDaARIsAABw4Ev3AxP89DaZnQ6TvWbfAlv08HjR_ny3gfYDE22MGx_RxwfpR3XQWcEaAmo_EALw_wcB");
+		resultJson.put("version", "1.0");
+		return resultJson;
 	}
 
 }
