@@ -1112,7 +1112,8 @@ public class OperationController extends AbstractController {
 		advertisement.setName("Advertisement/" + imageName);
 		if(pdfName.isEmpty()) {
 			advertisement.setPdf(pdf);
-		}else {
+		}
+		else {
 			advertisement.setPdf("/Advertisement/" + pdfName);
 		}
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
