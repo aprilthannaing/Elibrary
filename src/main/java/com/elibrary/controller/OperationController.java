@@ -1084,7 +1084,7 @@ public class OperationController extends AbstractController {
 			return resultJson;
 		}
 
-		String pdf = json.get("pdf").toString();
+		String pdf = json.get("pdfLink").toString();
 
 		String pdfName = json.get("pdfName").toString();
 
@@ -1097,18 +1097,24 @@ public class OperationController extends AbstractController {
 		BufferedImage bimg = ImageIO.read(new File(filePath + imageName));
 		int width = bimg.getWidth();
 		int height = bimg.getHeight();
+		
+		if(!pdfName.isEmpty()) {
+			String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
+			pdf = pdf.split("base64")[1];
+			byte[] pdfBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf.replaceAll(" ", "+"));
 
-		String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
-		pdf = pdf.split("base64")[1];
-		byte[] pdfBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf.replaceAll(" ", "+"));
-
-		Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
-		Files.write(destinationPDFFile, pdfBytes);
-
+			Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
+			Files.write(destinationPDFFile, pdfBytes);
+		}
+		
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
 		advertisement.setName("Advertisement/" + imageName);
-		advertisement.setPdf("/Advertisement/" + pdfName);
+		if(pdfName.isEmpty()) {
+			advertisement.setPdf(pdf);
+		}else {
+			advertisement.setPdf("/Advertisement/" + pdfName);
+		}
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
 
 		Boolean is_pdf = pdfName.contains(".pdf");
