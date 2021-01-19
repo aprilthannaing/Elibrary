@@ -126,10 +126,10 @@ public class HomeController extends AbstractController {
 		resultJson.put("international_author", getAuthors(AuthorType.INTERNATIONAL));
 		resultJson.put("advertisements", advertisementService.getAll());
 		resultJson.put("main_category", categoryList); // 6
-		resultJson.put("notiCount", feedbackService.getNotiCount(user.getId()));
+		resultJson.put("notiCount", feedbackService.findByUserId(user.getId()).size());
 		return resultJson;
 	}
-	
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "notiCount", method = RequestMethod.POST) // page by category
@@ -150,11 +150,11 @@ public class HomeController extends AbstractController {
 			return resultJson;
 		}
 		resultJson.put("status", true);
-		resultJson.put("notiCount", feedbackService.getNotiCount(user.getId()));
-		
-		return resultJson; 
+		resultJson.put("notiCount", feedbackService.findByUserId(user.getId()).size());
+		return resultJson;
 
 	}
+
 	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "book", method = RequestMethod.POST) // page by category
@@ -190,7 +190,7 @@ public class HomeController extends AbstractController {
 		}
 
 		Category category = categoryService.findByBoId(categoryId.toString());
-		List<Book> bookList= setBookInfo(bookService.getLatestBooksByCategoryId(category.getId()), user);
+		List<Book> bookList = setBookInfo(bookService.getLatestBooksByCategoryId(category.getId()), user);
 		int bookCount = bookList.size();
 		resultJson.put("local_author", getAuthors(category, AuthorType.LOCAL));
 		resultJson.put("international_author", getAuthors(category, AuthorType.INTERNATIONAL));

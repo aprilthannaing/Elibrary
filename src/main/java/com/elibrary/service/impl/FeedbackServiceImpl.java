@@ -1,5 +1,6 @@
 package com.elibrary.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -9,7 +10,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.elibrary.dao.FeedbackDao;
 import com.elibrary.dao.impl.CategoryDaoImpl;
-import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.Feedback;
 import com.elibrary.service.FeedbackService;
@@ -61,10 +61,10 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 	@Override
 	public List<Feedback> findByUserId(Long userId) {
-		String query = "select feedback from Feedback feedback where userId=" + userId + " and replyId <> NULL and entityStatus='" + EntityStatus.ACTIVE + "'";
-		List<Feedback> feedbackList = feedbackDao.getEntitiesByQuery(query);
+		String query = "select feedback from Feedback feedback where userId=" + userId + " and replyId <> NULL and replyId in (select reply.id from Reply reply where reply.viewStatus=false) and entityStatus='" + EntityStatus.ACTIVE + "' order by id desc";
+		List<Feedback> feedbackList = feedbackDao.getEntitiesByQuery(query, 10);
 		if (CollectionUtils.isEmpty(feedbackList))
-			return null;
+			return new ArrayList<Feedback>();
 		return feedbackList;
 	}
 

@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 @Table(name = "feedback")
 public class Feedback extends AbstractEntity implements Serializable {
 
-	// @JsonView(Views.Thin.class)
+	@JsonView(Views.Thin.class)
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "userId")
 	private User userId;

@@ -114,6 +114,9 @@ public class OperationController extends AbstractController {
 	@Value("${IMAGEUPLOADURL}")
 	private String IMAGEUPLOADURL;
 
+	@Value("${PDFPATH}")
+	private String PDFPATH;
+
 	private static Logger logger = Logger.getLogger(OperationController.class);
 
 	private void setBookInfo(Book book, JSONObject json) throws ServiceUnavailableException, IOException {
@@ -1068,6 +1071,41 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "viewall", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject viewAll(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		User user = getUser(json);
+		if (user == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "User is not valid!");
+			return resultJson;
+		}
+
+		feedbackService.findByUserId(user.getId()).forEach(feedback -> {
+			Reply reply = feedback.getReplyId();
+			reply.setViewStatus(true);
+			try {
+				replyService.save(reply);
+			} catch (ServiceUnavailableException e) {
+				logger.error("Error: " + e);
+			}
+		});
+
+		resultJson.put("status", true);
+		resultJson.put("message", "success!");
+		return resultJson;
+	}
+
 	@RequestMapping(value = "uploadImage", method = RequestMethod.POST) // advertise
 	@ResponseBody
 	@CrossOrigin(origins = "*")
@@ -1285,18 +1323,20 @@ public class OperationController extends AbstractController {
 			String pdfFilePath = IMAGEUPLOADURL.trim();
 			PdfReader reader = new PdfReader(file);
 			PdfReader.unethicalreading = true;
-			int n = reader.getNumberOfPages();
+			long n = reader.getNumberOfPages();
+
 			PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(watermarkFile));
-			int i = 0;
+			long i = 0;
 			PdfContentByte under;
 			Image img = Image.getInstance(pdfFilePath + "watermark.PNG");
 			img.setAbsolutePosition(0, 0);
 
 			while (i < n) {
 				i++;
-				under = stamp.getOverContent(i);
+				under = stamp.getOverContent((int) i);
 				under.addImage(img);
 			}
+
 			stamp.close();
 
 		} catch (Exception e) {
@@ -1313,13 +1353,11 @@ public class OperationController extends AbstractController {
 	@JsonView(Views.Thin.class)
 	public JSONObject uploadfiles() throws URISyntaxException, IOException {
 		JSONObject json = new JSONObject();
-		List<String> pdfs = new ArrayList<String>();
-		List<String> covers = new ArrayList<String>();
 
 		List<Book> books = bookService.getBooks();
 		logger.info("bookService.getPaths()!!!!!!!!!!!" + books.size());
 
-		int count = 1;
+		int count = 12274;
 		int errorCount = 0;
 
 		for (Book book : books) {
@@ -1328,29 +1366,50 @@ public class OperationController extends AbstractController {
 				String name = book.getName();
 				String path = book.getPath();
 
-				String pdfPath = path + "/" + name;
+				/* read pdf */
+				String originalFilePath = PDFPATH.trim();
+				String pdfPath = originalFilePath + path + "/" + name;
 				ub.addParameter("q", pdfPath);
 				String pdf = ub.toString().replace("?q=", "").replace("+", " ").replace("%2F", "/") + ".pdf";
-				pdfs.add(pdf);
+				// pdfs.add(pdf);
 
+				/* write pdf */
 				String pdfFilePath = IMAGEUPLOADURL.trim();
 				String watermarkFileName = "WaterMarkFile/" + "wartermark" + count + ".pdf";
-				if (!addWaterMark(pdfFilePath + pdfPath + ".pdf", pdfFilePath + watermarkFileName))
+
+				logger.info("read  : " + pdfPath + ".pdf");
+				logger.info("write: " + pdfFilePath + watermarkFileName);
+
+				if (!addWaterMark(pdfPath + ".pdf", pdfFilePath + watermarkFileName)) {
 					errorCount++;
-				logger.info("Error Count !!!!!!!!!!!!!!" + errorCount);
+					count++;
+					logger.info("Error Count !!!!!!!!!!!!!!" + errorCount);
+					logger.info("Book Count !!!!!!!!!!!!!!" + count);
+				} else {
+					logger.info("Error Count !!!!!!!!!!!!!!" + errorCount);
 
-				URIBuilder ub2 = new URIBuilder("http://localhost:8080/");
-				String coverPath = pdfFilePath + path + "/" + "cover.jpg";
-				covers.add(coverPath);
+					/* write image */
+					URIBuilder ub2 = new URIBuilder("http://localhost:8080/");
+					String coverPath = originalFilePath + path + "/" + "cover.jpg";
+					// covers.add(coverPath);
 
-				File initialImage = new File(coverPath);
-				BufferedImage bImage = ImageIO.read(initialImage);
-				ImageIO.write(bImage, "jpg", new File(pdfFilePath + "BookProfile/cover" + count + ".jpg"));
+					try {
+						File initialImage = new File(coverPath);
+						BufferedImage bImage = ImageIO.read(initialImage);
+						logger.info("initialImage!!!!!!!" + initialImage);
+						ImageIO.write(bImage, "jpg", new File(pdfFilePath + "BookProfile/cover" + count + ".jpg"));
+					} catch (Exception e) {
+						logger.error("Error: " + e);
+					}
 
-				book.setCoverPhoto("/BookProfile/cover" + count + ".jpg");
-				book.setPath("/" + watermarkFileName);
-				bookService.save(book);
-				count++;
+					/* set pdf and image */
+					book.setCoverPhoto("/BookProfile/cover" + count + ".jpg");
+					book.setPath("/" + watermarkFileName);
+					bookService.save(book);
+					count++;
+
+					logger.info("Book Count !!!!!!!!!!!!!!" + count);
+				}
 
 			} catch (URISyntaxException | ServiceUnavailableException e) {
 				logger.error("Error: " + e);
@@ -1358,8 +1417,8 @@ public class OperationController extends AbstractController {
 		}
 
 		logger.info("Book Count !!!!!!!!!!!!!!" + count);
-		json.put("pdfs", pdfs);
-		json.put("covers", covers);
+		logger.info("bookService.getPaths()!!!!!!!!!!!" + books.size());
+
 		return json;
 
 	}
@@ -1371,7 +1430,7 @@ public class OperationController extends AbstractController {
 	private JSONObject getVersion() {
 		JSONObject resultJson = new JSONObject();
 		resultJson.put("appLink", "Cj0KCQiA0fr_BRDaARIsAABw4Ev3AxP89DaZnQ6TvWbfAlv08HjR_ny3gfYDE22MGx_RxwfpR3XQWcEaAmo_EALw_wcB");
-		resultJson.put("version", "1.0");
+		resultJson.put("version", 1);
 		return resultJson;
 	}
 
