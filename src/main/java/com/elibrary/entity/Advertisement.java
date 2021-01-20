@@ -19,11 +19,6 @@ public class Advertisement extends AbstractEntity {
 	private String pdf;
 
 	@JsonView(Views.Thin.class)
-	@Column(name = "type")
-	@Enumerated(EnumType.STRING)
-	private AdvertisementType type;
-
-	@JsonView(Views.Thin.class)
 	@Column(name = "linkType")
 	@Enumerated(EnumType.STRING)
 	private LinkType linkType;
@@ -43,14 +38,6 @@ public class Advertisement extends AbstractEntity {
 
 	public void setPdf(String pdf) {
 		this.pdf = pdf;
-	}
-
-	public AdvertisementType getType() {
-		return type;
-	}
-
-	public void setType(AdvertisementType type) {
-		this.type = type;
 	}
 
 	public LinkType getLinkType() {

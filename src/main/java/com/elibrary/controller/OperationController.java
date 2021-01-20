@@ -1112,7 +1112,10 @@ public class OperationController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-
+		
+		String mobileImageName = json.get("mobileImageName").toString();
+		String mobileImage = json.get("mobileImage").toString();
+		
 		String image = json.get("image").toString();
 		String imageName = json.get("imageName").toString();
 
@@ -1131,10 +1134,17 @@ public class OperationController extends AbstractController {
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(image.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, imageName);
 		Files.write(destinationFile, imageBytes);
+		
+		
+		String mobileFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
+		mobileImage = mobileImage.split("base64")[1];
+		byte[] mobileImageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(mobileImage.replaceAll(" ", "+"));
+		Path mobileDestinationFile = Paths.get(mobileFilePath, mobileImageName);
+		Files.write(mobileDestinationFile, mobileImageBytes);
 
-		BufferedImage bimg = ImageIO.read(new File(filePath + imageName));
-		int width = bimg.getWidth();
-		int height = bimg.getHeight();
+//		BufferedImage bimg = ImageIO.read(new File(filePath + imageName));
+//		int width = bimg.getWidth();
+//		int height = bimg.getHeight();
 		
 		if(!pdfName.isEmpty()) {
 			String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
@@ -1144,6 +1154,19 @@ public class OperationController extends AbstractController {
 			Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
 			Files.write(destinationPDFFile, pdfBytes);
 		}
+		
+		Advertisement mobileAdvertisement = new Advertisement();
+		mobileAdvertisement.setBoId(SystemConstant.BOID_REQUIRED);
+		mobileAdvertisement.setName("Advertisement/" + mobileImageName);
+		if(pdfName.isEmpty()) {
+			mobileAdvertisement.setPdf(pdf);
+		}
+		else {
+			mobileAdvertisement.setPdf("/Advertisement/" + pdfName);
+		}
+		mobileAdvertisement.setEntityStatus(EntityStatus.ACTIVE);
+		
+		
 		
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
@@ -1155,29 +1178,31 @@ public class OperationController extends AbstractController {
 			advertisement.setPdf("/Advertisement/" + pdfName);
 		}
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
-
 		Boolean is_pdf = pdfName.contains(".pdf");
 
 		logger.info("is pdf:" + is_pdf);
 
-		if (is_pdf == true)
+		if (is_pdf == true) {
+			mobileAdvertisement.setLinkType(LinkType.pdf);
 			advertisement.setLinkType(LinkType.pdf);
-		else
+		}
+			
+		else {
+			mobileAdvertisement.setLinkType(LinkType.web);
 			advertisement.setLinkType(LinkType.web);
-
-		if (width == 1170 && height == 268) {
-			advertisement.setType(AdvertisementType.Web);
 		}
-
-		else if (width == 991 && height == 350) {
-			advertisement.setType(AdvertisementType.Mobile);
-		}
-
+			
+//		if (width == 1170 && height == 268) {
+//			advertisement.setType(AdvertisementType.Web);
+//		}
+//
+//		else if (width == 991 && height == 350) {
+//			advertisement.setType(AdvertisementType.Mobile);
+//		}
+		advertisementService.save(mobileAdvertisement);
 		advertisementService.save(advertisement);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "success!");
-		resultJson.put("width", width);
-		resultJson.put("height", height);
 		return resultJson;
 	}
 
