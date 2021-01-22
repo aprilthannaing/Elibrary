@@ -57,9 +57,9 @@ public class UserController extends AbstractController {
 		return result;
 	}
 
+	@ResponseBody
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "setuserinfo", method = RequestMethod.POST)
-	@ResponseBody
 	@JsonView(Views.Summary.class)
 	public JSONObject setuserinfo(@RequestBody User req) throws Exception {
 		JSONObject jsonRes = new JSONObject();
@@ -457,7 +457,7 @@ public class UserController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject setusers(@RequestBody ArrayList<User> arrayList, @RequestParam("sessionId") String sessionId) {
 		JSONObject jsonRes = new JSONObject();
-		String rowCount = "";
+		int rowCount = 0;
 		try {
 			String loginUserid = userservice.sessionActive(sessionId);
 			if (!loginUserid.equals("") || loginUserid.equals("000")) {
@@ -467,6 +467,7 @@ public class UserController extends AbstractController {
 				return jsonRes;
 			}
 			for (int i = 0; i < arrayList.size(); i++) {
+				rowCount = i + 1;
 				jsonRes = Validation(arrayList.get(i));
 				if (jsonRes.get("code").equals("000")) {
 					Hluttaw htaw = listOfValueService.checkHluttawById(arrayList.get(i).getHlutawType());
@@ -478,8 +479,10 @@ public class UserController extends AbstractController {
 					}
 					Department dept = new Department();
 					Position pos = new Position();
+					Constituency consti = new Constituency();
 					dept = listOfValueService.checkDepartmentbyId(arrayList.get(i).getDeptType());
 					pos = listOfValueService.getPositionbyId(arrayList.get(i).getPositionType());
+					consti = listOfValueService.getConstituencyById(arrayList.get(i).getConstituencyType());
 					arrayList.get(i).setSessionStatus(EntityStatus.NEW);
 					arrayList.get(i).setCreatedDate(dateFormat());
 					arrayList.get(i).setModifiedDate(dateFormat());
@@ -488,12 +491,12 @@ public class UserController extends AbstractController {
 					arrayList.get(i).setHluttaw(htaw);
 					arrayList.get(i).setDepartment(dept);
 					arrayList.get(i).setPosition(pos);
+					arrayList.get(i).setConstituency(consti);
 					// Role
 					arrayList.get(i).setRole(UserRole.User);
 					// Status
 					arrayList.get(i).setEntityStatus(EntityStatus.NEW);
 					userservice.save(arrayList.get(i));
-					rowCount += i;
 				}
 
 			}

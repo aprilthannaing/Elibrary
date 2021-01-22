@@ -278,4 +278,25 @@ public class ListOfValueController {
 		return jsonResponse;
 	}
 	
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "getConstituencyAll", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject getConstituencyAll(@RequestBody String req){
+		JSONObject jsonResponse = new JSONObject();
+		List<Constituency> constList = listOfValueService.checkConstituencyAll();
+		JSONObject[] jsonArr = new JSONObject[constList.size()];
+		for(int i=0; i< constList.size(); i++) {
+			JSONObject json = new JSONObject();
+			json.put("value", constList.get(i).getId());
+			json.put("caption", constList.get(i).getName());
+			json.put("code", constList.get(i).getCode());
+			json.put("status", constList.get(i).getEntityStatus().name());
+			json.put("joinid",constList.get(i).getHluttaw().getId());
+			jsonArr[i] = json;
+		}
+		jsonResponse.put("refConst", jsonArr);
+		
+		return jsonResponse;
+	}
 }

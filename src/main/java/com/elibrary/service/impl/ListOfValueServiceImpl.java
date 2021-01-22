@@ -293,5 +293,11 @@ import com.elibrary.service.ListOfValueService;
 			List<Constituency> constList = constituencyDao.byQuery(query);
 			return constList.get(0);
 		}
+		
+		public List<Constituency> checkConstituencyAll() {
+			String query = "from Constituency";
+			List<Constituency> deptList = constituencyDao.byQuery(query);
+			return deptList;
+		}
 	
 }

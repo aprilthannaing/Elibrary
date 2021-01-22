@@ -29,4 +29,5 @@ public interface ListOfValueService {
 	public long saveConstituency(Constituency req);
 	public List<Hluttaw> getHluttawByRepresentative();
 	public Constituency getConstituencyById(long id);
+	public List<Constituency> checkConstituencyAll();
 }
