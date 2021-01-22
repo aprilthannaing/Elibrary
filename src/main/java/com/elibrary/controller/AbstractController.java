@@ -35,7 +35,6 @@ import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.Publisher;
-import com.elibrary.entity.Rating;
 import com.elibrary.entity.Request;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
@@ -298,7 +297,7 @@ public class AbstractController {
 
 		CellStyle cellStyle = workbook.createCellStyle();
 		cellStyle.setFont(font);
-	
+
 		Cell cell;
 		if (row == null)
 			row = sheet.createRow(rowNumber);
@@ -385,12 +384,6 @@ public class AbstractController {
 			}
 			SubCategory subcategory = book.getSubCategory();
 			Category category = book.getCategory();
-			User user = book.getUploader();
-			String uploader = "";
-			if (user == null || user.toString().isEmpty()) {
-
-				uploader = "";
-			}
 
 			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "A", count, book.getISBN(), (short) 13, IndexedColors.BLACK.index);
 			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "B", count, book.getTitle(), (short) 13, IndexedColors.BLACK.index);
@@ -425,7 +418,7 @@ public class AbstractController {
 			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "P", count, book.getSeriesIndex(), (short) 10, IndexedColors.BLACK.index);
 			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "Q", count, book.getSize(), (short) 10, IndexedColors.BLACK.index);
 			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "R", count, book.getDownloadApproval(), (short) 10, IndexedColors.BLACK.index);
-			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "S", count, uploader, (short) 10, IndexedColors.BLACK.index);
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "S", count, book.getUploader() == null ? "" : book.getUploader().getName(), (short) 10, IndexedColors.BLACK.index);
 
 			Double rate = book.getOwnRating();
 			String rating = rate.toString();

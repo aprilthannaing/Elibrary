@@ -16,7 +16,7 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "category")
+@Table(name = "Category")
 public class Category extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
@@ -27,7 +27,7 @@ public class Category extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Summary.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "category_subCategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
+	@JoinTable(name = "Category_SubCategory", joinColumns = @JoinColumn(name = "categoryId"), inverseJoinColumns = @JoinColumn(name = "subCategoryId"))
 	private List<SubCategory> subCategories;
 
 	@JsonView(Views.Thin.class)

@@ -359,24 +359,7 @@ call GetBookCountByActionStatus()
 
 
 
-DELIMITER //
-DROP PROCEDURE IF EXISTS GET_BookId_ByST;
-CREATE PROCEDURE GET_BookId_ByST(IN ST nvarchar(1000))
-BEGIN
- SELECT b.id
-  , b.boId
-  FROM book b
-  LEFT JOIN book_author ba ON ba.bookId=B.id
-  LEFT JOIN book_category bc ON BC.bookId=B.id
-  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
-  LEFT JOIN book_publisher bp ON bp.bookId=b.id
-WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
-  ,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
-  , (SELECT a.name FROM author a WHERE a.id=ba.authorId) , (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
-  , (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId),  (SELECT S.engName FROM subcategory s WHERE S.id=BS.subcategoryId),(SELECT C.myanmarName FROM category c WHERE C.id=BC.categoryId)
-  ) LIKE CONCAT('%',ST,'%');
-END
-//DELIMITER ;
+
 
 
 DELIMITER //
@@ -503,106 +486,13 @@ alter table user add column currentAddress varchar(225);
 alter table user add column constituency bigint;
 
 
- 
- DELIMITER // 
-DROP PROCEDURE IF EXISTS GET_Recommended_BookId;
-CREATE PROCEDURE GET_Recommended_BookId (IN ST nvarchar(300), UsrID nvarchar(20))
-BEGIN
-  SELECT
-    b.id,
-    b.boId
-  FROM book b
-    LEFT JOIN book_author ba
-      ON ba.bookId = B.id
-    LEFT JOIN book_category bc
-      ON BC.bookId = B.id
-    LEFT JOIN book_subcategory bs
-      ON BS.bookId = B.id
-    LEFT JOIN book_publisher bp
-      ON bp.bookId = b.id
-    LEFT JOIN history h
-      ON h.bookId = b.id
-  WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
-  , b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
-  , (SELECT
-      a.name
-    FROM author a
-    WHERE a.id = ba.authorId), (SELECT
-      p.name
-    FROM publisher p
-    WHERE p.id = bp.publisherId), (SELECT
-      s.myanmarName
-    FROM subcategory s
-    WHERE s.id = bs.subcategoryId), (SELECT
-      s1.engName
-    FROM subcategory s1
-    WHERE s1.id = bs.subcategoryId), (SELECT
-      C.myanmarName
-    FROM category c
-    WHERE C.id = BC.categoryId), (SELECT
-      C.engName
-    FROM category c
-    WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST, '%')
-  AND (h.actionStatus = 'READ'
-  OR h.actionStatus = 'FAVOURITE')
-  AND H.userId = UsrID
-  GROUP BY b.id,
-           b.boId
-  ORDER BY COUNT(B.boId) DESC;
-END
-//
-DELIMITER ;
+
 
 call GET_Recommended_BookId('မြန်မာ့အတွဲ(၅၁)၊','10')
 
 
 
-USE elibrary;
-DELIMITER //
-DROP PROCEDURE IF EXISTS GET_Popular_BookId;
-CREATE PROCEDURE GET_Popular_BookId (IN ST nvarchar(300))
-BEGIN
-  SELECT
-    b.id,
-    b.boId
-  FROM book b
-    LEFT JOIN book_author ba
-      ON ba.bookId = B.id
-    LEFT JOIN book_category bc
-      ON BC.bookId = B.id
-    LEFT JOIN book_subcategory bs
-      ON BS.bookId = B.id
-    LEFT JOIN book_publisher bp
-      ON bp.bookId = b.id
-    LEFT JOIN history h
-      ON h.bookId = b.id
-  WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
-  , b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
-  , (SELECT
-      a.name
-    FROM author a
-    WHERE a.id = ba.authorId), (SELECT
-      p.name
-    FROM publisher p
-    WHERE p.id = bp.publisherId), (SELECT
-      s.myanmarName
-    FROM subcategory s
-    WHERE s.id = bs.subcategoryId), (SELECT
-      s1.engName
-    FROM subcategory s1
-    WHERE s1.id = bs.subcategoryId), (SELECT
-      C.myanmarName
-    FROM category c
-    WHERE C.id = BC.categoryId), (SELECT
-      C.engName
-    FROM category c
-    WHERE C.id = BC.categoryId)) LIKE CONCAT('%', ST, '%')
-  AND h.actionStatus = 'READ'
-  GROUP BY b.id,
-           b.boId
-  ORDER BY COUNT(B.boId) DESC;
-END
-// DELIMITER ;
+
 
 
 call GET_Popular_BookId('a');
@@ -619,31 +509,7 @@ PRIMARY KEY (`id`)
 
  
 alter table advertisement add column type varchar(50);
-DELIMITER //
-DROP PROCEDURE IF EXISTS GET_BookId_fromHistory;
-CREATE PROCEDURE GET_BookId_fromHistory(IN ST nvarchar(300), UsrID varchar(20), ActSt varchar(40))
-BEGIN
- SELECT b.id , b.boId -- , b.title -- , h.actionStatus -- , h.userId
-  FROM book b
-  LEFT JOIN book_author ba ON ba.bookId=B.id
-  LEFT JOIN book_category bc ON BC.bookId=B.id
-  LEFT JOIN book_subcategory bs ON BS.bookId=B.id
-  LEFT JOIN book_publisher bp ON bp.bookId=b.id
-  LEFT JOIN history h ON h.bookId=b.id
-WHERE CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN 
-,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
-, (SELECT a.name FROM author a WHERE a.id=ba.authorId) 
-, (SELECT p.name FROM publisher p  WHERE p.id=bp.publisherId)
-, (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId)
-, (SELECT S.myanmarName FROM subcategory s WHERE S.id=BS.subcategoryId)
-, (SELECT C.engName FROM category c WHERE C.id=BC.categoryId)
-, (SELECT C.engName FROM category c WHERE C.id=BC.categoryId)) LIKE CONCAT('%',ST,'%')
-AND h.userId=UsrID
-AND h.actionStatus=ActSt
-;
-END
-//
-DELIMITER ;
+
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS GET_PopularBook_byCatIDCreateDt;
@@ -909,10 +775,7 @@ WHERE  CONCAT_WS(' , ', B.publishedDate, B.title, b.ISBN
   AND B.uploader=Updr
   GROUP BY B.id
   , B.boId
-  ORDER BY B.id DESC;
-END
-//
-DELIMITER;
+  ORDER BY B.id DESC; END // DELIMITER;
 
 -- ------------------------------ --------------------------------- ---------------------------
 
@@ -920,4 +783,380 @@ CALL GET_Book_bySTandUploader('1', '7');
 
 
 alter table advertisement add column linkType varchar(50);
+
+
+
+
+
+//modify
+
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_BookId_ByST`(IN ST nvarchar(1000))
+BEGIN
+ SELECT b.id
+  , b.boId
+  FROM Book b
+  LEFT JOIN Book_Author ba ON ba.bookId=b.id
+  LEFT JOIN Book_Category bc ON bc.bookId=b.id
+  LEFT JOIN Book_SubCategory bs ON bs.bookId=b.id
+  LEFT JOIN Book_Publisher bp ON bp.bookId=b.id
+WHERE CONCAT_WS(' , ', b.publishedDate, b.title, b.ISBN 
+  ,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+  , (SELECT a.name FROM Author a WHERE a.id=ba.authorId) , (SELECT p.name FROM Publisher p  WHERE p.id=bp.publisherId)
+  , (SELECT s.myanmarName FROM SubCategory s WHERE s.id=bs.subcategoryId),  (SELECT s.engName FROM SubCategory s WHERE s.id=bs.subcategoryId),(SELECT c.myanmarName FROM Category c WHERE c.id=bc.categoryId)
+  ) LIKE CONCAT('%',ST,'%');
+END$$
+DELIMITER ;
+
+
+
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_Recommended_BookId`(IN ST nvarchar(300), UsrID nvarchar(20))
+BEGIN
+  SELECT
+    b.id,
+    b.boId
+  FROM Book b
+    LEFT JOIN Book_Author ba
+      ON ba.bookId = B.id
+    LEFT JOIN Book_Category bc
+      ON bc.bookId = B.id
+    LEFT JOIN Book_SubCategory bs
+      ON bs.bookId = B.id
+    LEFT JOIN Book_Publisher bp
+      ON bp.bookId = b.id
+    LEFT JOIN History h
+      ON h.bookId = b.id
+  WHERE CONCAT_WS(' , ', b.publishedDate, b.title, b.ISBN
+  , b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+  , (SELECT
+      a.name
+    FROM Author a
+    WHERE a.id = ba.authorId), (SELECT
+      p.name
+    FROM Publisher p
+    WHERE p.id = bp.publisherId), (SELECT
+      s.myanmarName
+    FROM SubCategory s
+    WHERE s.id = bs.subcategoryId), (SELECT
+      s1.engName
+    FROM SubCategory s1
+    WHERE s1.id = bs.subcategoryId), (SELECT
+      c.myanmarName
+    FROM Category c
+    WHERE c.id = bc.categoryId), (SELECT
+      c.engName
+    FROM Category c
+    WHERE c.id = bc.categoryId)) LIKE CONCAT('%', ST, '%')
+  AND (h.actionStatus = 'READ'
+  OR h.actionStatus = 'FAVOURITE')
+  AND H.userId = UsrID
+  GROUP BY b.id,
+           b.boId
+  ORDER BY COUNT(B.boId) DESC;
+END$$
+DELIMITER ;
+
+
+
+
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_Popular_BookId`(IN ST nvarchar(300))
+BEGIN
+  SELECT
+    b.id,
+    b.boId
+  FROM Book b
+    LEFT JOIN Book_Author ba
+      ON ba.bookId = b.id
+    LEFT JOIN Book_Category bc
+      ON bc.bookId = b.id
+    LEFT JOIN Book_SubCategory bs
+      ON bs.bookId = b.id
+    LEFT JOIN Book_Publisher bp
+      ON bp.bookId = b.id
+    LEFT JOIN History h
+      ON h.bookId = b.id
+  WHERE CONCAT_WS(' , ', b.publishedDate, b.title, b.ISBN
+  , b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+  , (SELECT
+      a.name
+    FROM Author a
+    WHERE a.id = ba.authorId), (SELECT
+      p.name
+    FROM Publisher p
+    WHERE p.id = bp.publisherId), (SELECT
+      s.myanmarName
+    FROM SubCategory s
+    WHERE s.id = bs.subcategoryId), (SELECT
+      s1.engName
+    FROM SubCategory s1
+    WHERE s1.id = bs.subcategoryId), (SELECT
+      c.myanmarName
+    FROM Category c
+    WHERE c.id = bc.categoryId), (SELECT
+      c.engName
+    FROM Category c
+    WHERE c.id = bc.categoryId)) LIKE CONCAT('%', ST, '%')
+  AND h.actionStatus = 'READ'
+  GROUP BY b.id,
+           b.boId
+  ORDER BY COUNT(B.boId) DESC;
+END$$
+DELIMITER ;
+
+
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_BookId_fromHistory`(IN ST nvarchar(300), UsrID varchar(20), ActSt varchar(40))
+BEGIN
+ SELECT b.id , b.boId -- , b.title -- , h.actionStatus -- , h.userId
+  FROM Book b
+  LEFT JOIN Book_Author ba ON ba.bookId=B.id
+  LEFT JOIN Book_Category bc ON bc.bookId=B.id
+  LEFT JOIN Book_Subcategory bs ON bs.bookId=B.id
+  LEFT JOIN Book_Publisher bp ON bp.bookId=b.id
+  LEFT JOIN History h ON h.bookId=b.id
+WHERE CONCAT_WS(' , ', b.publishedDate, b.title, b.ISBN 
+,b.edition, b.volume,  b.callNo,  b.accessionNo,b.uploader
+, (SELECT a.name FROM Author a WHERE a.id=ba.authorId) 
+, (SELECT p.name FROM Publisher p  WHERE p.id=bp.publisherId)
+, (SELECT s.myanmarName FROM SubCategory s WHERE s.id=bs.subcategoryId)
+, (SELECT s.myanmarName FROM SubCategory s WHERE s.id=bs.subcategoryId)
+, (SELECT c.engName FROM Category c WHERE c.id=bc.categoryId)
+, (SELECT c.engName FROM Category c WHERE c.id=bc.categoryId)) LIKE CONCAT('%',ST,'%')
+AND h.userId=UsrID
+AND h.actionStatus=ActSt
+;
+END$$
+DELIMITER ;
+
+
+
+
+
+USE elibrary;
+DELIMITER//
+DROP PROCEDURE IF EXISTS GET_BookCount_Librarian_byCreateDt;
+CREATE PROCEDURE GET_BookCount_Librarian_byCreateDt (IN SDate date,EDate date )
+BEGIN
+  SELECT  
+    COUNT(B.id) AS 'BOOK_COUNT'
+  ,  B.uploader
+  FROM Book B
+  JOIN User u ON U.id=B.uploader AND u.role='Librarian' 
+  AND u.entityStatus='ACTIVE'
+  WHERE  CONVERT(B.createdDate,DATETIME) BETWEEN SDate and EDate
+  GROUP BY  B.uploader
+  ORDER BY BOOK_COUNT DESC;
+END
+//
+DELIMITER;
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_PopularBook_byCatID`(IN CatID nvarchar(50))
+BEGIN
+  SELECT
+    BS.bookId 'Book',
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'    
+  FROM History H,
+       Book_Category BS
+  WHERE BS.bookId = H.bookId
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BS.categoryId = CatID
+  GROUP BY BS.categoryId
+  ,        BS.bookId
+  ORDER BY TOT_COUNT DESC;
+END$$
+DELIMITER ;
+
+use elibrary;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_Book_bySTandUploader`(IN ST nvarchar(100), Updr nvarchar(50) )
+BEGIN
+  SELECT
+  B.id 'ID',
+  B.boId 'BOOK',
+  B.uploader
+FROM 
+  Book B
+  LEFT JOIN Book_Author ba ON ba.bookId=B.id
+  LEFT JOIN Book_Category bc ON bc.bookId=B.id
+  LEFT JOIN Book_SubCategory bs ON bs.bookId=B.id
+  LEFT JOIN Book_Publisher bp ON bp.bookId=B.id
+WHERE  CONCAT_WS(' , ', B.publishedDate, B.title, B.ISBN
+, B.edition, B.volume, B.callNo, B.accessionNo, B.uploader
+, (SELECT
+    a.name
+  FROM Author a
+  WHERE a.id = ba.authorId), (SELECT
+    p.name
+  FROM Publisher p
+  WHERE p.id = bp.publisherId), (SELECT
+    s.myanmarName
+  FROM SubCategory s
+  WHERE s.id = bs.subcategoryId), (SELECT
+    s1.engName
+  FROM SubCategory s1
+  WHERE s1.id = bs.subcategoryId), (SELECT
+    c.myanmarName
+  FROM Category c
+  WHERE c.id = bc.categoryId), (SELECT
+    c.engName
+  FROM Category c
+  WHERE c.id = bc.categoryId)) LIKE CONCAT('%', ST , '%')
+  AND B.uploader=Updr
+  GROUP BY B.id
+  , B.boId
+  ORDER BY B.id DESC; 
+  END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_PopularBook_byCatIDandSearchTerm`(IN CatID nvarchar(50), ST nvarchar(100))
+BEGIN
+  SELECT
+	b.id 'Book',
+    H.boId,
+    bc.categoryId,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+  FROM  History H,
+        Book b
+  LEFT JOIN Book_Author ba ON ba.bookId=b.id
+  LEFT JOIN Book_Category bc ON bc.bookId=b.id
+  LEFT JOIN Book_SubCategory bs ON bs.bookId=b.id
+  LEFT JOIN Book_Publisher bp ON bp.bookId=b.id
+  WHERE bc.bookId = H.bookId
+  AND H.bookId=b.id
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND bc.categoryId = CatID
+  AND CONCAT_WS(' , ', b.publishedDate, b.title, b.ISBN
+, b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+, (SELECT
+    a.name
+  FROM Author a
+  WHERE a.id = ba.authorId), (SELECT
+    p.name
+  FROM Publisher p
+  WHERE p.id = bp.publisherId), (SELECT
+    s.myanmarName
+  FROM SubCategory s
+  WHERE s.id = bs.subcategoryId), (SELECT
+    s1.engName
+  FROM SubCategory s1
+  WHERE s1.id = bs.subcategoryId), (SELECT
+    c.myanmarName
+  FROM Category c
+  WHERE c.id = bc.categoryId), (SELECT
+    c.engName
+  FROM Category c
+  WHERE c.id = bc.categoryId)) LIKE CONCAT('%', ST , '%')
+  GROUP BY bc.categoryId
+    , b.boId
+  ORDER BY TOT_COUNT DESC;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_PopularBook_bySubCatIDandSearchTerm`(IN SubCatID nvarchar(50), ST nvarchar(100))
+BEGIN
+  SELECT
+    b.id 'Book',
+    H.bookId,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+  FROM  History H,
+        Book b
+  LEFT JOIN Book_Author ba ON ba.bookId=b.id
+  LEFT JOIN Book_Category bc ON bc.bookId=b.id
+  LEFT JOIN Book_SubCategory bs ON bs.bookId=b.id
+  LEFT JOIN Book_Publisher bp ON bp.bookId=b.id
+  WHERE bc.bookId = H.bookId
+  AND H.bookId=b.id
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND bs.subcategoryId = SubCatID
+  AND CONCAT_WS(' , ', b.publishedDate, b.title, b.ISBN
+, b.edition, b.volume, b.callNo, b.accessionNo, b.uploader
+, (SELECT
+    a.name
+  FROM Author a
+  WHERE a.id = ba.authorId), (SELECT
+    p.name
+  FROM Publisher p
+  WHERE p.id = bp.publisherId), (SELECT
+    s.myanmarName
+  FROM SubCategory s
+  WHERE s.id = bs.subcategoryId), (SELECT
+    s1.engName
+  FROM SubCategory s1
+  WHERE s1.id = bs.subcategoryId), (SELECT
+    c.myanmarName
+  FROM Category c
+  WHERE c.id = bc.categoryId), (SELECT
+    c.engName
+  FROM Category c
+  WHERE c.id = bc.categoryId)) LIKE CONCAT('%', ST , '%')
+  GROUP BY bs.subcategoryId
+    , b.boId
+  ORDER BY TOT_COUNT DESC;
+END$$
+DELIMITER ;
+
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_PopularBook_bySubCatIDCreateDt`(IN SubCatID nvarchar(50), SDate date,EDate date )
+BEGIN
+  SELECT
+    B.boId,
+    BS.bookId,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+  FROM History H
+    , Book_SubCategory BS
+    , Book B
+  WHERE BS.bookId = H.bookId
+  AND B.id=H.bookId
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BS.subcategoryId = SubCatID
+  AND  CONVERT(B.createdDate,DATETIME) BETWEEN SDate and EDate
+  GROUP BY  BS.bookId,
+            BS.subcategoryId
+  ORDER BY TOT_COUNT DESC;
+END$$
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
 

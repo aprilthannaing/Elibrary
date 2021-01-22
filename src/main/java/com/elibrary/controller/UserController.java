@@ -358,9 +358,7 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
-			// "Please verify your email address for Elibray System.\n"
-			// + "Your new password is " + user.getPassword());
+			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n" + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -635,9 +633,7 @@ public class UserController extends AbstractController {
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
-			// "Please verify your email address for Elibray System.\n"
-			// + "Your new password is " + user.getPassword());
+			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n" + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
@@ -667,9 +663,7 @@ public class UserController extends AbstractController {
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			// mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
-			// "Please verify your email address for Elibray System.\n"
-			// + "Your new password is " + user.getPassword());
+			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n" + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}

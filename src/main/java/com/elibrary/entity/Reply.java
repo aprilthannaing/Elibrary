@@ -4,13 +4,12 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "reply")
+@Table(name = "Reply")
 public class Reply extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
@@ -19,7 +18,7 @@ public class Reply extends AbstractEntity implements Serializable {
 	@JsonView(Views.Thin.class)
 	private String message;
 
-	@org.hibernate.annotations.Type(type="true_false")
+	@org.hibernate.annotations.Type(type = "true_false")
 	@NotNull
 	@JsonView(Views.Thin.class)
 	private boolean viewStatus;

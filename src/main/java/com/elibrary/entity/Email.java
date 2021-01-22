@@ -10,13 +10,13 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "email")
-public class Email extends AbstractEntity implements Serializable{
-	
+@Table(name = "Email")
+public class Email extends AbstractEntity implements Serializable {
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "hluttawboId")
 	private Hluttaw hluttaw;
-	
+
 	private String emailAddress;
 
 	public Hluttaw getHluttaw() {
@@ -34,6 +34,5 @@ public class Email extends AbstractEntity implements Serializable{
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
-	
 
 }

@@ -18,7 +18,7 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "book")
+@Table(name = "Book")
 public class Book extends AbstractReadingObject implements Serializable {
 
 	@JsonView(Views.Thin.class)
@@ -56,32 +56,32 @@ public class Book extends AbstractReadingObject implements Serializable {
 
 	@JsonView(Views.Thin.class)
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_subcategory", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "subcategoryId"))
+	@JoinTable(name = "Book_SubCategory", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "subcategoryId"))
 	private SubCategory subCategory;
 
 	@JsonView(Views.Thin.class)
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_category", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
+	@JoinTable(name = "Book_Category", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "categoryId"))
 	private Category category;
 
 	@JsonView(Views.Thin.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_author", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "authorId"))
+	@JoinTable(name = "Book_Author", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "authorId"))
 	private List<Author> authors = new ArrayList<Author>();
 
 	@JsonView(Views.Thin.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_publisher", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
+	@JoinTable(name = "Book_Publisher", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "publisherId"))
 	private List<Publisher> publishers = new ArrayList<Publisher>();
 
 	@JsonView(Views.Summary.class)
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_rating", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
+	@JoinTable(name = "Book_Rating", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "ratingId"))
 	private List<Rating> ratings = new ArrayList<Rating>();
 
 	@JsonView(Views.Thin.class)
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(name = "book_comment", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
+	@JoinTable(name = "Book_Comment", joinColumns = @JoinColumn(name = "bookId"), inverseJoinColumns = @JoinColumn(name = "commentId"))
 	private Comment comment;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

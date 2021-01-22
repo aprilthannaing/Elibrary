@@ -111,4 +111,8 @@ public interface BookService {
 
 	public List<Book> getBooks();
 
+	public List<Long> getPopularBookBySearchTermsAndSubCategory(Long subCategoryId, String searchTerms) throws SQLException, ClassNotFoundException;
+
+	public List<Book> getPopularBooksBySubCat(Long subCategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
+
 }

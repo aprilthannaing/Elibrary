@@ -6,9 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "hluttaw")
-public class Hluttaw extends AbstractEntity implements Serializable{
-	
+@Table(name = "Hluttaw")
+public class Hluttaw extends AbstractEntity implements Serializable {
+
 	private String name;
 
 	public String getName() {

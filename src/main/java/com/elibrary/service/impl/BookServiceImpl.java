@@ -633,6 +633,25 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
+	public List<Long> getPopularBookBySearchTermsAndSubCategory(Long subCategoryId, String searchTerms) throws SQLException, ClassNotFoundException {
+		List<Long> IdList = new ArrayList<Long>();
+		String storedProc = "{call GET_PopularBook_bySubCatIDandSearchTerm(?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, subCategoryId + "");
+		myCs.setString(2, searchTerms);
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				IdList.add(Long.parseLong(rs.getString("Book")));
+			}
+			con.close();
+		}
+		return IdList;
+	}
+
+	@Override
 	public List<Long> getEntriesByLibrarian(String startDate, String endDate) throws SQLException, ClassNotFoundException {
 		List<Long> totalCount = new ArrayList<Long>();
 		String storedProc = "{call GET_BookCount_Librarian_byCreateDt(?,?)}";
@@ -649,6 +668,26 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 			con.close();
 		}
 		return totalCount;
+	}
+
+	@Override
+	public List<Book> getPopularBooksBySubCat(Long subCategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException {
+		List<Book> bookList = new ArrayList<Book>();
+		String storedProc = "{call GET_PopularBook_bySubCatIDCreateDt(?,?,?)}";
+		Connection con = getConnection();
+		CallableStatement myCs = con.prepareCall(storedProc);
+		myCs.setString(1, subCategoryId + "");
+		myCs.setString(2, startDate);
+		myCs.setString(3, endDate);
+		boolean hasResults = myCs.execute();
+		if (hasResults) {
+			ResultSet rs = myCs.getResultSet();
+			while (rs.next()) {
+				bookList.add(findById(Long.parseLong(rs.getString("bookId"))));
+			}
+			con.close();
+		}
+		return bookList;
 	}
 
 	@Override

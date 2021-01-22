@@ -6,9 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "magazine")
-public class Magazine extends AbstractReadingObject implements Serializable{
-	
+@Table(name = "Magazine")
+public class Magazine extends AbstractReadingObject implements Serializable {
+
 	private String monthlyNo;
 
 	public String getMonthlyNo() {
@@ -18,7 +18,5 @@ public class Magazine extends AbstractReadingObject implements Serializable{
 	public void setMonthlyNo(String monthlyNo) {
 		this.monthlyNo = monthlyNo;
 	}
-	
-	
 
 }

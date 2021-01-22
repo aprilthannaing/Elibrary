@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "Comment")
 public class Comment extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)
