@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elibrary.entity.Advertisement;
-import com.elibrary.entity.AdvertisementType;
 import com.elibrary.entity.Author;
 import com.elibrary.entity.AuthorType;
 import com.elibrary.entity.Book;
@@ -196,14 +195,17 @@ public class OperationController extends AbstractController {
 		}
 
 		byte[] decodedBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf);
-		String pdfFilePath = IMAGEUPLOADURL.trim() + "BookFile//";
+		String pdfFilePath = IMAGEUPLOADURL.trim();
 
-		File file = new File(pdfFilePath + pdfName);
+		File file = new File(pdfFilePath + "BookFile/" + pdfName);
 		book.setSize(file.length() / 1024 + "KB");
+
+		logger.info("file!!!!!!!!!!!!!!!!" + file);
 		FileOutputStream fop = new FileOutputStream(file);
 		fop.write(decodedBytes);
-		addWaterMark(pdfFilePath + "BookFile/" + pdfName.trim(), pdfFilePath + "WaterMarkFile/" + pdfName.trim());
-		book.setPath("/WaterMarkFile/" + pdfName.trim());
+
+		addWaterMark(pdfFilePath + "BookFile/" + pdfName.trim(), pdfFilePath + "NewWaterMarkFile/" + pdfName.trim());
+		book.setPath("/NewWaterMarkFile/" + pdfName.trim());
 		return true;
 	}
 
@@ -568,11 +570,11 @@ public class OperationController extends AbstractController {
 
 		String pictureName = profile.split("\\\\")[2];
 		String profilePicture = "/AuthorProfile/" + pictureName;
-		if (authorService.isDuplicateProfile(profilePicture)) {
-			errorMessage.put("status", "0");
-			errorMessage.put("msg", "The profile picture is already registered!");
-			return errorMessage;
-		}
+//		if (authorService.isDuplicateProfile(profilePicture)) {
+//			errorMessage.put("status", "0");
+//			errorMessage.put("msg", "The profile picture is already registered!");
+//			return errorMessage;
+//		}
 
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, pictureName);
@@ -659,6 +661,8 @@ public class OperationController extends AbstractController {
 		resultJson = setAuthorInfo(author, json);
 		if (resultJson != null)
 			return resultJson;
+
+		authorService.save(author);
 
 		if (json.get("imageSrc").toString().contains("base64")) {
 			resultJson = setAuthorProfile(author, json);
@@ -1112,10 +1116,10 @@ public class OperationController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject uploadImage(@RequestBody JSONObject json) throws IOException, ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
-		
+
 		String mobileImageName = json.get("mobileImageName").toString();
 		String mobileImage = json.get("mobileImage").toString();
-		
+
 		String image = json.get("image").toString();
 		String imageName = json.get("imageName").toString();
 
@@ -1134,8 +1138,7 @@ public class OperationController extends AbstractController {
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(image.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, imageName);
 		Files.write(destinationFile, imageBytes);
-		
-		
+
 		String mobileFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
 		mobileImage = mobileImage.split("base64")[1];
 		byte[] mobileImageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(mobileImage.replaceAll(" ", "+"));
@@ -1145,8 +1148,8 @@ public class OperationController extends AbstractController {
 //		BufferedImage bimg = ImageIO.read(new File(filePath + imageName));
 //		int width = bimg.getWidth();
 //		int height = bimg.getHeight();
-		
-		if(!pdfName.isEmpty()) {
+
+		if (!pdfName.isEmpty()) {
 			String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
 			pdf = pdf.split("base64")[1];
 			byte[] pdfBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf.replaceAll(" ", "+"));
@@ -1154,27 +1157,23 @@ public class OperationController extends AbstractController {
 			Path destinationPDFFile = Paths.get(pdfFilePath, pdfName);
 			Files.write(destinationPDFFile, pdfBytes);
 		}
-		
+
 		Advertisement mobileAdvertisement = new Advertisement();
 		mobileAdvertisement.setBoId(SystemConstant.BOID_REQUIRED);
-		mobileAdvertisement.setName("Advertisement/" + mobileImageName);
-		if(pdfName.isEmpty()) {
+		mobileAdvertisement.setName("/Advertisement/" + mobileImageName);
+		if (pdfName.isEmpty()) {
 			mobileAdvertisement.setPdf(pdf);
-		}
-		else {
+		} else {
 			mobileAdvertisement.setPdf("/Advertisement/" + pdfName);
 		}
 		mobileAdvertisement.setEntityStatus(EntityStatus.ACTIVE);
-		
-		
-		
+
 		Advertisement advertisement = new Advertisement();
 		advertisement.setBoId(SystemConstant.BOID_REQUIRED);
-		advertisement.setName("Advertisement/" + imageName);
-		if(pdfName.isEmpty()) {
+		advertisement.setName("/Advertisement/" + imageName);
+		if (pdfName.isEmpty()) {
 			advertisement.setPdf(pdf);
-		}
-		else {
+		} else {
 			advertisement.setPdf("/Advertisement/" + pdfName);
 		}
 		advertisement.setEntityStatus(EntityStatus.ACTIVE);
@@ -1186,12 +1185,12 @@ public class OperationController extends AbstractController {
 			mobileAdvertisement.setLinkType(LinkType.pdf);
 			advertisement.setLinkType(LinkType.pdf);
 		}
-			
+
 		else {
 			mobileAdvertisement.setLinkType(LinkType.web);
 			advertisement.setLinkType(LinkType.web);
 		}
-			
+
 //		if (width == 1170 && height == 268) {
 //			advertisement.setType(AdvertisementType.Web);
 //		}
@@ -1294,7 +1293,7 @@ public class OperationController extends AbstractController {
 	@RequestMapping(value = "advertisementCount", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getAdvertisementCount() throws ServiceUnavailableException {
-		return advertisementService.countAdvertisement() + "";
+		return advertisementService.countActiveAdvertisement() + "";
 	}
 
 	@CrossOrigin(origins = "*")
@@ -1345,6 +1344,9 @@ public class OperationController extends AbstractController {
 	private boolean addWaterMark(String file, String watermarkFile) {
 		try {
 
+			logger.info("file!!!!!!!!!!" + file);
+			logger.info("watermarkFile!!!!!!!!!!" + watermarkFile);
+
 			String pdfFilePath = IMAGEUPLOADURL.trim();
 			PdfReader reader = new PdfReader(file);
 			PdfReader.unethicalreading = true;
@@ -1353,7 +1355,7 @@ public class OperationController extends AbstractController {
 			PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(watermarkFile));
 			long i = 0;
 			PdfContentByte under;
-			Image img = Image.getInstance(pdfFilePath + "watermark.PNG");
+			Image img = Image.getInstance(pdfFilePath + "watermark.png");
 			img.setAbsolutePosition(0, 0);
 
 			while (i < n) {

@@ -11,7 +11,6 @@ import org.springframework.util.CollectionUtils;
 import com.elibrary.dao.AdvertisementDao;
 import com.elibrary.dao.impl.AdvertisementDaoImpl;
 import com.elibrary.entity.Advertisement;
-import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.service.AdvertisementService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -48,6 +47,12 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
 	public String getBoId() {
 		return "Advertisement" + plus();
+	}
+
+	@Override
+	public long countActiveAdvertisement() {
+		String query = "select count(*) from Advertisement where entityStatus='" + EntityStatus.ACTIVE + "'";
+		return advertisementDao.findLongByQueryString(query).get(0);
 	}
 
 	@Override
