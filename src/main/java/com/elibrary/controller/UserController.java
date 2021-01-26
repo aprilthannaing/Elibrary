@@ -130,11 +130,11 @@ public class UserController extends AbstractController {
 				if (status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
 				else if (status.equals("ACTIVE")) {
-					// if(!status.equals(user.getEntityStatus().name())) {
-					// mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account",
-					// "Welcome!Please verify your email address for Elibray System.\n"
-					// + "Your password is "+ user.getPassword() + ".");
-					// }
+					 if(!status.equals(user.getEntityStatus().name())) {
+					 mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account",
+					 "Welcome!Please verify your email address for Elibray System.\n"
+					 + "Your password is "+ user.getPassword() + ".");
+					 }
 					user.setEntityStatus(EntityStatus.ACTIVE);
 				} else if (status.equals("EXPIRED"))
 					user.setEntityStatus(EntityStatus.EXPIRED);
