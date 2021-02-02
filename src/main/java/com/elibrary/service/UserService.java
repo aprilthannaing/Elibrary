@@ -35,4 +35,8 @@ public interface UserService {
 	public User getLoginByAdmin(String email, String password);
 	
 	public Session sessionActiveById(String sessionId,String userid);
+	
+	public User getLoginByWebsite(String email, String password);
+	
+	public User selectUserbyEmailActive(String email) ;
 }

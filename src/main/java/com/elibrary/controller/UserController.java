@@ -3,10 +3,12 @@ package com.elibrary.controller;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -44,7 +46,7 @@ public class UserController extends AbstractController {
 
 	@Autowired
 	private MailServiceImpl mailService;
-
+	
 	private static Logger logger = Logger.getLogger(UserController.class);
 
 	@ResponseBody
@@ -95,7 +97,8 @@ public class UserController extends AbstractController {
 					}
 					user.setSessionStatus(EntityStatus.NEW);
 					user.setCreatedDate(dateFormat());
-					user.setPassword(getRandomNumberString());
+					//user.setPassword(getRandomNumberString());
+					user.setPassword(generatePassword());
 					user.setFromUserId(loginUserid);
 					msg = "Insert Successfully";
 				}
@@ -130,11 +133,13 @@ public class UserController extends AbstractController {
 				if (status.equals("NEW"))
 					user.setEntityStatus(EntityStatus.NEW);
 				else if (status.equals("ACTIVE")) {
-					// if(!status.equals(user.getEntityStatus().name())) {
-					// mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account",
-					// "Welcome!Please verify your email address for Elibray System.\n"
-					// + "Your password is "+ user.getPassword() + ".");
-					// }
+					if(user.getEntityStatus()!= null) {
+						if(!status.equals(user.getEntityStatus().name())) {
+							 mailService.sendMail(req.getEmail().trim(), "Elibrary : Your New Account",
+							 "Welcome!Please verify your email address for Elibray System.\n"
+							 + "Your password is "+ user.getPassword() + ".");
+						}
+					}
 					user.setEntityStatus(EntityStatus.ACTIVE);
 				} else if (status.equals("EXPIRED"))
 					user.setEntityStatus(EntityStatus.EXPIRED);
@@ -349,16 +354,27 @@ public class UserController extends AbstractController {
 
 		User user = userservice.selectUserbyId(loginUserid);
 		if (user != null) {
-			if (user.getPassword().equals(newPassword) || !user.getPassword().equals(oldPassword)) {
+			if(!user.getPassword().equals(oldPassword)) {
+				resJson.put("message", "Your old password is wroung!");
+				resJson.put("status", false);
+				return resJson;
+			}
+			if (user.getPassword().equals(newPassword)) {
 				resJson.put("message", "Your new password cannot be the same as your old password. Please enter a different password");
 				resJson.put("status", false);
 				return resJson;
 			}
-
+			resJson = checkPasswordPolicyPattern(newPassword);
+			boolean status = Boolean.parseBoolean(resJson.get("status").toString());
+			if(!status) {
+				return resJson;
+			}
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n" + "Your new password is " + user.getPassword());
+			 mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
+			 "Please verify your email address for Elibray System.\n"
+			 + "Your new password is " + user.getPassword());
 			resJson.put("message", "Password changed Successfully");
 			resJson.put("status", true);
 		}
@@ -371,7 +387,6 @@ public class UserController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject goChangepwdByAdmin(@RequestBody JSONObject reqJson, @RequestHeader("token") String token) throws Exception {
 		JSONObject resJson = new JSONObject();
-
 		byte[] base64DecryptedOldPassword = Base64.getDecoder().decode(reqJson.get("old_password").toString());
 		String oldpwd = AES.decrypt(base64DecryptedOldPassword, secretKey);
 
@@ -388,12 +403,21 @@ public class UserController extends AbstractController {
 
 		User user = userservice.selectUserbyId(loginUserid);
 		if (user != null) {
-			if (user.getPassword().equals(newpwd) || !user.getPassword().equals(oldpwd)) {
+			if(!user.getPassword().equals(oldpwd)) {
+				resJson.put("message", "Your old password is wroung!");
+				resJson.put("status", false);
+				return resJson;
+			}
+			if (user.getPassword().equals(newpwd)) {
 				resJson.put("message", "Your new password cannot be the same as your old password. Please enter a different password");
 				resJson.put("status", false);
 				return resJson;
 			}
-
+			resJson = checkPasswordPolicyPattern(newpwd);
+			boolean status = Boolean.parseBoolean(resJson.get("status").toString());
+			if(!status) {
+				return resJson;
+			}
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
@@ -403,7 +427,6 @@ public class UserController extends AbstractController {
 		}
 		return resJson;
 	}
-
 	public String goValidation(String email, String password) {
 		if (email.isEmpty() && password.isEmpty())
 			return "Please enter your email address and password!";
@@ -561,7 +584,7 @@ public class UserController extends AbstractController {
 
 		JSONObject resultJson = new JSONObject();
 		try {
-			User user = userservice.selectUserbyEmail(json.get("email").toString());
+			User user = userservice.selectUserbyEmailActive(json.get("email").toString());
 			if (user == null) {
 				resultJson.put("message", "Email not found!");
 				resultJson.put("status", false);
@@ -627,13 +650,20 @@ public class UserController extends AbstractController {
 			resJson.put("message", "Session Fail");
 			return resJson;
 		}
+		resJson = checkPasswordPolicyPattern(newPassword);
+		boolean status = Boolean.parseBoolean(resJson.get("status").toString());
+		if(!status) {
+			return resJson;
+		}
 		User user = userservice.selectUserbyVerCode(loginUserid, code, email);
 		if (user != null) {
 
 			user.setPassword(newPassword);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n" + "Your new password is " + user.getPassword());
+			 mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
+			 "Please verify your email address for Elibray System.\n"
+			 + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
@@ -657,13 +687,20 @@ public class UserController extends AbstractController {
 			resJson.put("message", "Session Fail");
 			return resJson;
 		}
+		resJson = checkPasswordPolicyPattern(newpwd);
+		boolean status = Boolean.parseBoolean(resJson.get("status").toString());
+		if(!status) {
+			return resJson;
+		}
 		User user = userservice.selectUserbyVerCode(loginUserid, code, email);
 		if (user != null) {
 
 			user.setPassword(newpwd);
 			user.setSessionStatus(EntityStatus.ACTIVE);
 			userservice.save(user);
-			mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed", "Please verify your email address for Elibray System.\n" + "Your new password is " + user.getPassword());
+			 mailService.sendMail(user.getEmail(), "Elibrary : Your password was changed",
+			 "Please verify your email address for Elibray System.\n"
+			 + "Your new password is " + user.getPassword());
 			resJson.put("message", "success");
 			resJson.put("status", true);
 		}
@@ -713,5 +750,56 @@ public class UserController extends AbstractController {
 		return resultJson;
 
 	}
+		@ResponseBody
+		@CrossOrigin(origins = "*")
+		@JsonView(Views.Summary.class)
+		@RequestMapping(value = "goLoginByWebsite", method = RequestMethod.POST)
+		public JSONObject goLoginByWebsite(@RequestBody JSONObject reqJson) throws Exception {
+			JSONObject resJson = new JSONObject();
+			String message = "";
+			String email = reqJson.get("email").toString();
+			byte[] base64DecryptedPassword = Base64.getDecoder().decode(reqJson.get("password").toString());
+			String password = AES.decrypt(base64DecryptedPassword, secretKey);
+
+			message = this.goValidation(email, password);
+			if (!message.equals("")) {
+				resJson.put("message", message);
+				resJson.put("status", false);
+				return resJson;
+			}
+			User user = userservice.getLoginByWebsite(email, password);// diff
+			if (user != null) {
+				// session
+				String sessionId = saveSession(user);
+				if (user.getSessionStatus().equals(EntityStatus.NEW)) {
+					resJson.put("message", "first time login");
+					resJson.put("status", true);
+					resJson.put("changePwd", true);
+					resJson.put("token", sessionId);
+					return resJson;
+				}
+				// String sessionid = userservice.checkSession(user);
+				resJson.put("message", message);
+				resJson.put("status", true);
+				resJson.put("token", sessionId);
+				JSONObject json1 = new JSONObject();
+				json1.put("id", user.getBoId());
+				json1.put("name", user.getName());
+				json1.put("email", user.getEmail());
+				json1.put("phoneNo", user.getPhoneNo());
+				json1.put("hluttaw", listOfValueService.checkHluttawById(user.getHluttaw().getId()).getName());
+				json1.put("department", listOfValueService.checkDepartmentbyId(user.getDepartment().getId()).getName());
+				json1.put("position", listOfValueService.getPositionbyId(user.getPosition().getId()).getName());
+				json1.put("type", user.getType());
+				json1.put("role", user.getRole().name());
+				json1.put("initialName", initialName(user.getName()));
+				resJson.put("data", json1);
+				return resJson;
+			}
+			resJson.put("message", "Your email or passord is incorrect.");
+			resJson.put("status", false);
+			resJson.put("password", password);
+			return resJson;
+		}
 
 }

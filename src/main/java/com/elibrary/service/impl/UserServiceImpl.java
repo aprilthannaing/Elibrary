@@ -151,6 +151,15 @@ public class UserServiceImpl extends AbstractController implements UserService {
 			return userList.get(0);
 		return null;
 	}
+	
+	@Override
+	public User selectUserbyEmailActive(String email) {
+		String query = "Select user from User user where email='" + email + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<User> userList = userDao.byQuery(query);
+		if (userList.size() > 0)
+			return userList.get(0);
+		return null;
+	}
 
 	@Override
 	public User selectUserbyVerCode(String loginUserid, String verificationCode, String email) {
@@ -173,6 +182,14 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	@Override
 	public User getLoginByAdmin(String email, String password) {
 		String query = "from User where email='" + email + "' And password='" + password + "' And entityStatus='" + EntityStatus.ACTIVE + "' And role <>'" + UserRole.User + "'";
+		List<User> users = userDao.getEntitiesByQuery(query);
+		if (CollectionUtils.isEmpty(users))
+			return null;
+		return users.get(0);
+	}
+	@Override
+	public User getLoginByWebsite(String email, String password) {
+		String query = "from User where email='" + email + "' And password='" + password + "' And entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<User> users = userDao.getEntitiesByQuery(query);
 		if (CollectionUtils.isEmpty(users))
 			return null;
