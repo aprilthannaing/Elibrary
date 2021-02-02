@@ -59,6 +59,7 @@ public class CategoryController extends AbstractController {
 
 		List<Category> categoryList = categoryService.getAll();
 		categoryList.forEach(category -> {
+			category.setIcon(category.getIcon().replaceAll("CategoryIcon", "CategoryIcon2"));
 			category.setBookCount(bookService.getBookCountByCategory(category.getId()));
 		});
 
