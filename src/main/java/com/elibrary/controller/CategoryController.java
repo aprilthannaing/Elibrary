@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -57,7 +58,8 @@ public class CategoryController extends AbstractController {
 			return result;
 		}
 
-		List<Category> categoryList = categoryService.getAll();
+		List<Category> categoryList = new ArrayList<Category>();
+		categoryList = categoryService.getAll();
 		categoryList.forEach(category -> {
 			category.setIcon(category.getIcon().replaceAll("CategoryIcon", "BlackIcon"));
 			category.setBookCount(bookService.getBookCountByCategory(category.getId()));
