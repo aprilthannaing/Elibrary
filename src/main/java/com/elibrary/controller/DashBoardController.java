@@ -78,6 +78,11 @@ public class DashBoardController extends AbstractController {
 
 		List<Long> bookCount = bookService.getEntriesByLibrarian(startDate, endDate);
 		resultJson.put("status", "1");
+
+		logger.info("startDate !!!" + startDate + " endDate !!!" + endDate);
+		logger.info("bookCount !!!" + bookCount);
+		logger.info("nameList !!!" + nameList);
+
 		resultJson.put("bookCount", bookCount);
 		resultJson.put("nameList", nameList);
 		return resultJson;
@@ -329,6 +334,30 @@ public class DashBoardController extends AbstractController {
 
 		String searchTerms = json.get("searchTerms").toString();
 		List<Long> bookList = bookService.getPopularBookBySearchTermsAndCategory(category.getId(), searchTerms);
+		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
+		Object pageObject = json.get("page");
+		int pageNo = Integer.parseInt(pageObject.toString());
+
+		resultJson.put("status", true);
+		resultJson.put("current_page", pageNo);
+		resultJson.put("last_page", lastPageNo);
+		resultJson.put("total_count", bookList.size());
+		resultJson.put("books", getBooksByPaganationWithBookIds(json, bookList, pageNo));
+
+		return resultJson;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "popualrbooksearchbysub", method = RequestMethod.POST)
+	@JsonView(Views.Summary.class)
+	public JSONObject popualrbooksearchBySubCategory(@RequestBody JSONObject json) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+		JSONObject resultJson = new JSONObject();
+		int index = Integer.parseInt(json.get("index").toString());
+		SubCategory subCategory = getSubCategory(json);
+
+		String searchTerms = json.get("searchTerms").toString();
+		List<Long> bookList = bookService.getPopularBookBySearchTermsAndSubCategory(subCategory.getId(), searchTerms);
 		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
 		Object pageObject = json.get("page");
 		int pageNo = Integer.parseInt(pageObject.toString());

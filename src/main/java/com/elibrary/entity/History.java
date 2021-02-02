@@ -15,7 +15,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "history")
+@Table(name = "History")
 public class History extends AbstractEntity implements Serializable {
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

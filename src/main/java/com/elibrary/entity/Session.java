@@ -10,17 +10,17 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "session")
-public class Session extends AbstractEntity implements Serializable{
-	
+@Table(name = "Session")
+public class Session extends AbstractEntity implements Serializable {
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "userId")
 	private User user;
-	
+
 	private String startDate;
-	
+
 	private String endDate;
-	
+
 	public User getUser() {
 		return user;
 	}

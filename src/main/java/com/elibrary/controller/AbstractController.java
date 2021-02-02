@@ -29,6 +29,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.elibrary.entity.Author;
@@ -82,6 +83,24 @@ public class AbstractController {
 	public final String secretKeyByMobile = "7M8N3SLQ8QIKDJOSEPXJKJDFOZIN1NBO";
 
 	public static DecimalFormat df2 = new DecimalFormat("#.##");
+	
+	@Value("${specitalCharacter}")
+	private String specitalCharacter;
+	
+	@Value("${upperCharacter}")
+	private String upperCharacter;
+	
+	@Value("${lowerCharacter}")
+	private String lowerCharacter;
+	
+	@Value("${number}")
+	private String number;
+	
+	@Value("${maximumNumber}")
+	private String maximumNumber;
+	
+	@Value("${minimumNumber}")
+	private String minimumNumber;
 
 	public static Logger logger = Logger.getLogger(AbstractController.class);
 
@@ -473,4 +492,173 @@ public class AbstractController {
 		}
 		return "-1";
 	}
+	
+	public static String generatePassword(){
+		String num_list = "0123456789";
+		String lowerchar_list = "abcdefghijklmnopqrstuvwxyz";
+		String upperchar_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		String specialchar_list = "!#$%&*?@";
+		String list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+		int minimunlength = 8;
+		int splength = 1;
+		int uppercharlength = 1;
+		int lowercharlength = 2;
+		int numberlength = 2;
+
+		StringBuffer randStr = new StringBuffer();
+		int number = 0;
+		//minimunlength = 6;//MinimumLength
+		//splength = 1;// SpecialCharacter
+		//uppercharlength = 1;// UpperCaseCharacter
+		//lowercharlength = 1;// LowerCaseCharacter
+		//numberlength = 1;// Number
+
+		String pwd = "";
+		if (splength == 0 && uppercharlength == 0 && lowercharlength == 0 && numberlength == 0) {
+			pwd = autogeneratePassword(minimunlength);
+		} else {
+			char ch;
+			int count = 0;
+			Random randomGenerator = new Random();
+			if (uppercharlength != 0) {
+				number = randomGenerator.nextInt(upperchar_list.length());
+				ch = upperchar_list.charAt(number);
+				randStr.append(ch);
+				uppercharlength = uppercharlength - 1;
+				count++;
+			}
+			if (lowercharlength != 0) {
+				number = randomGenerator.nextInt(lowerchar_list.length());
+				ch = lowerchar_list.charAt(number);
+				randStr.append(ch);
+				lowercharlength = lowercharlength - 1;
+				count++;
+			}
+			if (splength != 0) {
+				number = randomGenerator.nextInt(specialchar_list.length());
+				ch = specialchar_list.charAt(number);
+				randStr.append(ch);
+				splength = splength - 1;
+				count++;
+			}
+			if (numberlength != 0) {
+				number = randomGenerator.nextInt(num_list.length());
+				ch = num_list.charAt(number);
+				randStr.append(ch);
+				numberlength = numberlength - 1;
+				count++;
+			}
+			if (splength != 0) {
+				for (int f = 0; f < splength; f++) {
+					number = randomGenerator.nextInt(specialchar_list.length());
+					ch = specialchar_list.charAt(number);
+					randStr.append(ch);
+					count++;
+				}
+			}
+
+			if (uppercharlength != 0) {
+				for (int d = 0; d < uppercharlength; d++) {
+					number = randomGenerator.nextInt(upperchar_list.length());
+					ch = upperchar_list.charAt(number);
+					randStr.append(ch);
+					count++;
+				}
+
+			}
+			if (numberlength != 0) {
+				for (int j = 0; j < numberlength; j++) {
+					number = randomGenerator.nextInt(num_list.length());
+					ch = num_list.charAt(number);
+					randStr.append(ch);
+					count++;
+				}
+			}
+
+			if (lowercharlength != 0) {
+				for (int k = 0; k < lowercharlength; k++) {
+					number = randomGenerator.nextInt(lowerchar_list.length());
+					ch = lowerchar_list.charAt(number);
+					randStr.append(ch);
+					count++;
+				}
+			}
+
+			if (count < minimunlength) {
+				for (int i = 0; i < (minimunlength - count); i++) {
+					number = randomGenerator.nextInt(list.length());
+					ch = list.charAt(number);
+					randStr.append(ch);
+				}
+			}
+			pwd = String.valueOf(randStr);
+		}
+		return pwd;
+	}
+	// generate password
+		public static String autogeneratePassword(int length) {
+
+			String pwd = "";
+			if (length == 0) {
+				length = 6;
+			}
+			int pwdlength = length;
+
+			char ch;
+			String num_list = "0123456789";
+			String char_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			String list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			StringBuffer randStr = new StringBuffer();
+
+			for (int i = 0; i < pwdlength; i++) {
+				Random randomGenerator = new Random();
+				int number = 0;
+				if (i == 0) {
+					number = randomGenerator.nextInt(char_list.length());
+					ch = char_list.charAt(number);
+				} else if (i == 2) {
+					number = randomGenerator.nextInt(num_list.length());
+					ch = num_list.charAt(number);
+				} else {
+					number = randomGenerator.nextInt(list.length());
+					ch = list.charAt(number);
+				}
+				randStr.append(ch);
+			}
+			pwd = String.valueOf(randStr);
+			return pwd;
+
+		}
+		public JSONObject checkPasswordPolicyPattern(String pwd){
+			JSONObject resObj = new JSONObject();
+			String desc = "";
+			int sc =Integer.parseInt(specitalCharacter), uc = Integer.parseInt(upperCharacter), lc = Integer.parseInt(lowerCharacter), 
+					no = Integer.parseInt(number), maxno = Integer.parseInt(maximumNumber), minno = Integer.parseInt(minimumNumber);
+			String pattern = "(?=(.*[a-z]){" + lc + "})(?=(.*[A-Z]){" + uc + "})(?=(.*[0-9]){" + no + "})(?=(.*[!#$%&*?@]){"
+					+ sc + "}).{" + minno + "," + maxno + "}";
+			boolean response = pwd.matches(pattern);
+			if (response) {			
+				resObj.put("status", true);
+			} else {
+				desc = "Password Format  is not correct! \n* Password is at least " + minno
+						+ " characters and no more than " + maxno + " characters.";
+
+				if (sc > 0) {
+					desc += "* Password must contain " + sc + " special characters";
+				}
+				if (uc > 0) {
+					desc += ", " + uc + " uppercase characters";
+				}
+				if (lc > 0) {
+					desc += ", " + lc + " lowercase characters";
+				}
+				if (no > 0) {
+					desc += " and " + no + " number.";
+	      }
+				resObj.put("status", false);
+				resObj.put("message", desc);
+			}
+			return resObj;
+		}
 }

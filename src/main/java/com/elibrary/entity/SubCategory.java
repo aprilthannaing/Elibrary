@@ -9,7 +9,7 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "subCategory")
+@Table(name = "SubCategory")
 public class SubCategory extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)

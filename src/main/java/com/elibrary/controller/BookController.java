@@ -14,6 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -343,7 +344,7 @@ public class BookController extends AbstractController {
 		endDate = start[3] + "-" + parseMonthToInt(start[1]) + "-" + start[2];
 		return endDate;
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "exportEntry", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
@@ -366,6 +367,10 @@ public class BookController extends AbstractController {
 		else {
 			String startDate = getStartDate(param);
 			String endDate = getEndDate(param);
+			logger.info("startDate !!!!" + startDate);
+			logger.info("endDate  !!!!!!!!" + endDate);
+			logger.info("user.getId()  !!!!!!!!" + user.getId());
+
 			books.addAll(bookService.getBooksByLibrarian(user.getId(), startDate, endDate));
 		}
 
@@ -376,7 +381,6 @@ public class BookController extends AbstractController {
 		}
 
 		workbook.write(response.getOutputStream());
-	
 		resultJson.put("status", "1");
 		return resultJson;
 
@@ -418,7 +422,7 @@ public class BookController extends AbstractController {
 		return resultJson;
 
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "exportBooksByCategory", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
@@ -453,7 +457,7 @@ public class BookController extends AbstractController {
 		return resultJson;
 
 	}
-	
+
 	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "exportPopularBooksBySubCategory", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
@@ -470,14 +474,20 @@ public class BookController extends AbstractController {
 
 		/* have not start date and end date */
 		if (param.startsWith(",")) {
-			bookService.getPopularBooksBySubCategory(subCategory.getId()).forEach(id->{
+			bookService.getPopularBooksBySubCategory(subCategory.getId()).forEach(id -> {
 				books.add(bookService.findById(id));
 			});
-		}
-		else {
+		} else {
 			String startDate = getStartDate(param);
 			String endDate = getEndDate(param);
-			books.addAll(bookService.getBookListByDateAndSubCategory(subCategory.getId(), startDate, endDate)); //pending
+			books.addAll(bookService.getPopularBooksBySubCat(subCategory.getId(), startDate, endDate));
+		}
+
+		if (CollectionUtils.isEmpty(books)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "There is no books within date range.");
+			return resultJson;
+
 		}
 
 		Boolean result = writeBookSheet(workbook, books);
@@ -487,7 +497,6 @@ public class BookController extends AbstractController {
 		}
 
 		workbook.write(response.getOutputStream());
-		resultJson.put("status", "1");
 		return resultJson;
 
 	}

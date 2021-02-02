@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "rating")
+@Table(name = "Rating")
 public class Rating extends AbstractEntity implements Serializable {
 
 	private double rating;

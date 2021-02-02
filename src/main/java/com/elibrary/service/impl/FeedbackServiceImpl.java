@@ -61,7 +61,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 	@Override
 	public List<Feedback> findByUserId(Long userId) {
-		String query = "select feedback from Feedback feedback where userId=" + userId + " and replyId <> NULL and replyId in (select reply.id from Reply reply where reply.viewStatus=false) and entityStatus='" + EntityStatus.ACTIVE + "' order by id desc";
+		String query = "select feedback from Feedback feedback where userId=" + userId + " and replyId <> NULL and entityStatus='" + EntityStatus.ACTIVE + "' order by id desc";
 		List<Feedback> feedbackList = feedbackDao.getEntitiesByQuery(query, 10);
 		if (CollectionUtils.isEmpty(feedbackList))
 			return new ArrayList<Feedback>();

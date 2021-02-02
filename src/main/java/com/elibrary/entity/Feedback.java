@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "feedback")
+@Table(name = "Feedback")
 public class Feedback extends AbstractEntity implements Serializable {
 
 	@JsonView(Views.Thin.class)

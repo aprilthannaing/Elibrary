@@ -10,15 +10,15 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "constituency")
-public class Constituency extends AbstractEntity implements Serializable{
-	
+@Table(name = "Constituency")
+public class Constituency extends AbstractEntity implements Serializable {
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "hluttawboId")
 	private Hluttaw hluttaw;
-	
+
 	private String name;
-	
+
 	private String code;
 
 	public Hluttaw getHluttaw() {
@@ -44,5 +44,5 @@ public class Constituency extends AbstractEntity implements Serializable{
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
 }

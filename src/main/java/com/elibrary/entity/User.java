@@ -16,25 +16,25 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "user")
+@Table(name = "User")
 public class User extends AbstractEntity implements Serializable {
-	
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "constituency")
 	private Constituency constituency;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private long constituencyType;
-	
+
 	@JsonView(Views.Thin.class)
 	@Column(name = "permanentAddress")
 	private String permanentAddress;
-	
+
 	@JsonView(Views.Thin.class)
 	@Column(name = "currentAddress")
 	private String currentAddress;
-	
+
 	@JsonView(Views.Thin.class)
 	@Column(name = "name")
 	private String name;
@@ -66,19 +66,19 @@ public class User extends AbstractEntity implements Serializable {
 	@Column(name = "modifiedDate")
 	@JsonView(Views.Thin.class)
 	private String modifiedDate;
-	
+
 	@Column(name = "expiredDate")
 	private String expiredDate;
-	
+
 	@Column(name = "sessionStatus")
 	private EntityStatus sessionStatus;
-	
+
 	@Column(name = "fromUserId")
 	private String fromUserId;
-	
+
 	@Column(name = "verificationCode")
 	private String verificationCode;
-	
+
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "hluttawboId")
 	private Hluttaw hluttaw;
@@ -90,52 +90,51 @@ public class User extends AbstractEntity implements Serializable {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "positionboId")
 	private Position position;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String hlutawName;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String deptName;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String positionName;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String constituencyName;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private long hlutawType;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private long deptType;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private long positionType;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String roleType;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String status;
-	
+
 	@Transient
 	@JsonView(Views.Thin.class)
-	private String sessionId="";
-	
+	private String sessionId = "";
+
 	@Transient
 	@JsonView(Views.Thin.class)
 	private String fromUser;
-	
-	
+
 	public String getVerificationCode() {
 		return verificationCode;
 	}

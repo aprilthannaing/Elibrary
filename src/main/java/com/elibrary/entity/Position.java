@@ -2,23 +2,19 @@ package com.elibrary.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "position")
-public class Position extends AbstractEntity implements Serializable{
-	
-	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	//@JoinColumn(name = "departmentboId")
-	//private Department department;
-	
+@Table(name = "Position")
+public class Position extends AbstractEntity implements Serializable {
+
+	// @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	// @JoinColumn(name = "departmentboId")
+	// private Department department;
+
 	private String name;
-	
+
 	private String code;
 
 	public String getName() {
@@ -36,5 +32,5 @@ public class Position extends AbstractEntity implements Serializable{
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
 }

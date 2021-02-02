@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "advertisement")
+@Table(name = "Advertisement")
 public class Advertisement extends AbstractEntity {
 
 	@JsonView(Views.Thin.class)
@@ -22,7 +22,6 @@ public class Advertisement extends AbstractEntity {
 	@Column(name = "linkType")
 	@Enumerated(EnumType.STRING)
 	private LinkType linkType;
-
 
 	public String getName() {
 		return name;

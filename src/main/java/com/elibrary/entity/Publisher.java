@@ -8,9 +8,9 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @Entity
-@Table(name = "publisher")
+@Table(name = "Publisher")
 public class Publisher extends AbstractEntity implements Serializable {
-	
+
 	@JsonView(Views.Thin.class)
 	private String name;
 
