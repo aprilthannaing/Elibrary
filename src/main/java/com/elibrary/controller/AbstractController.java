@@ -85,22 +85,22 @@ public class AbstractController {
 	public static DecimalFormat df2 = new DecimalFormat("#.##");
 	
 	@Value("${specitalCharacter}")
-	private String specitalCharacter;
+	private int specitalCharacter;
 	
 	@Value("${upperCharacter}")
-	private String upperCharacter;
+	private int upperCharacter;
 	
 	@Value("${lowerCharacter}")
-	private String lowerCharacter;
+	private int lowerCharacter;
 	
 	@Value("${number}")
-	private String number;
+	private int number;
 	
 	@Value("${maximumNumber}")
-	private String maximumNumber;
+	private int maximumNumber;
 	
 	@Value("${minimumNumber}")
-	private String minimumNumber;
+	private int minimumNumber;
 
 	public static Logger logger = Logger.getLogger(AbstractController.class);
 
@@ -493,27 +493,19 @@ public class AbstractController {
 		return "-1";
 	}
 	
-	public static String generatePassword(){
+	public String generatePassword(){
 		String num_list = "0123456789";
 		String lowerchar_list = "abcdefghijklmnopqrstuvwxyz";
 		String upperchar_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		String specialchar_list = "!#$%&*?@";
 		String list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-		int minimunlength = 8;
-		int splength = 1;
-		int uppercharlength = 1;
-		int lowercharlength = 2;
-		int numberlength = 2;
-
+		int splength =specitalCharacter,
+			uppercharlength =upperCharacter, 
+			lowercharlength =lowerCharacter, 
+			numberlength = number,
+			minimunlength = minimumNumber;
 		StringBuffer randStr = new StringBuffer();
 		int number = 0;
-		//minimunlength = 6;//MinimumLength
-		//splength = 1;// SpecialCharacter
-		//uppercharlength = 1;// UpperCaseCharacter
-		//lowercharlength = 1;// LowerCaseCharacter
-		//numberlength = 1;// Number
-
 		String pwd = "";
 		if (splength == 0 && uppercharlength == 0 && lowercharlength == 0 && numberlength == 0) {
 			pwd = autogeneratePassword(minimunlength);
@@ -633,8 +625,8 @@ public class AbstractController {
 		public JSONObject checkPasswordPolicyPattern(String pwd){
 			JSONObject resObj = new JSONObject();
 			String desc = "";
-			int sc =Integer.parseInt(specitalCharacter), uc = Integer.parseInt(upperCharacter), lc = Integer.parseInt(lowerCharacter), 
-					no = Integer.parseInt(number), maxno = Integer.parseInt(maximumNumber), minno = Integer.parseInt(minimumNumber);
+			int sc =specitalCharacter, uc = upperCharacter, lc = lowerCharacter, 
+					no = number, maxno = maximumNumber, minno = minimumNumber;
 			String pattern = "(?=(.*[a-z]){" + lc + "})(?=(.*[A-Z]){" + uc + "})(?=(.*[0-9]){" + no + "})(?=(.*[!#$%&*?@]){"
 					+ sc + "}).{" + minno + "," + maxno + "}";
 			boolean response = pwd.matches(pattern);

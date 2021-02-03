@@ -3,12 +3,10 @@ package com.elibrary.controller;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Random;
-
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -87,6 +85,13 @@ public class UserController extends AbstractController {
 				if (!req.getBoId().equals("")) {
 					user = userservice.selectUserByKey(req.getBoId());
 					msg = "Update Successfully";
+						User user1 = userservice.selectUserbyEmailAndBoId(req.getEmail().trim(), user.getBoId());
+						if (user1 != null) {
+							msg = "Email is already exit";
+							jsonRes.put("code", "001");
+							jsonRes.put("desc", msg);
+							return jsonRes;
+						}
 				} else {
 					User user1 = userservice.selectUserbyEmail(req.getEmail().trim());
 					if (user1 != null) {
@@ -173,17 +178,24 @@ public class UserController extends AbstractController {
 	public JSONObject Validation(User user) {
 		JSONObject jsonRes = new JSONObject();
 		String message = "";
-		if (user.getName().equals("") || user.getName().equals(null)) {
+		if(user.getName() == null || user.getName().equals("")) {
 			message = "Please fill correct User Name";
 		}
-		if (user.getEmail().trim().equals("") || user.getEmail().trim().equals(null)) {
+		boolean allowLocal = true;
+		if (user.getEmail()== null || user.getEmail().trim().equals("")) {
+			 message = "Please fill User Email";
+		}
+		if(!EmailValidator.getInstance(allowLocal).isValid(user.getEmail())) {
 			message = "Please fill correct User Email";
 		}
-		if (user.getPhoneNo().trim().equals("") || user.getPhoneNo().trim().equals(null)) {
+		if (user.getPhoneNo()== null || user.getPhoneNo().trim().equals("")) {
 			message = "Please fill correct User Phone No";
 		}
-		if (!message.equals(""))
+		if (!message.equals("")) {
 			jsonRes.put("code", "001");
+			jsonRes.put("desc", message);
+			return jsonRes;
+		}
 		else
 			jsonRes.put("code", "000");
 		return jsonRes;
@@ -487,20 +499,23 @@ public class UserController extends AbstractController {
 				jsonRes.put("desc", "Session Fail");
 				return jsonRes;
 			}
-			for (int i = 0; i < arrayList.size(); i++) {
-				rowCount = i + 1;
-				jsonRes = Validation(arrayList.get(i));
+			for (int j = 0; j < arrayList.size(); j++) {
+				jsonRes = Validation(arrayList.get(j));
 				if (jsonRes.get("code").equals("000")) {
-					Hluttaw htaw = listOfValueService.checkHluttawById(arrayList.get(i).getHlutawType());
-					User user1 = userservice.selectUserbyEmail(arrayList.get(i).getEmail());
+					User user1 = userservice.selectUserbyEmail(arrayList.get(j).getEmail());
 					if (user1 != null) {
 						jsonRes.put("code", "001");
-						jsonRes.put("desc", "Email '" + arrayList.get(i).getEmail() + "' is already registered.");
+						jsonRes.put("desc", "Email '" + arrayList.get(j).getEmail() + "' is already registered.");
 						return jsonRes;
 					}
+				}else return jsonRes;
+			}
+				for (int i = 0; i < arrayList.size(); i++) {
+					rowCount = i + 1;
 					Department dept = new Department();
 					Position pos = new Position();
 					Constituency consti = new Constituency();
+					Hluttaw htaw = listOfValueService.checkHluttawById(arrayList.get(i).getHlutawType());
 					dept = listOfValueService.checkDepartmentbyId(arrayList.get(i).getDeptType());
 					pos = listOfValueService.getPositionbyId(arrayList.get(i).getPositionType());
 					consti = listOfValueService.getConstituencyById(arrayList.get(i).getConstituencyType());
@@ -519,8 +534,6 @@ public class UserController extends AbstractController {
 					arrayList.get(i).setEntityStatus(EntityStatus.NEW);
 					userservice.save(arrayList.get(i));
 				}
-
-			}
 			jsonRes.put("code", "000");
 			jsonRes.put("desc", rowCount + " Row Inserted Successfully");
 

@@ -153,6 +153,16 @@ public class UserServiceImpl extends AbstractController implements UserService {
 	}
 	
 	@Override
+	public User selectUserbyEmailAndBoId(String email,String boId) {
+		String query = "Select user from User user where email='" + email + "' and entityStatus<>'" + EntityStatus.DELETED + "'"
+				+ " And boId<>'" + boId + "'";
+		List<User> userList = userDao.byQuery(query);
+		if (userList.size() > 0)
+			return userList.get(0);
+		return null;
+	}
+	
+	@Override
 	public User selectUserbyEmailActive(String email) {
 		String query = "Select user from User user where email='" + email + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<User> userList = userDao.byQuery(query);

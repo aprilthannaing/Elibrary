@@ -39,4 +39,6 @@ public interface UserService {
 	public User getLoginByWebsite(String email, String password);
 	
 	public User selectUserbyEmailActive(String email) ;
+	
+	public User selectUserbyEmailAndBoId(String email,String boId);
 }
