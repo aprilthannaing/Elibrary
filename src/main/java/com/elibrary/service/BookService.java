@@ -115,4 +115,8 @@ public interface BookService {
 
 	public List<Book> getPopularBooksBySubCat(Long subCategoryId, String startDate, String endDate) throws SQLException, ClassNotFoundException;
 
+	public List<Long> getFilterLatestBooks();
+
+	public boolean isDuplicateAcessionNo(String accessionNo);
+
 }

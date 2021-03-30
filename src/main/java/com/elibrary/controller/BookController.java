@@ -93,6 +93,8 @@ public class BookController extends AbstractController {
 	@RequestMapping(value = "count", method = RequestMethod.GET)
 	@JsonView(Views.Summary.class)
 	public String getCount() throws ServiceUnavailableException {
+
+		logger.info("bookService.countBook():::" + bookService.countBook() + "");
 		return bookService.countBook() + "";
 	}
 
@@ -199,6 +201,25 @@ public class BookController extends AbstractController {
 		}
 
 		if (title.equals("latest")) {
+			List<Long> bookIdList = bookService.getFilterLatestBooks();
+			int lastPageNo = bookIdList.size() % 10 == 0 ? bookIdList.size() / 10 : bookIdList.size() / 10 + 1;
+
+			List<Book> books = getBooksByPaganationWithBookIds(json, bookIdList, pageNo);
+			if (books == null) {
+				resultJson.put("status", false);
+				resultJson.put("message", "This User or Author or Sub-Category is not found!");
+				return resultJson;
+			}
+
+			resultJson.put("status", true);
+			resultJson.put("current_page", pageNo);
+			resultJson.put("last_page", lastPageNo);
+			resultJson.put("total_count", bookIdList.size());
+			resultJson.put("books", books);
+			return resultJson;
+		}
+
+		if (title.equals("latestAll")) {
 			List<Long> bookIdList = bookService.getAllLatestBooks();
 			int lastPageNo = bookIdList.size() % 10 == 0 ? bookIdList.size() / 10 : bookIdList.size() / 10 + 1;
 
@@ -487,7 +508,6 @@ public class BookController extends AbstractController {
 			resultJson.put("status", false);
 			resultJson.put("message", "There is no books within date range.");
 			return resultJson;
-
 		}
 
 		Boolean result = writeBookSheet(workbook, books);

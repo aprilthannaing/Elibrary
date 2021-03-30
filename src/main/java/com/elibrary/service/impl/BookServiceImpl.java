@@ -56,12 +56,21 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 
 	@Override
 	public long countBook() {
-		String query = "select count(*) from Book";
+		String query = "select count(*) from Book where entityStatus='" + EntityStatus.ACTIVE + "'";
 		return bookDao.findLongByQueryString(query).get(0);
 	}
 
 	public String getBoId() {
 		return "BOOK" + plus();
+
+	}
+
+	@Override
+	public boolean isDuplicateAcessionNo(String accessionNo) {
+		String query = "select book from Book book where accessionNo='" + accessionNo.trim() + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		return !CollectionUtils.isEmpty(books);
+
 	}
 
 	@Override
@@ -216,8 +225,17 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
-	public List<Long> getAllLatestBooks() {
+	public List<Long> getFilterLatestBooks() {
 		String query = "select distinct book.id from Book book where entityStatus='" + EntityStatus.ACTIVE + "' and book.id in (Select bc.bookId from Book_Category bc where (bc.categoryId!=6 AND bc.categoryId!=5))";
+		List<Long> books = bookDao.findLongByQueryString(query);
+		if (CollectionUtils.isEmpty(books))
+			return new ArrayList<Long>();
+		return books;
+	}
+
+	@Override
+	public List<Long> getAllLatestBooks() {
+		String query = "select distinct book.id from Book book where entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Long> books = bookDao.findLongByQueryString(query);
 		if (CollectionUtils.isEmpty(books))
 			return new ArrayList<Long>();

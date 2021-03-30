@@ -69,6 +69,7 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.mchange.rmi.ServiceUnavailableException;
+import com.spire.pdf.PdfDocument;
 
 @RestController
 @RequestMapping("operation")
@@ -185,8 +186,7 @@ public class OperationController extends AbstractController {
 		try {
 			pdf = pdf.split("base64")[1];
 		} catch (Exception e) {
-			logger.getLogger("error:" + e.getMessage());
-			logger.info(pdf);
+			logger.error("error:" + e.getMessage());
 		}
 
 		String pdfName = json.get("pdfName").toString().split("\\\\")[2];
@@ -197,16 +197,50 @@ public class OperationController extends AbstractController {
 		byte[] decodedBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(pdf);
 		String pdfFilePath = IMAGEUPLOADURL.trim();
 
-		File file = new File(pdfFilePath + "BookFile/" + pdfName);
+		String fileStr = pdfFilePath + "BookFile/" + pdfName;
+		File file = new File(fileStr);
 		book.setSize(file.length() / 1024 + "KB");
 
-		logger.info("file!!!!!!!!!!!!!!!!" + file);
 		FileOutputStream fop = new FileOutputStream(file);
 		fop.write(decodedBytes);
+
+		// set image
+		setImage(fileStr, book);
 
 		addWaterMark(pdfFilePath + "BookFile/" + pdfName.trim(), pdfFilePath + "NewWaterMarkFile/" + pdfName.trim());
 		book.setPath("/NewWaterMarkFile/" + pdfName.trim());
 		return true;
+	}
+
+	private void setImage(String fileStr, Book book) {
+		PdfDocument doc = new PdfDocument();
+		doc.loadFromFile(fileStr);
+		BufferedImage image = doc.saveAsImage(0);
+		String pdfFilePath = IMAGEUPLOADURL.trim();
+		String fileName = "BookProfile/" + "coverPhoto" + bookService.countBook() + ".png";
+
+		String fullPath = pdfFilePath + fileName;
+		File file = new File(String.format(fullPath, 0));
+		try {
+			ImageIO.write(image, "PNG", file);
+		} catch (IOException e) {
+			logger.error("Can't write cover photo!");
+		}
+		doc.close();
+		book.setCoverPhoto(fileName);
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "pdftoimg", method = RequestMethod.POST)
+	@JsonView(Views.Detailed.class)
+	public void pdfToImg() throws IOException {
+		PdfDocument doc = new PdfDocument();
+		doc.loadFromFile("D://ThawDarSwe_ABrandeAndFamousShortStories.pdf");
+		BufferedImage image = doc.saveAsImage(0);
+		File file = new File(String.format("D://coverPhoto.png", 0));
+		ImageIO.write(image, "PNG", file);
+		doc.close();
 	}
 
 	@ResponseBody
@@ -233,24 +267,25 @@ public class OperationController extends AbstractController {
 			return resultJson;
 		}
 		book.setUploader(user);
-		Object image = json.get("imageSrc");
-		if (image == null || image.toString().isEmpty()) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "Please select cover photo!");
-			return resultJson;
-		}
 
-		Object categoryObject = json.get("category");
-		if (categoryObject == null || categoryObject.toString().isEmpty()) {
+		Object categoryBoId = json.get("category");
+		if (categoryBoId == null || categoryBoId.toString().isEmpty()) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Please choose Category!");
 			return resultJson;
 		}
-		Category category = categoryService.findByBoId(categoryObject.toString());
+		Category category = categoryService.findByBoId(categoryBoId.toString());
 		if (category != null)
 			book.setCategory(category);
 
 		String accessionNo = json.get("accessionNo").toString();
+
+		if (bookService.isDuplicateAcessionNo(accessionNo)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "Duplicate Accession Number!");
+			return resultJson;
+		}
+
 		if (accessionNo == null || accessionNo.isEmpty()) {
 			resultJson.put("status", "0");
 			resultJson.put("msg", "Please enter the accession No!");
@@ -272,12 +307,6 @@ public class OperationController extends AbstractController {
 		Date date = new Date();
 		String createdDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date);
 		book.setCreatedDate(createdDate);
-
-		if (!setImage(json, book)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "This Profile Picture is already registered!");
-			return resultJson;
-		}
 
 		Object pdf = json.get("pdfName").toString();
 		if (pdf == null || pdf.toString().isEmpty()) {
@@ -1343,9 +1372,6 @@ public class OperationController extends AbstractController {
 
 	private boolean addWaterMark(String file, String watermarkFile) {
 		try {
-
-			logger.info("file!!!!!!!!!!" + file);
-			logger.info("watermarkFile!!!!!!!!!!" + watermarkFile);
 
 			String pdfFilePath = IMAGEUPLOADURL.trim();
 			PdfReader reader = new PdfReader(file);
