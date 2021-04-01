@@ -634,7 +634,7 @@ public class UserController extends AbstractController {
 			resJson.put("message", "Session Fail");
 			return resJson;
 		}
-		User user = userservice.selectUserbyVerCode(loginUserid, resJson.get("code").toString(), resJson.get("email").toString());
+		User user = userservice.selectUserbyVerCode(loginUserid, resJson.get("code").toString().trim(), resJson.get("email").toString().trim());
 		if (user == null) {
 			resultJson.put("message", "Invalid Verification Code.");
 			resultJson.put("status", false);

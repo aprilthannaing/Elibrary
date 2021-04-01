@@ -3,6 +3,7 @@ package com.elibrary.controller;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -152,5 +154,52 @@ public class SearchController extends AbstractController {
 		else
 			return searchTerms.isEmpty() ? bookService.getBooksByDate(startDate, endDate) : bookService.getBookBySearchTerms(searchTerms);
 	}
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "opac-search", method = RequestMethod.GET) // web, mobile
+	@JsonView(Views.Thin.class)
+	public JSONObject searchBook(@RequestParam("title") String title,@RequestParam("author") String author,@RequestParam("publisher") String publisher,
+			@RequestParam("copyrightdate") String copyrightdate,@RequestParam("language") String language,@RequestParam("page") String page,@RequestParam("keyword") String keyword) throws ServiceUnavailableException, ClassNotFoundException, SQLException {
+		JSONObject resultJson = new JSONObject();
+		
+		//request json
+		JSONObject json = new JSONObject();
+		json.put("title", title);
+		json.put("author", author);
+		json.put("publisher", publisher);
+		json.put("copyrightdate", copyrightdate);
+		json.put("language", language);
+		json.put("page", page);
+		json.put("keyword", keyword);
+		List<Long> bookList = searchBookyByStatus(json);
+		int lastPageNo = bookList.size() % 10 == 0 ? bookList.size() / 10 : bookList.size() / 10 + 1;
+		int pageNo = Integer.parseInt(page);
+		List<Book> books = getBooksByPaganationWithBookIds(json, bookList, pageNo);
+		if (books == null) {
+			resultJson.put("status", false);
+			resultJson.put("message", "This User is not found!");
+			return resultJson;
+		}
 
+		resultJson.put("status", true);
+		resultJson.put("current_page", pageNo);
+		resultJson.put("last_page", lastPageNo);
+		resultJson.put("total_count", bookList.size());
+		resultJson.put("books", books);
+		return resultJson;
+	}
+	
+	private List<Long> searchBookyByStatus(JSONObject json) throws ClassNotFoundException, SQLException {
+		List<Long> longList = new ArrayList<Long>();
+		String searchTerms = json.get("keyword").toString();
+		Object actionStatus = json.get("keyword");
+//			switch (actionStatus) {
+//			case AUTHOR:
+//				return searchTerms.isEmpty() ? bookService.getBooksByDateAndActionStatus(startDate, endDate, actionStatus, user.getId()) : bookService.getBooksBySearchTermsAndRecommended(searchTerms, user.getId());
+//			default: // favourite and bookmark
+//				return searchTerms.isEmpty() ? bookService.getBooksByDateAndActionStatus(startDate, endDate, actionStatus, user.getId()) : bookService.getBooksBySearchTermsAndActionnStatus(searchTerms, actionStatus, user.getId());
+//
+//			}
+		return longList;
+	}
 }
