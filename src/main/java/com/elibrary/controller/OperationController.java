@@ -579,78 +579,22 @@ public class OperationController extends AbstractController {
 
 	}
 
-	private JSONObject setAuthorProfile(Author author, JSONObject json) throws IOException {
-		JSONObject errorMessage = new JSONObject();
+	private void setAuthorProfile(Author author, JSONObject json) throws IOException {
 
 		String imageSrc = json.get("imageSrc").toString();
-		if (imageSrc == null || imageSrc.isEmpty()) {
-			errorMessage.put("status", "0");
-			errorMessage.put("msg", "Please select an image!");
-			return errorMessage;
-		}
 		imageSrc = imageSrc.split("base64")[1];
 
 		String filePath = IMAGEUPLOADURL.trim() + "AuthorProfile//";
 		String profile = json.get("profilePicture").toString();
-		if (profile == null || profile.isEmpty()) {
-			errorMessage.put("status", "0");
-			errorMessage.put("msg", "Please select a profile picture!");
-			return errorMessage;
-		}
 
 		String pictureName = profile.split("\\\\")[2];
-		String profilePicture = "/AuthorProfile/" + pictureName;
-//		if (authorService.isDuplicateProfile(profilePicture)) {
-//			errorMessage.put("status", "0");
-//			errorMessage.put("msg", "The profile picture is already registered!");
-//			return errorMessage;
-//		}
-
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(imageSrc.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, pictureName);
 		Files.write(destinationFile, imageBytes);
 
 		/* to retrieve profile */
 		author.setProfilePicture("/AuthorProfile/" + pictureName);
-		return null;
 
-	}
-
-	private JSONObject setAuthorInfo(Author author, JSONObject json) {
-		JSONObject errorMessage = new JSONObject();
-		Object img = json.get("imageSrc").toString();
-		if (img == null || img.toString().isEmpty()) {
-			errorMessage.put("status", "0");
-			errorMessage.put("msg", "Please select author profile picture!");
-			return errorMessage;
-		}
-
-		String name = json.get("name").toString();
-		if (name == null || name.isEmpty()) {
-			errorMessage.put("status", "0");
-			errorMessage.put("msg", "Please enter author name!");
-			return errorMessage;
-		}
-		author.setName(name);
-
-		Object sort = json.get("sort");
-//		if (sort == null || sort.isEmpty()) {
-//			errorMessage.put("status", "0");
-//			errorMessage.put("msg", "Please enter sort!");
-//			return errorMessage;
-//		}
-
-		String authorType = json.get("authorType").toString();
-		if (authorType == null || authorType.isEmpty()) {
-			errorMessage.put("status", "0");
-			errorMessage.put("msg", "Please choose author type!");
-			return errorMessage;
-		}
-
-		author.setAuthorType(AuthorType.valueOf(authorType.toUpperCase()));
-		author.setSort(sort != null ? sort.toString() : "");
-		author.setEntityStatus(EntityStatus.ACTIVE);
-		return null;
 	}
 
 	@ResponseBody
@@ -660,23 +604,40 @@ public class OperationController extends AbstractController {
 	public JSONObject saveAuthor(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
 		JSONObject resultJson = new JSONObject();
 
+		JSONObject errorMessage = new JSONObject();
+
 		Author author = new Author();
 		author.setBoId(SystemConstant.BOID_REQUIRED);
-		resultJson = setAuthorInfo(author, json);
-		if (resultJson != null)
-			return resultJson;
 
-		if (json.get("imageSrc").toString().contains("base64")) {
-			resultJson = setAuthorProfile(author, json);
-			if (resultJson != null)
-				return resultJson;
+		Object img = json.get("imageSrc").toString();
+		if (img == null || img.toString().isEmpty())
+			author.setProfilePicture("/AuthorProfile/author1.png");
 
-			resultJson = new JSONObject();
-			authorService.save(author);
-			resultJson.put("status", "1");
-			resultJson.put("msg", "Success!");
+		else if (json.get("imageSrc").toString().contains("base64"))
+			setAuthorProfile(author, json);
+
+		String name = json.get("name").toString();
+		if (name == null || name.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please enter author name!");
+			return errorMessage;
+		}
+		author.setName(name);
+
+		String authorType = json.get("authorType").toString();
+		if (authorType == null || authorType.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please choose author type!");
+			return errorMessage;
 		}
 
+		Object sort = json.get("sort");
+		author.setAuthorType(AuthorType.valueOf(authorType.toUpperCase()));
+		author.setSort(sort != null ? sort.toString() : "");
+		author.setEntityStatus(EntityStatus.ACTIVE);
+		authorService.save(author);
+		resultJson.put("status", "1");
+		resultJson.put("msg", "Success!");
 		return resultJson;
 	}
 
@@ -686,23 +647,35 @@ public class OperationController extends AbstractController {
 	@JsonView(Views.Summary.class)
 	public JSONObject editAuthor(@RequestBody JSONObject json) throws ServiceUnavailableException, IOException {
 		JSONObject resultJson = new JSONObject();
-
+		JSONObject errorMessage = new JSONObject();
 		Author author = authorService.findByBoId(json.get("boId").toString());
-		resultJson = setAuthorInfo(author, json);
-		if (resultJson != null)
-			return resultJson;
 
-		authorService.save(author);
+		Object img = json.get("imageSrc").toString();
+		if (img == null || img.toString().isEmpty())
+			author.setProfilePicture("/AuthorProfile/author1.png");
 
-		if (json.get("imageSrc").toString().contains("base64")) {
-			resultJson = setAuthorProfile(author, json);
-			if (resultJson != null)
-				return resultJson;
+		else if (json.get("imageSrc").toString().contains("base64"))
+			setAuthorProfile(author, json);
 
-			authorService.save(author);
-
+		String name = json.get("name").toString();
+		if (name == null || name.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please enter author name!");
+			return errorMessage;
 		}
-		resultJson = new JSONObject();
+		author.setName(name);
+
+		String authorType = json.get("authorType").toString();
+		if (authorType == null || authorType.isEmpty()) {
+			errorMessage.put("status", "0");
+			errorMessage.put("msg", "Please choose author type!");
+			return errorMessage;
+		}
+
+		Object sort = json.get("sort");
+		author.setAuthorType(AuthorType.valueOf(authorType.toUpperCase()));
+		author.setSort(sort != null ? sort.toString() : "");
+		authorService.save(author);
 		resultJson.put("status", "1");
 		resultJson.put("msg", "Success!");
 		return resultJson;
