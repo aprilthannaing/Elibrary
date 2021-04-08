@@ -122,8 +122,17 @@ public class OperationController extends AbstractController {
 	private void setBookInfo(Book book, JSONObject json) throws ServiceUnavailableException, IOException {
 		List<Author> authors = new ArrayList<Author>();
 		List<Object> authorObjects = (List<Object>) json.get("authors");
+		if (CollectionUtils.isEmpty(authorObjects)) {
+			Author author = new Author();
+			author.setBoId(SystemConstant.BOID_REQUIRED);
+			author.setName(json.get("authorName").toString());
+			author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
+			author.setEntityStatus(EntityStatus.ACTIVE);
+			authorService.save(author);
+			logger.info("author saving !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		}
 
-		if (!CollectionUtils.isEmpty(authorObjects)) {
+		else {
 			for (Object boId : authorObjects) {
 				Author author = authorService.findByBoId(boId.toString());
 				if (author != null)
@@ -279,19 +288,8 @@ public class OperationController extends AbstractController {
 			book.setCategory(category);
 
 		String accessionNo = json.get("accessionNo").toString();
-
-		if (bookService.isDuplicateAcessionNo(accessionNo)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "Duplicate Accession Number!");
-			return resultJson;
-		}
-
-		if (accessionNo == null || accessionNo.isEmpty()) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "Please enter the accession No!");
-			return resultJson;
-		}
-		book.setAccessionNo(accessionNo);
+		if (accessionNo != null || !accessionNo.isEmpty())
+			book.setAccessionNo(accessionNo);
 
 		Object subCategoryObject = json.get("subCategory");
 		if (subCategoryObject == null || subCategoryObject.toString().isEmpty()) {
@@ -1382,7 +1380,6 @@ public class OperationController extends AbstractController {
 		JSONObject json = new JSONObject();
 
 		List<Book> books = bookService.getBooks();
-		logger.info("bookService.getPaths()!!!!!!!!!!!" + books.size());
 
 		int count = 12274;
 		int errorCount = 0;
