@@ -459,6 +459,7 @@ public class OperationController extends AbstractController {
 		category.setMyanmarName(myanmarName);
 		category.setEngName(engName);
 		category.setPriority(Double.parseDouble(priority));
+		category.setIcon("/BlackIcon/origanization.png");
 		category.setEntityStatus(EntityStatus.ACTIVE);
 		return null;
 	}
