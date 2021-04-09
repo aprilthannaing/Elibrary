@@ -81,6 +81,13 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
+	public boolean isDuplicateTitle(String title) {
+		String query = "select book from Book book where title='" + title.trim() + "'and entityStatus='" + EntityStatus.ACTIVE + "'";
+		List<Book> books = bookDao.getEntitiesByQuery(query);
+		return !CollectionUtils.isEmpty(books);
+	}
+
+	@Override
 	public boolean isDuplicatePDF(String fullProfile) {
 		String query = "select book from Book book where path='" + fullProfile.trim() + "' and entityStatus='" + EntityStatus.ACTIVE + "'";
 		List<Book> books = bookDao.getEntitiesByQuery(query);

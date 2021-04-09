@@ -119,4 +119,6 @@ public interface BookService {
 
 	public boolean isDuplicateAcessionNo(String accessionNo);
 
+	public boolean isDuplicateTitle(String title);
+
 }

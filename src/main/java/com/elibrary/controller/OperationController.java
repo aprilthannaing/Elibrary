@@ -129,7 +129,6 @@ public class OperationController extends AbstractController {
 			author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
 			author.setEntityStatus(EntityStatus.ACTIVE);
 			authorService.save(author);
-			logger.info("author saving !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		}
 
 		else {
@@ -156,7 +155,6 @@ public class OperationController extends AbstractController {
 		book.setPublishedDate(json.get("publishedDate").toString().split("T")[0]);
 		book.setSeriesIndex(json.get("seriesIndex").toString());
 		book.setSort(json.get("sort").toString());
-		book.setTitle(json.get("title").toString());
 		book.setISBN(json.get("ISBN").toString());
 		book.setState(json.get("state") != null ? State.APPROVE : State.PENDING);
 		book.setEntityStatus(EntityStatus.ACTIVE);
@@ -319,6 +317,14 @@ public class OperationController extends AbstractController {
 			return resultJson;
 		}
 
+		String title = json.get("title").toString();
+		if (bookService.isDuplicateTitle(title)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This title is duplicated!");
+			return resultJson;
+		}
+		book.setTitle(title);
+
 		setBookInfo(book, json);
 		book.setCallNo(json.get("callNumber").toString());
 		book.setEdition(json.get("edition").toString());
@@ -382,6 +388,13 @@ public class OperationController extends AbstractController {
 			}
 		}
 
+		String title = json.get("title").toString();
+		if (bookService.isDuplicateTitle(title)) {
+			resultJson.put("status", "0");
+			resultJson.put("msg", "This title is duplicated!");
+			return resultJson;
+		}
+		book.setTitle(title);
 		book.setCallNo(json.get("callNumber") != null ? json.get("callNumber").toString() : book.getCallNo());
 		book.setEdition(json.get("edition") != null ? json.get("edition").toString() : book.getEdition());
 		book.setVolume(json.get("volume") != null ? json.get("volume").toString() : book.getVolume());
@@ -695,11 +708,6 @@ public class OperationController extends AbstractController {
 			return resultJson;
 		}
 		String sort = json.get("sort").toString();
-		if (sort == null || sort.isEmpty()) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "Please enter sort!");
-			return resultJson;
-		}
 		publisher.setName(name);
 		publisher.setSort(sort);
 		publisher.setEntityStatus(EntityStatus.ACTIVE);
