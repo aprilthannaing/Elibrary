@@ -205,6 +205,7 @@ public class OperationController extends AbstractController {
 		String pdfFilePath = IMAGEUPLOADURL.trim();
 
 		String fileStr = pdfFilePath + "BookFile/" + pdfName;
+		logger.info("fileStr !!!!!!!!!!" + fileStr);
 		File file = new File(fileStr);
 		book.setSize(file.length() / 1024 + "KB");
 
