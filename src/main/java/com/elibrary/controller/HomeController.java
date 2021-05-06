@@ -116,7 +116,8 @@ public class HomeController extends AbstractController {
 		}
 		List<Category> categoryList = categoryService.getAll();
 		categoryList.forEach(category -> {
-			category.setIcon(category.getIcon().replaceAll("BlackIcon", "CategoryIcon"));
+			if (category.getIcon() != null)
+				category.setIcon(category.getIcon().replaceAll("BlackIcon", "CategoryIcon"));
 			category.setBookCount(bookService.getBookCountByCategory(category.getId()));
 		});
 		resultJson.put("status", true);

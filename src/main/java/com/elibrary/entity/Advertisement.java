@@ -23,6 +23,19 @@ public class Advertisement extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private LinkType linkType;
 
+	@JsonView(Views.Thin.class)
+	@Column(name = "type")
+	@Enumerated(EnumType.STRING)
+	private Type type;
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
+	}
+
 	public String getName() {
 		return name;
 	}

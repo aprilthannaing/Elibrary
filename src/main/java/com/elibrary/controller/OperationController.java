@@ -47,6 +47,7 @@ import com.elibrary.entity.Reply;
 import com.elibrary.entity.State;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.SystemConstant;
+import com.elibrary.entity.Type;
 import com.elibrary.entity.User;
 import com.elibrary.entity.UserRole;
 import com.elibrary.entity.UserType;
@@ -127,6 +128,7 @@ public class OperationController extends AbstractController {
 			author.setBoId(SystemConstant.BOID_REQUIRED);
 			author.setName(json.get("authorName").toString());
 			author.setAuthorType(AuthorType.valueOf(json.get("authorType").toString().toUpperCase()));
+			author.setProfilePicture("AuthorProfile/author1.png");
 			author.setEntityStatus(EntityStatus.ACTIVE);
 			authorService.save(author);
 		}
@@ -152,7 +154,7 @@ public class OperationController extends AbstractController {
 
 		book.setPublishers(publishers);
 		book.setDownloadApproval(json.get("downloadApproval").toString());
-		book.setPublishedDate(json.get("publishedDate").toString().split("T")[0]);
+		book.setPublishedDate(json.get("publishedDate").toString());
 		book.setSeriesIndex(json.get("seriesIndex").toString());
 		book.setSort(json.get("sort").toString());
 		book.setISBN(json.get("ISBN").toString());
@@ -390,12 +392,8 @@ public class OperationController extends AbstractController {
 		}
 
 		String title = json.get("title").toString();
-		if (bookService.isDuplicateTitle(title)) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "This title is duplicated!");
-			return resultJson;
-		}
-		book.setTitle(title);
+
+		book.setTitle(json.get("title").toString() != null ? title : book.getTitle());
 		book.setCallNo(json.get("callNumber") != null ? json.get("callNumber").toString() : book.getCallNo());
 		book.setEdition(json.get("edition") != null ? json.get("edition").toString() : book.getEdition());
 		book.setVolume(json.get("volume") != null ? json.get("volume").toString() : book.getVolume());
@@ -733,12 +731,9 @@ public class OperationController extends AbstractController {
 			resultJson.put("msg", "Please enter the name!");
 			return resultJson;
 		}
+
 		String sort = json.get("sort").toString();
-		if (sort == null || sort.isEmpty()) {
-			resultJson.put("status", "0");
-			resultJson.put("msg", "Please enter sort!");
-			return resultJson;
-		}
+
 		Publisher publisher = publisherService.findByBoId(boId);
 		publisher.setName(name);
 		publisher.setSort(sort);
@@ -1144,6 +1139,8 @@ public class OperationController extends AbstractController {
 		String pdfName = json.get("pdfName").toString();
 
 		String filePath = IMAGEUPLOADURL.trim() + "Advertisement//";
+		logger.info("filePath !!!!!!!!!!!!!!!" + filePath);
+
 		image = image.split("base64")[1];
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(image.replaceAll(" ", "+"));
 		Path destinationFile = Paths.get(filePath, imageName);
@@ -1154,10 +1151,6 @@ public class OperationController extends AbstractController {
 		byte[] mobileImageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(mobileImage.replaceAll(" ", "+"));
 		Path mobileDestinationFile = Paths.get(mobileFilePath, mobileImageName);
 		Files.write(mobileDestinationFile, mobileImageBytes);
-
-//		BufferedImage bimg = ImageIO.read(new File(filePath + imageName));
-//		int width = bimg.getWidth();
-//		int height = bimg.getHeight();
 
 		if (!pdfName.isEmpty()) {
 			String pdfFilePath = IMAGEUPLOADURL.trim() + "Advertisement//";
@@ -1194,20 +1187,15 @@ public class OperationController extends AbstractController {
 		if (is_pdf == true) {
 			mobileAdvertisement.setLinkType(LinkType.pdf);
 			advertisement.setLinkType(LinkType.pdf);
+			advertisement.setType(Type.Mobile);
 		}
 
 		else {
 			mobileAdvertisement.setLinkType(LinkType.web);
 			advertisement.setLinkType(LinkType.web);
+			advertisement.setType(Type.Web);
 		}
 
-//		if (width == 1170 && height == 268) {
-//			advertisement.setType(AdvertisementType.Web);
-//		}
-//
-//		else if (width == 991 && height == 350) {
-//			advertisement.setType(AdvertisementType.Mobile);
-//		}
 		advertisementService.save(mobileAdvertisement);
 		advertisementService.save(advertisement);
 		resultJson.put("status", "1");
@@ -1317,6 +1305,7 @@ public class OperationController extends AbstractController {
 			resultJson.put("message", "Unauthorized Request");
 			return resultJson;
 		}
+
 		String advertisementId = json.get("boId").toString();
 		Advertisement advertisement = advertisementService.findByBoId(advertisementId);
 		if (advertisement == null) {

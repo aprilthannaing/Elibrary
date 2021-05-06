@@ -719,17 +719,14 @@ DROP PROCEDURE IF EXISTS GET_BookCount_Librarian_byCreateDt;
 CREATE PROCEDURE GET_BookCount_Librarian_byCreateDt (IN SDate date,EDate date )
 BEGIN
   SELECT  
-    COUNT(B.id) AS 'BOOK_COUNT'
-  ,  B.uploader
+    COUNT(B.id) AS 'BOOK_COUNT',
+    B.uploader
   FROM book B
   JOIN user u ON U.id=B.uploader AND U.role='Librarian' 
   AND U.entityStatus='ACTIVE'
   WHERE  CONVERT(B.createdDate,DATETIME) BETWEEN SDate and EDate
   GROUP BY  B.uploader
-  ORDER BY BOOK_COUNT DESC;
-END
-//
-DELIMITER;
+  ORDER BY BOOK_COUNT DESC; END // DELIMITER;
 
 -- ------------------------------ --------------------------------- ---------------------------
 
