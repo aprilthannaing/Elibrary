@@ -1,5 +1,8 @@
 package com.elibrary.service.impl;
 
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,16 @@ public class ReplyServiceImpl implements ReplyService {
 
 	public String getBoId() {
 		return "REPLY" + plus();
+	}
+
+	@Override
+	public Reply getReply(String replyId) {
+
+		String query = "From Reply where boId='" + replyId + "'";
+		List<Reply> replies = replyDao.byQuery(query);
+		if (CollectionUtils.isEmpty(replies))
+			return null;
+		return replies.get(0);
 	}
 
 }

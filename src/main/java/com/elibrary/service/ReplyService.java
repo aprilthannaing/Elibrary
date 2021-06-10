@@ -7,4 +7,6 @@ public interface ReplyService {
 
 	public void save(Reply reply) throws ServiceUnavailableException;
 
+	public Reply getReply(String replyId);
+
 }

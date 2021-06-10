@@ -131,6 +131,7 @@ public class OperationController extends AbstractController {
 			author.setProfilePicture("AuthorProfile/author1.png");
 			author.setEntityStatus(EntityStatus.ACTIVE);
 			authorService.save(author);
+			authors.add(author);
 		}
 
 		else {
@@ -144,7 +145,17 @@ public class OperationController extends AbstractController {
 		book.setAuthors(authors);
 		List<Publisher> publishers = new ArrayList<Publisher>();
 		List<Object> publisherObjects = (List<Object>) json.get("publishers");
-		if (!CollectionUtils.isEmpty(publisherObjects)) {
+
+		if (CollectionUtils.isEmpty(publisherObjects)) {
+			Publisher publisher = new Publisher();
+			publisher.setBoId(SystemConstant.BOID_REQUIRED);
+			publisher.setName(json.get("publisherName") != null ? json.get("publisherName").toString() : "");
+			publisher.setSort(json.get("publisherSort") != null ? json.get("publisherSort").toString() : "");
+			publisher.setEntityStatus(EntityStatus.ACTIVE);
+			publisherService.save(publisher);
+			publishers.add(publisher);
+
+		} else {
 			for (Object boId : publisherObjects) {
 				Publisher publisher = publisherService.findByBoId(boId.toString());
 				if (publisher != null)
@@ -977,6 +988,34 @@ public class OperationController extends AbstractController {
 		feedback.setEntityStatus(EntityStatus.ACTIVE);
 		feedback.setUserId(user);
 		feedbackService.save(feedback);
+
+		resultJson.put("status", true);
+		resultJson.put("message", "success!");
+		return resultJson;
+	}
+
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "getReply", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Summary.class)
+	public JSONObject getReply(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject resultJson = new JSONObject();
+
+		if (!isTokenRight(token)) {
+			resultJson.put("status", false);
+			resultJson.put("message", "Unauthorized Request");
+			return resultJson;
+		}
+
+		String feedbackId = json.get("feedbackId") != null ? json.get("feedbackId").toString() : "";
+		Feedback feedback = feedbackService.findByBoId(feedbackId);
+		Reply reply = null;
+		if (feedback != null) {
+			reply = replyService.getReply(feedback.getReplyId().getBoId());
+		}
+
+		if (reply != null)
+			resultJson.put("reply", reply.getMessage());
 
 		resultJson.put("status", true);
 		resultJson.put("message", "success!");
