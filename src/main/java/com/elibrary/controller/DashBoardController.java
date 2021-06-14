@@ -76,7 +76,7 @@ public class DashBoardController extends AbstractController {
 		Date start = c.getTime();
 		String startDate = dateFormat.format(start);
 
-		List<Long> bookCount = bookService.getEntriesByLibrarian(startDate, endDate);
+		List<Long> bookCount = bookService.getEntriesByLibrarian(startDate, endDate, librarianList);
 		resultJson.put("status", "1");
 
 		logger.info("startDate !!!" + startDate + " endDate !!!" + endDate);

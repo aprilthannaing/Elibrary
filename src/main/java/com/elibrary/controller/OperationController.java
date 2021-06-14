@@ -1495,4 +1495,41 @@ public class OperationController extends AbstractController {
 		return resultJson;
 	}
 
+	private static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
+		if ((lat1 == lat2) && (lon1 == lon2)) {
+			return 0;
+		} else {
+			double theta = lon1 - lon2;
+			double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
+			dist = Math.acos(dist);
+			dist = Math.toDegrees(dist);
+			dist = dist * 60 * 1.1515;
+			if (unit.equals("K")) {
+				dist = dist * 1.609344;
+			} else if (unit.equals("N")) {
+				dist = dist * 0.8684;
+			}
+			return (dist);
+		}
+	}
+
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "test", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(Views.Thin.class)
+	private JSONObject test(@RequestHeader("lat1") String lat1, @RequestHeader("long1") String long1, @RequestHeader("lat2") String lat2, @RequestHeader("long2") String long2) {
+		JSONObject resultJson = new JSONObject();
+
+		double lati1 = Double.parseDouble(lat1);
+		double longi1 = Double.parseDouble(long1);
+
+		double lati2 = Double.parseDouble(lat2);
+		double longi2 = Double.parseDouble(long2);
+
+		logger.info("lati1 - " + lati1 + " long1 - " + longi1 + " lati2 - " + lati2 + " long2 - " + longi2);
+		String kilometers = distance(lati1, longi1, lati2, longi2, "K") + " Kilometers\n";
+		resultJson.put("kilometers", kilometers);
+		return resultJson;
+	}
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Book;
+import com.elibrary.entity.User;
 import com.mchange.rmi.ServiceUnavailableException;
 
 public interface BookService {
@@ -107,8 +108,6 @@ public interface BookService {
 
 	public List<Long> getPopularBooksBySubCategory(Long subCategoryId) throws SQLException, ClassNotFoundException;
 
-	public List<Long> getEntriesByLibrarian(String startDate, String endDate) throws SQLException, ClassNotFoundException;
-
 	public List<Book> getBooks();
 
 	public List<Long> getPopularBookBySearchTermsAndSubCategory(Long subCategoryId, String searchTerms) throws SQLException, ClassNotFoundException;
@@ -120,5 +119,7 @@ public interface BookService {
 	public boolean isDuplicateAcessionNo(String accessionNo);
 
 	public boolean isDuplicateTitle(String title);
+
+	List<Long> getEntriesByLibrarian(String startDate, String endDate, List<User> librianList) throws SQLException, ClassNotFoundException;
 
 }

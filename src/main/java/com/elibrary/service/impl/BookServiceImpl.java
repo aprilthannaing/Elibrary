@@ -5,7 +5,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import com.elibrary.entity.ActionStatus;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.EntityStatus;
 import com.elibrary.entity.State;
+import com.elibrary.entity.User;
 import com.elibrary.service.AuthorService;
 import com.elibrary.service.BookService;
 import com.mchange.rmi.ServiceUnavailableException;
@@ -677,8 +680,9 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 	}
 
 	@Override
-	public List<Long> getEntriesByLibrarian(String startDate, String endDate) throws SQLException, ClassNotFoundException {
+	public List<Long> getEntriesByLibrarian(String startDate, String endDate, List<User> librarianList) throws SQLException, ClassNotFoundException {
 		List<Long> totalCount = new ArrayList<Long>();
+		Map<Long, Long> map = new HashMap<Long, Long>();
 		String storedProc = "{call GET_BookCount_Librarian_byCreateDt(?,?)}";
 		Connection con = getConnection();
 		CallableStatement myCs = con.prepareCall(storedProc);
@@ -688,9 +692,14 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 		if (hasResults) {
 			ResultSet rs = myCs.getResultSet();
 			while (rs.next()) {
-				totalCount.add(Long.parseLong(rs.getString("BOOK_COUNT")));
+				map.put(Long.parseLong(rs.getString("uploader")), Long.parseLong(rs.getString("BOOK_COUNT")));
+
 			}
 			con.close();
+		}
+
+		for (User librarian : librarianList) {
+			totalCount.add(map.get(librarian.getId()) == null ? 0 : map.get(librarian.getId()));
 		}
 		return totalCount;
 	}
@@ -724,5 +733,4 @@ public class BookServiceImpl extends AbstractServiceImpl implements BookService 
 			return new ArrayList<Book>();
 		return bookList;
 	}
-
 }
