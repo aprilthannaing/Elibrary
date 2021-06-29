@@ -71,6 +71,33 @@ public class BookController extends AbstractController {
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "setDownlaodApproval", method = RequestMethod.POST)
+	@JsonView(Views.Thin.class)
+	public JSONObject setDownloadApproval(@RequestBody JSONObject json) throws ServiceUnavailableException {
+		JSONObject result = new JSONObject();
+		List<Object> bookBoIds = (List<Object>) json.get("bookBoIds");
+		for (Object boId : bookBoIds) {
+
+			logger.info("boid !!!!!!!" + boId);
+			Book book = bookService.findById(Long.parseLong(boId.toString()));
+			if (book == null)
+				continue;
+
+			logger.info("book.getDownloadApproval() !!!!!!!" + book.getDownloadApproval());
+			if (book.getDownloadApproval().toString().trim().equals("true")) {
+				book.setDownloadApproval("");
+			} else
+				book.setDownloadApproval("true");
+			logger.info("book download approval!!!!!!!!!" + book.getDownloadApproval());
+			bookService.save(book);
+		}
+
+		result.put("status", "true");
+		return result;
+	}
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
 	@RequestMapping(value = "all", method = RequestMethod.GET)
 	@JsonView(Views.Thin.class)
 	public JSONObject getAll() throws ServiceUnavailableException {
@@ -507,13 +534,11 @@ public class BookController extends AbstractController {
 		if (CollectionUtils.isEmpty(books)) {
 			resultJson.put("status", false);
 			resultJson.put("message", "There is no books within date range.");
-			return resultJson;
 		}
 
 		Boolean result = writeBookSheet(workbook, books);
 		if (result == false) {
 			resultJson.put("status", "0");
-			return resultJson;
 		}
 
 		workbook.write(response.getOutputStream());

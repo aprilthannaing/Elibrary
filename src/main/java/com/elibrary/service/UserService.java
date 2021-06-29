@@ -23,22 +23,23 @@ public interface UserService {
 	public String sessionActive(String sessionId);
 
 	public User selectUserbyId(String key);
-	
+
 	public List<User> getLibrarians();
-	
+
 	public User selectUserbyEmail(String email);
-	
+
 	public List<User> selectUserbyStatus(Request req);
-	
-	public User selectUserbyVerCode(String loginid,String verificationCode,String email);
-	
+
+	public User selectUserbyVerCode(String loginid, String verificationCode, String email);
+
 	public User getLoginByAdmin(String email, String password);
-	
-	public Session sessionActiveById(String sessionId,String userid);
-	
+
+	public Session sessionActiveById(String sessionId, String userid);
+
 	public User getLoginByWebsite(String email, String password);
-	
-	public User selectUserbyEmailActive(String email) ;
-	
-	public User selectUserbyEmailAndBoId(String email,String boId);
+
+	public User selectUserbyEmailActive(String email);
+
+	public User selectUserbyEmailAndBoId(String email, String boId);
+
 }

@@ -1149,6 +1149,71 @@ DELIMITER ;
 
 
 
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_PopularBook_byCatID`(IN CatID nvarchar(50))
+BEGIN
+  SELECT
+    H.bookId 'Book',
+    H.boId,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'
+  FROM History H,
+       Book_Category BC
+  WHERE BC.bookId = H.bookId
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BC.categoryId = CatID
+  GROUP BY BC.categoryId
+  ORDER BY TOT_COUNT DESC;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_PopularBook_bySubCatID`(IN SubCatID nvarchar(50))
+BEGIN
+  SELECT
+    BS.bookId,
+    H.boId,
+    SUM(CASE WHEN (H.actionStatus = "READ" OR
+        H.actionStatus = "FAVOURITE" OR
+        H.actionStatus = "BOOKMARK") THEN 1 ELSE 0 END) AS 'TOT_COUNT'    
+  FROM History H,
+       Book_SubCategory BS
+  WHERE BS.bookId = H.bookId
+  AND (H.actionStatus = "READ"
+  OR H.actionStatus = "FAVOURITE"
+  OR H.actionStatus = "BOOKMARK")
+  AND BS.subcategoryId = SubCatID
+  GROUP BY BS.subcategoryId
+  ,        BS.bookId
+  ORDER BY TOT_COUNT DESC;
+END$$
+DELIMITER ;
+
+DROP PROCEDURE GET_PopularBook_bySubCatID;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GET_BookId_BySubCat`(IN ST nvarchar(1000), SubcatID varchar(30))
+BEGIN
+ SELECT B.id
+  , B.boId
+  FROM Book B
+  LEFT JOIN Book_Author BA ON BA.bookId=B.id
+  LEFT JOIN Book_Category BC ON BC.bookId=B.id
+  LEFT JOIN Book_SubCategory BS ON BS.bookId=B.id
+  LEFT JOIN Book_Publisher BP ON BP.bookId=B.id
+WHERE CONCAT_WS(' , ', B.publishedDate, B.title, B.ISBN 
+  ,B.edition, B.volume,  B.callNo,  B.accessionNo,B.uploader
+  , (SELECT A.name FROM Author A WHERE A.id=BA.authorId) , (SELECT P.name FROM Publisher P  WHERE P.id=BP.publisherId)
+  , (SELECT S.myanmarName FROM SubCategory S WHERE S.id=BS.subcategoryId), (SELECT S.engName FROM SubCategory S WHERE S.id=BS.subcategoryId),(SELECT C.myanmarName FROM Category C WHERE C.id=BC.categoryId)
+  ) LIKE CONCAT('%',ST,'%')
+AND BS.subcategoryId=SubcatID;
+END$$
+DELIMITER ;
+
 
 
 

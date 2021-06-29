@@ -1,5 +1,6 @@
 package com.elibrary.controller;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,7 +9,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,6 +31,7 @@ import com.elibrary.entity.User;
 import com.elibrary.entity.Views;
 import com.elibrary.service.BookService;
 import com.elibrary.service.CategoryService;
+import com.elibrary.service.SessionService;
 import com.elibrary.service.SubCategoryService;
 import com.elibrary.service.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -46,7 +53,44 @@ public class DashBoardController extends AbstractController {
 	@Autowired
 	private CategoryService categoryService;
 
+	@Autowired
+	private SessionService sessionService;
+
 	private static Logger logger = Logger.getLogger(DashBoardController.class);
+
+	@ResponseBody
+	@CrossOrigin(origins = "*")
+	@RequestMapping(value = "enteredUsers", method = RequestMethod.GET)
+	@JsonView(Views.Thin.class)
+	public JSONObject getEnteredUser(HttpServletResponse response) throws IOException {
+		JSONObject resultJson = new JSONObject();
+
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String endDate = dateFormat.format(date);
+
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.MONTH, -3);
+		Date start = c.getTime();
+		String startDate = dateFormat.format(start);
+
+		List<User> userList = sessionService.getEnteredUserIdList(startDate, endDate);
+
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("User");
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "A", 1, "Users", (short) 13, IndexedColors.BLACK.index);
+		writeValueinSpecificeCellWithBackGroundColor(workbook, sheet.getSheetName(), "B", 1, userList.size() + "", (short) 13, IndexedColors.BLACK.index);
+
+		int index = 2;
+		for (User user : userList) {
+			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "B", index, user.getName(), (short) 13, IndexedColors.BLACK.index);
+			index++;
+		}
+
+		workbook.write(response.getOutputStream());
+		resultJson.put("status", true);
+		return resultJson;
+	}
 
 	@ResponseBody
 	@CrossOrigin(origins = "*")

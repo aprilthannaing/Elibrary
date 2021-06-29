@@ -36,7 +36,6 @@ import com.elibrary.entity.Author;
 import com.elibrary.entity.Book;
 import com.elibrary.entity.Category;
 import com.elibrary.entity.Publisher;
-import com.elibrary.entity.Rating;
 import com.elibrary.entity.Request;
 import com.elibrary.entity.SubCategory;
 import com.elibrary.entity.User;
@@ -83,22 +82,22 @@ public class AbstractController {
 	public final String secretKeyByMobile = "7M8N3SLQ8QIKDJOSEPXJKJDFOZIN1NBO";
 
 	public static DecimalFormat df2 = new DecimalFormat("#.##");
-	
+
 	@Value("${specitalCharacter}")
 	private int specitalCharacter;
-	
+
 	@Value("${upperCharacter}")
 	private int upperCharacter;
-	
+
 	@Value("${lowerCharacter}")
 	private int lowerCharacter;
-	
+
 	@Value("${number}")
 	private int number;
-	
+
 	@Value("${maximumNumber}")
 	private int maximumNumber;
-	
+
 	@Value("${minimumNumber}")
 	private int minimumNumber;
 
@@ -317,7 +316,7 @@ public class AbstractController {
 
 		CellStyle cellStyle = workbook.createCellStyle();
 		cellStyle.setFont(font);
-	
+
 		Cell cell;
 		if (row == null)
 			row = sheet.createRow(rowNumber);
@@ -404,10 +403,13 @@ public class AbstractController {
 			}
 			SubCategory subcategory = book.getSubCategory();
 			Category category = book.getCategory();
-			User user = book.getUploader();
-			String uploader = "";
-			if (user == null || user.toString().isEmpty()) {
 
+			String uploader = "";
+
+			try {
+				User user = book.getUploader();
+				uploader = user.getName();
+			} catch (Exception e) {
 				uploader = "";
 			}
 
@@ -429,7 +431,6 @@ public class AbstractController {
 			String authorNames = "";
 			for (Author author : authors) {
 				String authorName = author.getName();
-
 				authorNames += authorName + ",";
 			}
 			writeValueinSpecificeCellWithColumn(workbook, sheet.getSheetName(), "G", count, authorNames + "\n", (short) 10, IndexedColors.BLACK.index);
@@ -492,18 +493,14 @@ public class AbstractController {
 		}
 		return "-1";
 	}
-	
-	public String generatePassword(){
+
+	public String generatePassword() {
 		String num_list = "0123456789";
 		String lowerchar_list = "abcdefghijklmnopqrstuvwxyz";
 		String upperchar_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		String specialchar_list = "!#$%&*?@";
 		String list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		int splength =specitalCharacter,
-			uppercharlength =upperCharacter, 
-			lowercharlength =lowerCharacter, 
-			numberlength = number,
-			minimunlength = minimumNumber;
+		int splength = specitalCharacter, uppercharlength = upperCharacter, lowercharlength = lowerCharacter, numberlength = number, minimunlength = minimumNumber;
 		StringBuffer randStr = new StringBuffer();
 		int number = 0;
 		String pwd = "";
@@ -588,69 +585,68 @@ public class AbstractController {
 		}
 		return pwd;
 	}
+
 	// generate password
-		public static String autogeneratePassword(int length) {
+	public static String autogeneratePassword(int length) {
 
-			String pwd = "";
-			if (length == 0) {
-				length = 6;
-			}
-			int pwdlength = length;
-
-			char ch;
-			String num_list = "0123456789";
-			String char_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-			String list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-			StringBuffer randStr = new StringBuffer();
-
-			for (int i = 0; i < pwdlength; i++) {
-				Random randomGenerator = new Random();
-				int number = 0;
-				if (i == 0) {
-					number = randomGenerator.nextInt(char_list.length());
-					ch = char_list.charAt(number);
-				} else if (i == 2) {
-					number = randomGenerator.nextInt(num_list.length());
-					ch = num_list.charAt(number);
-				} else {
-					number = randomGenerator.nextInt(list.length());
-					ch = list.charAt(number);
-				}
-				randStr.append(ch);
-			}
-			pwd = String.valueOf(randStr);
-			return pwd;
-
+		String pwd = "";
+		if (length == 0) {
+			length = 6;
 		}
-		public JSONObject checkPasswordPolicyPattern(String pwd){
-			JSONObject resObj = new JSONObject();
-			String desc = "";
-			int sc =specitalCharacter, uc = upperCharacter, lc = lowerCharacter, 
-					no = number, maxno = maximumNumber, minno = minimumNumber;
-			String pattern = "(?=(.*[a-z]){" + lc + "})(?=(.*[A-Z]){" + uc + "})(?=(.*[0-9]){" + no + "})(?=(.*[!#$%&*?@]){"
-					+ sc + "}).{" + minno + "," + maxno + "}";
-			boolean response = pwd.matches(pattern);
-			if (response) {			
-				resObj.put("status", true);
+		int pwdlength = length;
+
+		char ch;
+		String num_list = "0123456789";
+		String char_list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		String list = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		StringBuffer randStr = new StringBuffer();
+
+		for (int i = 0; i < pwdlength; i++) {
+			Random randomGenerator = new Random();
+			int number = 0;
+			if (i == 0) {
+				number = randomGenerator.nextInt(char_list.length());
+				ch = char_list.charAt(number);
+			} else if (i == 2) {
+				number = randomGenerator.nextInt(num_list.length());
+				ch = num_list.charAt(number);
 			} else {
-				desc = "Password Format  is not correct! \n* Password is at least " + minno
-						+ " characters and no more than " + maxno + " characters.";
-
-				if (sc > 0) {
-					desc += "* Password must contain " + sc + " special characters";
-				}
-				if (uc > 0) {
-					desc += ", " + uc + " uppercase characters";
-				}
-				if (lc > 0) {
-					desc += ", " + lc + " lowercase characters";
-				}
-				if (no > 0) {
-					desc += " and " + no + " number.";
-	      }
-				resObj.put("status", false);
-				resObj.put("message", desc);
+				number = randomGenerator.nextInt(list.length());
+				ch = list.charAt(number);
 			}
-			return resObj;
+			randStr.append(ch);
 		}
+		pwd = String.valueOf(randStr);
+		return pwd;
+
+	}
+
+	public JSONObject checkPasswordPolicyPattern(String pwd) {
+		JSONObject resObj = new JSONObject();
+		String desc = "";
+		int sc = specitalCharacter, uc = upperCharacter, lc = lowerCharacter, no = number, maxno = maximumNumber, minno = minimumNumber;
+		String pattern = "(?=(.*[a-z]){" + lc + "})(?=(.*[A-Z]){" + uc + "})(?=(.*[0-9]){" + no + "})(?=(.*[!#$%&*?@]){" + sc + "}).{" + minno + "," + maxno + "}";
+		boolean response = pwd.matches(pattern);
+		if (response) {
+			resObj.put("status", true);
+		} else {
+			desc = "Password Format  is not correct! \n* Password is at least " + minno + " characters and no more than " + maxno + " characters.";
+
+			if (sc > 0) {
+				desc += "* Password must contain " + sc + " special characters";
+			}
+			if (uc > 0) {
+				desc += ", " + uc + " uppercase characters";
+			}
+			if (lc > 0) {
+				desc += ", " + lc + " lowercase characters";
+			}
+			if (no > 0) {
+				desc += " and " + no + " number.";
+			}
+			resObj.put("status", false);
+			resObj.put("message", desc);
+		}
+		return resObj;
+	}
 }
