@@ -164,7 +164,7 @@ public class OperationController extends AbstractController {
 		}
 
 		book.setPublishers(publishers);
-		book.setDownloadApproval(json.get("downloadApproval").toString());
+		book.setDownloadApproval(json.get("downloadApproval").toString().trim().equals("true") ? "true" : "");
 		book.setPublishedDate(json.get("publishedDate").toString());
 		book.setSeriesIndex(json.get("seriesIndex").toString());
 		book.setSort(json.get("sort").toString());
