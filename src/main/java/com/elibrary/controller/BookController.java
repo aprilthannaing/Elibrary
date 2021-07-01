@@ -149,6 +149,8 @@ public class BookController extends AbstractController {
 	public JSONObject approve(@RequestHeader("token") String token, @RequestBody JSONObject json) throws ServiceUnavailableException {
 		JSONObject resultJson = new JSONObject();
 
+		logger.info("approving !!!!!!!!!!");
+
 		if (!isTokenRight(token)) {
 			resultJson.put("status", false);
 			resultJson.put("message", "Unauthorized Request");
@@ -157,7 +159,7 @@ public class BookController extends AbstractController {
 
 		List<Object> bookBoIds = (List<Object>) json.get("bookBoIds");
 		for (Object boId : bookBoIds) {
-			Book book = bookService.findByBoId(boId.toString());
+			Book book = bookService.findById(Long.parseLong(boId.toString()));
 			if (book == null)
 				continue;
 
